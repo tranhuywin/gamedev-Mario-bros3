@@ -3,6 +3,8 @@
 #include <assert.h>
 #include "Utils.h"
 #include "Game.h"
+#include "Line.h"
+#include "Goomba.h"
 
 FireBullet::FireBullet()
 {
@@ -42,6 +44,15 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		else
 			OnPlatform = false;
 		vy = -FIRE_BULLET_SPEED_Y;
+		for (UINT i = 0; i < coEventsResult.size(); i++)
+		{
+			LPCOLLISIONEVENT e = coEventsResult[i];
+			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
+			{
+				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+				goomba->SetState(GOOMBA_STATE_DIE);
+			}
+		}
 
 	}
 	// clean up collision events

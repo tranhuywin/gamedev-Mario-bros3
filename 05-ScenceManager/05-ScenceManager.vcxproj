@@ -129,6 +129,7 @@
     <ClCompile Include="FireBullet.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="Koopas.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Portal.cpp" />
     <ClCompile Include="Tail.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="FireBullet.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="Koopas.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Portal.h" />
     <ClInclude Include="Tail.h" />

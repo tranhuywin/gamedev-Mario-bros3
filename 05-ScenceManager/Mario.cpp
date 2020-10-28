@@ -9,6 +9,7 @@
 #include "Portal.h"
 #include "Brick.h"
 #include "Tail.h"
+#include "Line.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -35,7 +36,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
  		IsLimitFlying = true;
 	}
 
-	DebugOut(L"Vx%f\n", vx);
+
 	CGameObject::Update(dt);
 	// Simple fall down
 	if (vx >= MARIO_MAX_SPEED_RUNNING)
@@ -135,7 +136,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	//ny = 0;
 	// No collision occured, proceed normally
-
+	//DebugOut(L"Vy%f\n", vy);
 	if (coEvents.size()==0)
 	{
 		x += dx;
@@ -145,9 +146,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	else
 	{
+		
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
+		float vyLine = vy;
 		// TODO: This is a very ugly designed function!!!!
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
@@ -171,7 +174,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		else
 			OnPlatform = false;
 
-		//DebugOut(L"OnPlatformCoEvent%d\n", OnPlatform);
 		if (ny == 1)
 			AllowJump = false;
 
@@ -193,7 +195,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 				else if (e->nx != 0 && Iskilling)
 				{
-					
 					goomba->SetState(GOOMBA_STATE_DIE);
 				}
 				else if (e->nx != 0 && !Iskilling)
@@ -212,7 +213,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 					}
 				}
-			} // if Goomba
+			} // TODO: Mario nhay dung tren tuong
+			else if (dynamic_cast<Line*>(e->obj))
+			{
+				if (e->ny > 0)		// o duoi len
+				{
+					AllowJump = true;
+					vy = vyLine;
+				}
+			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
@@ -308,7 +317,7 @@ void CMario::Render()
 			if (Iskilling && Kill)
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
 			if (vx < 0.1 && nx == -1)
-				ani = MARIO_ANI_SLIP_RIGHT;
+				ani = MARIO_ANI_RACCOON_SLIP_RIGHT;
 		}
 		else 
 		{
@@ -318,7 +327,7 @@ void CMario::Render()
 			if (Iskilling && Kill)
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;
 			if (vx > -0.1 && nx == 1)
-				ani = MARIO_ANI_SLIP_RIGHT;
+				ani = MARIO_ANI_RACCOON_SLIP_LEFT;
 		}
 		if (IsLimitRunning)
 			ani = MARIO_ANI_RACCOON_PREPARE_FLY_RIGHT;
@@ -371,7 +380,7 @@ void CMario::Render()
 	int alpha = 255;
 	if (untouchable) alpha = 128;
 	animation_set->at(ani)->Render(x, y, alpha);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 void CMario::SetState(int state)
