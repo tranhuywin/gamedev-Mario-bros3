@@ -12,7 +12,15 @@ FireBullet::FireBullet()
 }
 void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-
+	if (!IsBeingFired)
+	{
+		x = -OUTSIDE_MAP; y = OUTSIDE_MAP;
+		vx = 0; vy = 0;
+	}
+	if (x < CGame::GetInstance()->GetCamPosX())
+		IsBeingFired = false;
+	if (x > CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())
+ 		IsBeingFired = false;
 	CGameObject::Update(dt);
 	if ( PosPlatform - y > FIRE_BULLET_DISTANCE_PLATFORM)
 	{
@@ -32,6 +40,7 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
+		float vyLine = vy;
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.4f;
@@ -51,6 +60,15 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				goomba->SetState(GOOMBA_STATE_DIE);
+				this->IsBeingFired = false;
+			}
+			else if (dynamic_cast<Line*>(e->obj))
+			{
+				if (e->ny > 0)		// o duoi len
+				{
+					vy = vyLine;
+					y += dy;
+				}
 			}
 		}
 
@@ -74,6 +92,7 @@ void FireBullet::GetBoundingBox(float& left, float& top, float& right, float& bo
 }
 void FireBullet::attack(float x, float y, bool isRight)
 {
+	this->IsBeingFired = true;
 	this->x = x;
 	this->y = y;
 	if (isRight)

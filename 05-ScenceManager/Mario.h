@@ -16,6 +16,7 @@
 #define MARIO_DISTANCE_JUMP			70.0f
 #define MARIO_DISTANCE_SLOW_DROP	30.0f
 #define MARIO_FLY_SPEED_Y			0.008f
+#define	MARIO_OVER_LINE				3.0f
 
 #define MARIO_STATE_IDLE				0
 #define MARIO_STATE_WALKING_RIGHT		100
@@ -82,6 +83,7 @@
 #define MARIO_RACCOON_BBOX_WIDTH		24
 #define MARIO_RACCOON_BBOX_HEIGHT		32
 #define MARIO_RACCOON_KILL_BBOX_WIDTH	23
+#define	MARIO_RACCOON_BBOX_TAIL			10
 
 #define MARIO_UNTOUCHABLE_TIME			5000
 #define MARIO_KILL_TIME					500
@@ -117,8 +119,8 @@ class CMario : public CGameObject
 	
 	
 	bool IsLimitFlying;
-	FireBullet* firebullet = new FireBullet();
-
+	FireBullet* firebullet_1 = new FireBullet();
+	FireBullet* firebullet_2 = new FireBullet();
 public: 
 	bool OnPlatform;
 	bool IsFlying;

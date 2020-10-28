@@ -28,8 +28,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Calculate dx, dy 
 	
 
-	firebullet->Update(dt, coObjects);
-
+	firebullet_1->Update(dt, coObjects);
+	firebullet_2->Update(dt, coObjects);
 	if (y < 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2 && level == MARIO_LEVEL_RACCOON)
 	{
 		y = 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2;
@@ -213,13 +213,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 					}
 				}
-			} // TODO: Mario nhay dung tren tuong
+			}
 			else if (dynamic_cast<Line*>(e->obj))
 			{
 				if (e->ny > 0)		// o duoi len
 				{
 					AllowJump = true;
 					vy = vyLine;
+					y += dy;
 				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
@@ -235,8 +236,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 void CMario::Render()
 {
-	firebullet->Render();
-
+	firebullet_1->Render();
+	firebullet_2->Render();
 	int ani = -1;
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
@@ -301,7 +302,7 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_KILL_RIGHT;
 			}
 			else 
-			{ 
+			{
 				ani = MARIO_ANI_RACCOON_IDLE_LEFT; 
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
@@ -390,6 +391,7 @@ void CMario::SetState(int state)
 	switch (state)
 	{
 	case MARIO_STATE_KILL:
+
 		if (!Kill && level == MARIO_LEVEL_RACCOON)
 		{
 			Iskilling = true;
@@ -397,16 +399,24 @@ void CMario::SetState(int state)
 		}
 		if (level == MARIO_LEVEL_FIRE)
 		{
-			if(nx == 1)
-				firebullet->attack(this->x, this->y, true);
-			else
-				firebullet->attack(this->x, this->y, false);
+			
+			if (!firebullet_2->IsBeingFired && firebullet_1->IsBeingFired)		// vien 1 dc ban chua, r thi ban vien 2
+				if (nx == 1)
+					firebullet_2->attack(this->x, this->y, true);		//right == true
+				else
+					firebullet_2->attack(this->x, this->y, false);
+			if(!firebullet_1->IsBeingFired)
+				if(nx == 1)
+					firebullet_1->attack(this->x, this->y, true);		//right == true
+				else
+					firebullet_1->attack(this->x, this->y, false);
 			StartFireAttack();
 			break;
 		}
 	case MARIO_STATE_FAST_RUN:
 		if(level == MARIO_LEVEL_RACCOON)
 			IsRunning = true;
+		break;
 	case MARIO_STATE_WALKING_RIGHT:
 		if (!HaveInertia)
 			XHolding = x;
@@ -537,14 +547,14 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	case MARIO_LEVEL_RACCOON:
 		if (nx == 1)
 		{
-			//left += 5.0f;
+			left += MARIO_RACCOON_BBOX_TAIL;
 			//right = x + MARIO_RACCOON_BBOX_WIDTH;//+ 3.0f;
 			right = x + MARIO_RACCOON_BBOX_WIDTH;//+ 3.0f;
 
 		}
 		else
 		{
-			right = x + MARIO_RACCOON_BBOX_WIDTH;
+			right = x + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL;
 		}
 		bottom = y + MARIO_RACCOON_BBOX_HEIGHT;
 		if (Iskilling)

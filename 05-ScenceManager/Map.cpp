@@ -63,7 +63,7 @@ void TileMap::LoadTextureToSprites()
 void TileMap::Draw()
 {	
 	int FirstCol = (int)CGame::GetInstance()->GetCamPosX() / TileSetWidth;
-	int LastCol = FirstCol + (SCREEN_WIDTH / TileSetWidth);
+	int LastCol = FirstCol + (CGame::GetInstance()->GetScreenWidth() / TileSetWidth);
 	for (int currentRow = 0; currentRow < NumRowOnTilemap; currentRow++)
 	{
 		for (int currentColumn = FirstCol; currentColumn <= LastCol; currentColumn++)
