@@ -2,7 +2,7 @@
 void Ground::Render()
 {
 	//animation_set->at(5)->Render(x, y);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 void Ground::GetBoundingBox(float& l, float& t, float& r, float& b)

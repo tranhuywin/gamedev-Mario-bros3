@@ -333,7 +333,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_SPACE:
 		mario->SetState(MARIO_STATE_JUMP);
 		break;
-	case DIK_D:			//TODO: dung yen k attack
+	case DIK_Q:			//TODO: dung yen k attack
 		DebugOut(L"Fired\n");
 		mario->SetState(MARIO_STATE_KILL);
 		break;

@@ -401,16 +401,22 @@ void CMario::SetState(int state)
 		{
 			
 			if (!firebullet_2->IsBeingFired && firebullet_1->IsBeingFired)		// vien 1 dc ban chua, r thi ban vien 2
+			{
 				if (nx == 1)
 					firebullet_2->attack(this->x, this->y, true);		//right == true
 				else
 					firebullet_2->attack(this->x, this->y, false);
-			if(!firebullet_1->IsBeingFired)
-				if(nx == 1)
+				StartFireAttack();
+			}
+			if (!firebullet_1->IsBeingFired)
+			{
+				if (nx == 1)
 					firebullet_1->attack(this->x, this->y, true);		//right == true
 				else
 					firebullet_1->attack(this->x, this->y, false);
-			StartFireAttack();
+				StartFireAttack();
+			}
+			
 			break;
 		}
 	case MARIO_STATE_FAST_RUN:
