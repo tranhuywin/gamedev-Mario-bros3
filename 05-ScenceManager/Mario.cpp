@@ -27,7 +27,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	// Calculate dx, dy 
 	
-
 	firebullet_1->Update(dt, coObjects);
 	firebullet_2->Update(dt, coObjects);
 	if (y < 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2 && level == MARIO_LEVEL_RACCOON)
@@ -251,12 +250,16 @@ void CMario::Render()
 				ani = MARIO_ANI_BIG_IDLE_RIGHT;
 				if (AllowJump)
 					ani = MARIO_ANI_BIG_JUMP_RIGHT;
+				if (IsBendingOver)
+					ani = MARIO_ANI_BIG_BEND_OVER_RIGHT;
 			}
 
 			else {
 				ani = MARIO_ANI_BIG_IDLE_LEFT;
 				if (AllowJump)
 					ani = MARIO_ANI_BIG_JUMP_LEFT;
+				if (IsBendingOver)
+					ani = MARIO_ANI_BIG_BEND_OVER_LEFT;
 			}
 			
 		}
@@ -266,6 +269,8 @@ void CMario::Render()
 				ani = MARIO_ANI_SLIP_RIGHT;
 			if (AllowJump)
 				ani = MARIO_ANI_BIG_JUMP_RIGHT;
+			if (IsBendingOver)
+				ani = MARIO_ANI_BIG_BEND_OVER_RIGHT;
 
 		}
 		else {
@@ -274,6 +279,8 @@ void CMario::Render()
 				ani = MARIO_ANI_SLIP_LEFT;
 			if (AllowJump)
 				ani = MARIO_ANI_BIG_JUMP_LEFT;
+			if (IsBendingOver)
+				ani = MARIO_ANI_BIG_BEND_OVER_LEFT;
 		}
 	}
 	else if (level == MARIO_LEVEL_SMALL)
@@ -300,6 +307,8 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 				if (Iskilling && Kill)
 					ani = MARIO_ANI_RACCOON_KILL_RIGHT;
+				if (IsBendingOver)
+					ani = MARIO_ANI_RACCOON_BEND_OVER_RIGHT;
 			}
 			else 
 			{
@@ -308,6 +317,8 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
 				if (Iskilling && Kill)
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
+				if (IsBendingOver)
+					ani = MARIO_ANI_RACCOON_BEND_OVER_LEFT;
 			}
 		}
 		else if (vx > 0)
@@ -319,6 +330,8 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
 			if (vx < 0.1 && nx == -1)
 				ani = MARIO_ANI_RACCOON_SLIP_RIGHT;
+			if (IsBendingOver)
+				ani = MARIO_ANI_RACCOON_BEND_OVER_RIGHT;
 		}
 		else 
 		{
@@ -329,6 +342,8 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;
 			if (vx > -0.1 && nx == 1)
 				ani = MARIO_ANI_RACCOON_SLIP_LEFT;
+			if (IsBendingOver)
+				ani = MARIO_ANI_RACCOON_BEND_OVER_LEFT;
 		}
 		if (IsLimitRunning)
 			ani = MARIO_ANI_RACCOON_PREPARE_FLY_RIGHT;
@@ -481,9 +496,32 @@ void CMario::SetState(int state)
 		AllowJump = false;
 		IsJumping = false;
 		break;
+	case MARIO_STATE_STAND:
+		if (IsBendingOver)
+		{
+			if (level == MARIO_LEVEL_BIG)
+				this->y -= MARIO_BIG_STAND_Y;
+			if (level == MARIO_LEVEL_RACCOON)
+				this->y -= MARIO_RACCOON_STAND_Y;
+		}
+		IsBendingOver = false;
+		
+		break;
+	case MARIO_STATE_BEND_OVER:
+		if (!IsBendingOver)
+		{
+			if (level == MARIO_LEVEL_BIG)
+				this->y += MARIO_Y_BEND_OVER;
+			if (level == MARIO_LEVEL_RACCOON)
+				this->y += MARIO_Y_BEND_OVER;
+		}
+			
+		
+		IsBendingOver = true;
 	case MARIO_STATE_IDLE: 
 		IsRunning = false;
 		IsLimitRunning = false;
+		//IsBendingOver = false;
 		if (x - XHolding > MARIO_DISTANCE_INERTIA) // khoan cach bi vang
 		{
 			if (vx > 0.0f)
@@ -498,12 +536,6 @@ void CMario::SetState(int state)
 					
 				break;							//thoat khoi case khong cho nhay? xuong if else duoi(vx =0)
 			}
-			//else
-			//{
-			//	vx = 0;
-			//	HaveInertia = false;
-			//	break;
-			//}
 		}
 		if (XHolding - x > MARIO_DISTANCE_INERTIA)
 		{
@@ -549,6 +581,12 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	case MARIO_LEVEL_BIG:
 		right = x + MARIO_BIG_BBOX_WIDTH;
 		bottom = y + MARIO_BIG_BBOX_HEIGHT;
+		if (IsBendingOver == true)
+		{
+			right = x + 14.0f;
+			bottom = y + 18.0f;
+		}
+			
 		break;
 	case MARIO_LEVEL_RACCOON:
 		if (nx == 1)
@@ -565,6 +603,11 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		bottom = y + MARIO_RACCOON_BBOX_HEIGHT;
 		if (Iskilling)
 			right = x + MARIO_RACCOON_KILL_BBOX_WIDTH;
+		if (IsBendingOver == true)
+		{
+			right = x + 22.0f;
+			bottom = y + 18.0f;
+		}
 		break;
 	case MARIO_LEVEL_SMALL:
 		right = x + MARIO_SMALL_BBOX_WIDTH;
