@@ -26,6 +26,12 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		vy = FIRE_BULLET_SPEED_Y;
 	}
+	if (GetTickCount() - Explode_start > 400)
+	{
+		Explode_start = 0;
+		Explode = 0;
+	}
+	else IsBeingFired = false;
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -60,7 +66,10 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				goomba->SetState(GOOMBA_STATE_DIE);
-				this->IsBeingFired = false;
+				//this->IsBeingFired = false;
+				StartExplode();
+				XExplode = x;
+				YExplode = y;
 			}
 			else if (dynamic_cast<Line*>(e->obj))
 			{
@@ -80,6 +89,12 @@ void FireBullet::Render()
 {
 	int ani = 0;
 	int alpha = 255;
+	if (Explode)
+	{
+		ani = FIRE_BULLET_ANI_EXPLODE;
+		this->x = XExplode;
+		this->y = YExplode;
+	}
 	animation_set->at(ani)->Render(x, y, alpha);
 	//RenderBoundingBox();
 }

@@ -367,6 +367,8 @@ void CMario::Render()
 					ani = MARIO_ANI_FIRE_JUMP_RIGHT;
 				if (FireAttack)
 					ani = MARIO_ANI_FIRE_ATTACK_RIGHT;
+				if (IsBendingOver)
+					ani = MARIO_ANI_FIRE_BEND_OVER_RIGHT;
 			}
 			else {
 				ani = MARIO_ANI_FIRE_IDLE_LEFT;
@@ -374,6 +376,8 @@ void CMario::Render()
 					ani = MARIO_ANI_FIRE_JUMP_LEFT;
 				if (FireAttack)
 					ani = MARIO_ANI_FIRE_ATTACK_LEFT;
+				if (IsBendingOver)
+					ani = MARIO_ANI_FIRE_BEND_OVER_LEFT;
 			}
 		}
 		else if (vx > 0)
@@ -383,6 +387,10 @@ void CMario::Render()
 				ani = MARIO_ANI_FIRE_JUMP_RIGHT;
 			if (FireAttack)
 				ani = MARIO_ANI_FIRE_ATTACK_RIGHT;
+			if(vx < 0.1 && nx == -1)
+				ani = MARIO_ANI_FIRE_SLIP_RIGHT;
+			if (IsBendingOver)
+				ani = MARIO_ANI_FIRE_BEND_OVER_RIGHT;
 		}
 		else 
 		{
@@ -391,6 +399,10 @@ void CMario::Render()
 				ani = MARIO_ANI_FIRE_JUMP_LEFT;
 			if (FireAttack)
 				ani = MARIO_ANI_FIRE_ATTACK_LEFT;
+			if (vx > -0.1 && nx == 1)
+				ani = MARIO_ANI_FIRE_SLIP_LEFT;
+			if (IsBendingOver)
+				ani = MARIO_ANI_FIRE_BEND_OVER_LEFT;
 		}
 	}
 	int alpha = 255;
@@ -475,19 +487,21 @@ void CMario::SetState(int state)
 		{
 			AllowJump = true;
 			YHolding = y;
-			IsSlowDropping = false;
+			if(level == MARIO_LEVEL_RACCOON)
+				IsSlowDropping = false;
 		}
 		if (!AllowJump)
 		{
-   			IsSlowDropping = true;
+			if (level == MARIO_LEVEL_RACCOON)
+   				IsSlowDropping = true;
 			YHolding = y;
 		}
-		
-		if (IsLimitRunning)
-		{
-			IsFlying = true;
-			Startfly();
-		}
+		if (level == MARIO_LEVEL_RACCOON)
+			if (IsLimitRunning)
+			{
+				IsFlying = true;
+				Startfly();
+			}
 			
 		IsJumping = true;
 		OnPlatform = false;
@@ -499,7 +513,7 @@ void CMario::SetState(int state)
 	case MARIO_STATE_STAND:
 		if (IsBendingOver)
 		{
-			if (level == MARIO_LEVEL_BIG)
+			if (level == MARIO_LEVEL_BIG || level == MARIO_LEVEL_FIRE)
 				this->y -= MARIO_BIG_STAND_Y;
 			if (level == MARIO_LEVEL_RACCOON)
 				this->y -= MARIO_RACCOON_STAND_Y;
@@ -510,9 +524,9 @@ void CMario::SetState(int state)
 	case MARIO_STATE_BEND_OVER:
 		if (!IsBendingOver)
 		{
-			if (level == MARIO_LEVEL_BIG)
+			/*if (level == MARIO_LEVEL_BIG)
 				this->y += MARIO_Y_BEND_OVER;
-			if (level == MARIO_LEVEL_RACCOON)
+			if (level == MARIO_LEVEL_RACCOON)*/
 				this->y += MARIO_Y_BEND_OVER;
 		}
 			
@@ -521,7 +535,6 @@ void CMario::SetState(int state)
 	case MARIO_STATE_IDLE: 
 		IsRunning = false;
 		IsLimitRunning = false;
-		//IsBendingOver = false;
 		if (x - XHolding > MARIO_DISTANCE_INERTIA) // khoan cach bi vang
 		{
 			if (vx > 0.0f)
