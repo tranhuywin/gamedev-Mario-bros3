@@ -66,7 +66,6 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				goomba->SetState(GOOMBA_STATE_DIE);
-				//this->IsBeingFired = false;
 				StartExplode();
 				XExplode = x;
 				YExplode = y;

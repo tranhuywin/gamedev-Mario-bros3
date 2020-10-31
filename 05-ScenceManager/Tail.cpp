@@ -7,34 +7,36 @@
 #include "Tail.h"
 #include "Goomba.h"
 
-Tail::Tail(float x, float y) : CGameObject()
+Tail::Tail()
 {
-	this->x = x - 5.0f;
-	this->y = y;
+	//this->SetPosition(-100, 100);
+	this->SetAnimationSet(CAnimationSets::GetInstance()->Get(2));
 }
 
 void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	//if (!IsKilling)
 	//	return;
-
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
+	CalcPotentialCollisions(coObjects, coEvents);
+
 	if (coEvents.size() != 0)
 	{
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
-
+		//TODO: tail attack
+		DebugOut(L"collision Goomba\n");
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-		DebugOut(L"Prepare collision\n");
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
+			DebugOut(L"collision Goomba\n");
 			LPCOLLISIONEVENT e = coEventsResult[i];
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
-				DebugOut(L"collision Goomba\n");
+				
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				if (goomba->GetState() != GOOMBA_STATE_DIE)
 				{
@@ -42,18 +44,26 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 			}
 		}
-		for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	}
+	// clean up collision events
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
 void Tail::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	left = x + 30.0f;
+	left = x;
 	top = y;
-	right = x + 70.0f;
+	right = x + 50.0f;
 	bottom = y + 28.0f;
-	DebugOut(L"BBox tail\n");
 }
 void Tail::Render()
 {
+	int ani = 0;
+	int alpha = 255;
+	animation_set->at(ani)->Render(x, y, alpha);
 	RenderBoundingBox();
+}
+void Tail::Attack(float x, float y)
+{
+	this->x = x;
+	this->y = y;
 }

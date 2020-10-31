@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Game.h"
 #include "FireBullet.h"
+#include "Tail.h"
 
 #define MARIO_WALKING_SPEED				0.1f 
 #define MARIO_MAX_SPEED_RUNNING			0.25f 
@@ -133,6 +134,7 @@ class CMario : public CGameObject
 	bool IsLimitFlying;
 	FireBullet* firebullet_1 = new FireBullet();
 	FireBullet* firebullet_2 = new FireBullet();
+	Tail* TailofRaccoon = new Tail();
 public: 
 	bool OnPlatform;
 	bool IsFlying;

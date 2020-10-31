@@ -29,6 +29,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	
 	firebullet_1->Update(dt, coObjects);
 	firebullet_2->Update(dt, coObjects);
+	TailofRaccoon->Update(dt, coObjects);
 	if (y < 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2 && level == MARIO_LEVEL_RACCOON)
 	{
 		y = 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2;
@@ -407,7 +408,10 @@ void CMario::Render()
 	}
 	int alpha = 255;
 	if (untouchable) alpha = 128;
-	animation_set->at(ani)->Render(x, y, alpha);
+	if(level == MARIO_LEVEL_RACCOON && nx == 1)			// tru di vi tri cai duoi
+		animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+	else
+		animation_set->at(ani)->Render(x, y, alpha);
 	RenderBoundingBox();
 }
 
@@ -422,6 +426,7 @@ void CMario::SetState(int state)
 		if (!Kill && level == MARIO_LEVEL_RACCOON)
 		{
 			Iskilling = true;
+			TailofRaccoon->Attack(this->x, this->y);
 			StartKill();
 		}
 		if (level == MARIO_LEVEL_FIRE)
@@ -524,9 +529,6 @@ void CMario::SetState(int state)
 	case MARIO_STATE_BEND_OVER:
 		if (!IsBendingOver)
 		{
-			/*if (level == MARIO_LEVEL_BIG)
-				this->y += MARIO_Y_BEND_OVER;
-			if (level == MARIO_LEVEL_RACCOON)*/
 				this->y += MARIO_Y_BEND_OVER;
 		}
 			
@@ -605,7 +607,6 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		if (nx == 1)
 		{
 			left += MARIO_RACCOON_BBOX_TAIL;
-			//right = x + MARIO_RACCOON_BBOX_WIDTH;//+ 3.0f;
 			right = x + MARIO_RACCOON_BBOX_WIDTH;//+ 3.0f;
 
 		}
