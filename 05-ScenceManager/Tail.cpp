@@ -9,14 +9,11 @@
 
 Tail::Tail()
 {
-	//this->SetPosition(-100, 100);
-	this->SetAnimationSet(CAnimationSets::GetInstance()->Get(2));
 }
 
 void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	//if (!IsKilling)
-	//	return;
+	CGameObject::Update(dt);
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -28,11 +25,9 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float rdx = 0;
 		float rdy = 0;
 		//TODO: tail attack
-		DebugOut(L"collision Goomba\n");
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
-			DebugOut(L"collision Goomba\n");
 			LPCOLLISIONEVENT e = coEventsResult[i];
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
@@ -50,20 +45,26 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 }
 void Tail::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	left = x;
+	left = x - TAIL_BBOX_WIDTH;
 	top = y;
-	right = x + 50.0f;
-	bottom = y + 28.0f;
+	right = x + TAIL_BBOX_WIDTH;
+	bottom = y + RACCOON_BBOX_HIGHT;
 }
 void Tail::Render()
 {
-	int ani = 0;
-	int alpha = 255;
-	animation_set->at(ani)->Render(x, y, alpha);
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
-void Tail::Attack(float x, float y)
+void Tail::Attack(float x, float y, bool IsKilling)
 {
-	this->x = x;
-	this->y = y;
+	this->IsKilling = IsKilling;
+	if (this->IsKilling)
+	{
+		this->x = x;
+		this->y = y;
+	}
+	else
+	{
+		this->x = -OUTSIDE_MAP;
+		this->y = OUTSIDE_MAP;
+	}
 }
