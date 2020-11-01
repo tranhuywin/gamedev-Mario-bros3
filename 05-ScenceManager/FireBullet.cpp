@@ -26,7 +26,7 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		vy = FIRE_BULLET_SPEED_Y;
 	}
-	if (GetTickCount() - Explode_start > 400)
+	if (GetTickCount() - Explode_start > FIRE_BULLET_EXPLODE_TIME)
 	{
 		Explode_start = 0;
 		Explode = 0;
@@ -43,6 +43,7 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	else
 	{
+		DebugOut(L"CoEvents%d\n", coEvents.size());
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
@@ -76,6 +77,13 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					vy = vyLine;
 					y += dy;
+				}
+
+				if (e->nx != 0 && coEvents.size() == 1)
+				{
+					StartExplode();
+					XExplode = x;
+					YExplode = y;
 				}
 			}
 		}

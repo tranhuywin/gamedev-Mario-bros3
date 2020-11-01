@@ -1,12 +1,13 @@
 #pragma once
 #include "GameObject.h"
 #define FIRE_BULLET_BBOX_WIDTH			8
-#define FIRE_BULLET_SPEED_Y				0.1f
-#define FIRE_BULLET_SPEED_X				0.1f
-#define FIRE_BULLET_DISTANCE_PLATFORM	30.0f
+#define FIRE_BULLET_SPEED_Y				0.08f
+#define FIRE_BULLET_SPEED_X				0.12f
+#define FIRE_BULLET_DISTANCE_PLATFORM	20.0f
 #define OUTSIDE_MAP						500.0f
 
 #define FIRE_BULLET_ANI_EXPLODE			1
+#define FIRE_BULLET_EXPLODE_TIME		400
 class FireBullet : public CGameObject
 {
 	float PosPlatform;

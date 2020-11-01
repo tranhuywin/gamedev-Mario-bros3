@@ -308,8 +308,15 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
 				if(!AllowJump && !OnPlatform)
 					ani = MARIO_ANI_RACCOON_DROP_RIGHT;
-				if (Iskilling && Kill)
+				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_RIGHT;
+					if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
+					{
+						ani = MARIO_ANI_RACCOON_KILL_LEFT;
+					}
+						
+				}
+					
 				if (IsBendingOver)
 					ani = MARIO_ANI_RACCOON_BEND_OVER_RIGHT;
 			}
@@ -318,8 +325,13 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_IDLE_LEFT; 
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-				if (Iskilling && Kill)
+				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
+					if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
+					{
+						ani = MARIO_ANI_RACCOON_KILL_RIGHT;
+					}
+				}
 				if (IsBendingOver)
 					ani = MARIO_ANI_RACCOON_BEND_OVER_LEFT;
 			}
@@ -329,8 +341,14 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_RIGHT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
-			if (Iskilling && Kill)
+			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
+				if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
+				{
+					ani = MARIO_ANI_RACCOON_KILL_LEFT;
+				}
+
+			}
 			if (vx < 0.1 && nx == -1)
 				ani = MARIO_ANI_RACCOON_SLIP_RIGHT;
 			if (IsBendingOver)
@@ -341,8 +359,13 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_LEFT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-			if (Iskilling && Kill)
+			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;
+				if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
+				{
+					ani = MARIO_ANI_RACCOON_KILL_RIGHT;
+				}
+			}
 			if (vx > -0.1 && nx == 1)
 				ani = MARIO_ANI_RACCOON_SLIP_LEFT;
 			if (IsBendingOver)
@@ -410,10 +433,25 @@ void CMario::Render()
 	}
 	int alpha = 255;
 	if (untouchable) alpha = 128;
-	if(level == MARIO_LEVEL_RACCOON && nx == 1)			// tru di vi tri cai duoi
-		animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+
+	if (level == MARIO_LEVEL_RACCOON && nx == 1)			// tru` di vi tri cai duoi
+	{
+		if (ani == MARIO_ANI_RACCOON_KILL_LEFT)
+			animation_set->at(ani)->Render(x - MARIO_KILL_LEFT_TAIL, y, alpha);
+		else
+			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+		
+	}
+	else if (level == MARIO_LEVEL_RACCOON && nx == -1 && Kill)
+	{
+		if (ani == MARIO_ANI_RACCOON_KILL_RIGHT)
+			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+		else
+			animation_set->at(ani)->Render(x, y, alpha);
+	}
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
+	
 	RenderBoundingBox();
 }
 
