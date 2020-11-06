@@ -24,7 +24,6 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
-		//TODO: tail attack
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{

@@ -63,17 +63,20 @@ void TileMap::LoadTextureToSprites()
 void TileMap::Draw()
 {	
 	int FirstCol = (int)CGame::GetInstance()->GetCamPosX() / TileSetWidth;
-	int LastCol = FirstCol + (CGame::GetInstance()->GetScreenWidth() / TileSetWidth);
-	for (int currentRow = 0; currentRow < NumRowOnTilemap; currentRow++)
+	int LastCol = FirstCol + (CGame::GetInstance()->GetScreenWidth() / TileSetWidth) + 1;
+
+	int FirstRow = (int)CGame::GetInstance()->GetCamPosY() / TileSetHeight;
+	int LastRow = FirstRow + (CGame::GetInstance()->GetScreenHeight() / TileSetHeight) + 1;
+
+	for (int currentRow = FirstRow; currentRow <= LastRow; currentRow++)
 	{
 		for (int currentColumn = FirstCol; currentColumn <= LastCol; currentColumn++)
 		{
 			float x = TileSetWidth * (currentColumn - FirstCol) + CGame::GetInstance()->GetCamPosX() - (int)(CGame::GetInstance()->GetCamPosX()) % TileSetWidth;
-			float y = TileSetHeight * currentRow; 
+			float y = TileSetHeight * (currentRow - FirstRow) + CGame::GetInstance()->GetCamPosY() - (int)(CGame::GetInstance()->GetCamPosY()) % TileSetHeight;
 			CSprites::GetInstance()->Get(tilemap[currentRow][currentColumn] + id)->Draw(x, y);
 		}
 	}
-
 }
 float TileMap::GetHeightMap()
 {

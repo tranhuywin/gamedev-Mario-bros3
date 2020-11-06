@@ -10,6 +10,7 @@
 #include "Brick.h"
 #include "Tail.h"
 #include "Line.h"
+#include "Koopas.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -23,10 +24,14 @@ CMario::CMario(float x, float y) : CGameObject()
 	this->y = y; 
 }
 
-void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	// Calculate dx, dy 
-	
+	if (!Iskilling && SkillOn)
+	{
+		PrepareCatch = true;
+		IsFlying = false;
+	}
 	firebullet_1->Update(dt, coObjects);
 	firebullet_2->Update(dt, coObjects);
 	TailofRaccoon->Update(dt, coObjects);
@@ -35,8 +40,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		y = 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2;
  		IsLimitFlying = true;
 	}
-
-
 	CGameObject::Update(dt);
 	// Simple fall down
 	if (vx >= MARIO_MAX_SPEED_RUNNING)
@@ -49,12 +52,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		vx = -MARIO_MAX_SPEED_RUNNING;
 		IsLimitRunning = true;
 	}
-	else
-		IsLimitRunning = false;
-	
+	else IsLimitRunning = false;
 	if (IsFlying && Fly)
 	{
-		DebugOut(L"IsLimitFlying%d\n", IsLimitFlying);
 		if (!IsLimitFlying)
 		{
 			vy = -MARIO_FLY_SPEED_Y * dt;
@@ -74,7 +74,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			vy = 0;
 		}
 	}
-
 	if (AllowJump)
 	{
 		vy = -MARIO_JUMP_SPEED_Y * dt;
@@ -93,8 +92,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	if (YHolding - y > MARIO_DISTANCE_JUMP)
 		AllowJump = false;
-	
-	
+	if (IsCatching && Shell != NULL)
+		Shell->BeCatch(this, this->y + 5);
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -147,7 +146,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	else
 	{
-		
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
@@ -210,7 +208,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 								StartUntouchable();
 							}
 							else
-								SetState(MARIO_STATE_DIE);
+								SetState(MARIO_STATE_DIE);	
 						}
 					}
 				}
@@ -222,6 +220,26 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					AllowJump = true;
 					vy = vyLine;
 					y += dy;
+				}
+
+			}
+			else if (dynamic_cast<CKoopas*>(e->obj))
+			{
+				Shell = dynamic_cast<CKoopas*>(e->obj);
+				if (e->nx != 0 && Iskilling)
+				{
+					Shell->SetState(KOOPAS_STATE_SHELL);
+				}
+				if (e->nx != 0 && Shell->GetState() == KOOPAS_STATE_SHELL)
+				{
+					if (PrepareCatch)
+					{
+						//if (e->nx == -1)
+						//	Shell->SetPosition(this->x + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL + 2.5, this->y + 5);
+						//else
+						//	Shell->SetPosition(this->x - KOOPAS_BBOX_WIDTH - 2.5, this->y + 5);
+						IsCatching = true;
+					}
 				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
@@ -236,7 +254,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 }
 
 void CMario::Render()
-{
+{	//TO DO: Check render slip mario x
 	firebullet_1->Render();
 	firebullet_2->Render();
 	TailofRaccoon->Render();
@@ -316,7 +334,8 @@ void CMario::Render()
 					}
 						
 				}
-					
+				if (IsCatching)
+					ani = MARIO_ANI_RACCOON_CATCHING_IDLE_RIGHT;
 				if (IsBendingOver)
 					ani = MARIO_ANI_RACCOON_BEND_OVER_RIGHT;
 			}
@@ -332,6 +351,8 @@ void CMario::Render()
 						ani = MARIO_ANI_RACCOON_KILL_RIGHT;
 					}
 				}
+				if (IsCatching)
+					ani = MARIO_ANI_RACCOON_CATCHING_IDLE_LEFT;
 				if (IsBendingOver)
 					ani = MARIO_ANI_RACCOON_BEND_OVER_LEFT;
 			}
@@ -351,6 +372,8 @@ void CMario::Render()
 			}
 			if (vx < 0.1 && nx == -1)
 				ani = MARIO_ANI_RACCOON_SLIP_RIGHT;
+			if (IsCatching)
+				ani = MARIO_ANI_RACCOON_CATCHING_WALKING_RIGHT;
 			if (IsBendingOver)
 				ani = MARIO_ANI_RACCOON_BEND_OVER_RIGHT;
 		}
@@ -368,10 +391,12 @@ void CMario::Render()
 			}
 			if (vx > -0.1 && nx == 1)
 				ani = MARIO_ANI_RACCOON_SLIP_LEFT;
+			if (IsCatching)
+				ani = MARIO_ANI_RACCOON_CATCHING_WALKING_LEFT;
 			if (IsBendingOver)
 				ani = MARIO_ANI_RACCOON_BEND_OVER_LEFT;
 		}
-		if (IsLimitRunning)
+		if (IsLimitRunning && !IsCatching)
 			ani = MARIO_ANI_RACCOON_PREPARE_FLY_RIGHT;
 		if (IsFlying)
 			ani = MARIO_ANI_RACCOON_FLY_RIGHT;
@@ -465,9 +490,11 @@ void CMario::SetState(int state)
 
 		if (!Kill && level == MARIO_LEVEL_RACCOON)
 		{
+			SkillOn = true;
 			Iskilling = true;
 			TailofRaccoon->Attack(this->x, this->y, Iskilling);
 			StartKill();
+			PrepareCatch = false;
 		}
 		if (level == MARIO_LEVEL_FIRE)
 		{
@@ -508,8 +535,9 @@ void CMario::SetState(int state)
 		if (vx == 0 && !IsRunning)
 			vx = MARIO_WALKING_SPEED;
 		if (IsRunning && vx < MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
-			vx += 0.002f;
-		nx = 1;
+			vx += 0.0014f;
+		if(vx > 0)
+			nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT: 
 		if (!HaveInertia)
@@ -524,8 +552,9 @@ void CMario::SetState(int state)
 		if(vx == 0 && !IsRunning)
 			vx = -MARIO_WALKING_SPEED;
 		if (IsRunning && vx != -MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
-			vx -= 0.002f;
-		nx = -1;
+			vx -= 0.0014f;
+		if(vx < 0)
+			nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
 		if (OnPlatform && !IsJumping)						// check mario on a platform
@@ -547,13 +576,17 @@ void CMario::SetState(int state)
 				IsFlying = true;
 				Startfly();
 			}
-			
 		IsJumping = true;
 		OnPlatform = false;
 		break; 
 	case MARIO_STATE_DROP:
 		AllowJump = false;
 		IsJumping = false;
+		break;
+	case MARIO_STATE_SKILL_OFF:
+		SkillOn = false;
+		PrepareCatch = false;
+		IsCatching = false;
 		break;
 	case MARIO_STATE_STAND:
 		if (IsBendingOver)
@@ -563,16 +596,13 @@ void CMario::SetState(int state)
 			if (level == MARIO_LEVEL_RACCOON)
 				this->y -= MARIO_RACCOON_STAND_Y;
 		}
-		IsBendingOver = false;
-		
+		IsBendingOver = false;	
 		break;
 	case MARIO_STATE_BEND_OVER:
 		if (!IsBendingOver)
 		{
 				this->y += MARIO_Y_BEND_OVER;
 		}
-			
-		
 		IsBendingOver = true;
 	case MARIO_STATE_IDLE: 
 		IsRunning = false;
@@ -641,22 +671,17 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 			right = x + 14.0f;
 			bottom = y + 18.0f;
 		}
-			
 		break;
 	case MARIO_LEVEL_RACCOON:
-		if (nx == 1)
+		if (vx > 0)
 		{
-			//left += MARIO_RACCOON_BBOX_TAIL - 8;
-			right = x  + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL;//+ 3.0f;
-
+			right = x  + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL;
 		}
 		else
 		{
 			right = x + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL;
 		}
 		bottom = y + MARIO_RACCOON_BBOX_HEIGHT;
-		/*if (Iskilling)
-			right = x + MARIO_RACCOON_KILL_BBOX_WIDTH;*/
 		if (IsBendingOver == true)
 		{
 			right = x + 22.0f;

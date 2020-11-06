@@ -1,8 +1,14 @@
 #include "Koopas.h"
+#include "Utils.h"
+#include <algorithm>
+#include <assert.h>
+#include "Game.h"
+#include "Mario.h"
 
 CKoopas::CKoopas()
 {
 	SetState(KOOPAS_STATE_WALKING);
+	this->SetAnimationSet(CAnimationSets::GetInstance()->Get(8));
 }
 
 void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &bottom)
@@ -11,23 +17,16 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 	top = y;
 	right = x + KOOPAS_BBOX_WIDTH;
 
-	if (state == KOOPAS_STATE_DIE)
-		bottom = y + KOOPAS_BBOX_HEIGHT_DIE;
+	if (state == KOOPAS_STATE_SHELL)
+		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL;
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT;
 }
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	CGameObject::Update(dt, coObjects);
-
-	//
-	// TO-DO: make sure Koopas can interact with the world and to each of them too!
-	// 
-
-	x += dx;
-	y += dy;
-
+	//vy = 0.01f * dt;
+	CGameObject::Update(dt);
 	if (vx < 0 && x < 0) {
 		x = 0; vx = -vx;
 	}
@@ -35,16 +34,49 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	if (vx > 0 && x > 290) {
 		x = 290; vx = -vx;
 	}
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
+	coEvents.clear();
+	//CalcPotentialCollisions(coObjects, coEvents);
+
+	if (coEvents.size() == 0)
+	{
+		x += dx;
+		y += dy;
+	}
+	else
+	{
+		float min_tx, min_ty, nx = 0, ny;
+		float rdx = 0;
+		float rdy = 0;
+
+		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+			x += min_tx * dx + nx * 0.4f;
+			y += min_ty * dy + ny * 0.4f;
+		vx = -vx;
+		if (nx != 0)
+			vx = 0;
+		if (ny != 0)
+			vy = 0;
+	}
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
 
 void CKoopas::Render()
 {
 	int ani = KOOPAS_ANI_WALKING_LEFT;
-	if (state == KOOPAS_STATE_DIE) {
-		ani = KOOPAS_ANI_DIE;
+	if (state == KOOPAS_STATE_SHELL) {
+		ani = KOOPAS_ANI_SHELL;
 	}
-	else if (vx > 0) ani = KOOPAS_ANI_WALKING_RIGHT;
-	else if (vx <= 0) ani = KOOPAS_ANI_WALKING_LEFT;
+	else if (state == KOOPAS_STATE_ROTATORY)
+	{
+		if (vx > 0)
+			ani = KOOPAS_ANI_ROTATORY_RIGHT;
+		else
+			ani = KOOPAS_ANI_ROTATORY_LEFT; 
+	}
+	else if (vx > 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_RIGHT;
+	else if (vx <= 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_LEFT;
 
 	animation_set->at(ani)->Render(x, y);
 
@@ -56,13 +88,24 @@ void CKoopas::SetState(int state)
 	CGameObject::SetState(state);
 	switch (state)
 	{
-	case KOOPAS_STATE_DIE:
-		y += KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_DIE + 1;
+	case KOOPAS_STATE_SHELL:
+		//y += KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL + 1;
 		vx = 0;
 		vy = 0;
 		break;
+	case KOOPAS_STATE_ROTATORY:
+		vx = KOOPAS_ROTATORY_SPEED;
 	case KOOPAS_STATE_WALKING:
 		vx = KOOPAS_WALKING_SPEED;
 	}
+}
 
+void CKoopas::BeCatch(LPGAMEOBJECT mario, float YShell)
+{
+	float XMario, YMario;
+	mario->GetPosition(XMario, YMario);
+	if(mario->vx > 0)
+			this->SetPosition(XMario + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL -  3, YShell);
+	if(mario->vx < 0)
+		this->SetPosition(XMario - KOOPAS_BBOX_WIDTH + 3, YShell);
 }

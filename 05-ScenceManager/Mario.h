@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "FireBullet.h"
 #include "Tail.h"
+#include "Koopas.h"
 
 #define MARIO_WALKING_SPEED				0.1f 
 #define MARIO_MAX_SPEED_RUNNING			0.25f 
@@ -35,6 +36,8 @@
 #define MARIO_STATE_FAST_RUN			800
 #define MARIO_STATE_BEND_OVER			900
 #define MARIO_STATE_STAND				1000
+#define MARIO_STATE_SKILL_ON			1100
+#define MARIO_STATE_SKILL_OFF			1200
 
 #define MARIO_ANI_BIG_IDLE_RIGHT			0
 #define MARIO_ANI_BIG_IDLE_LEFT				1
@@ -68,20 +71,24 @@
 #define MARIO_ANI_BIG_BEND_OVER_LEFT		28
 #define MARIO_ANI_RACCOON_BEND_OVER_RIGHT	29
 #define MARIO_ANI_RACCOON_BEND_OVER_LEFT	30
-#define MARIO_ANI_DIE						31
+#define MARIO_ANI_RACCOON_CATCHING_IDLE_RIGHT		31
+#define MARIO_ANI_RACCOON_CATCHING_WALKING_RIGHT	32
+#define MARIO_ANI_RACCOON_CATCHING_IDLE_LEFT		33
+#define MARIO_ANI_RACCOON_CATCHING_WALKING_LEFT		34
+#define MARIO_ANI_DIE						35			//529
 
-#define MARIO_ANI_FIRE_IDLE_RIGHT			32
-#define MARIO_ANI_FIRE_WALK_RIGHT			33
-#define MARIO_ANI_FIRE_JUMP_RIGHT			34
-#define MARIO_ANI_FIRE_IDLE_LEFT			35
-#define MARIO_ANI_FIRE_WALK_LEFT			36
-#define MARIO_ANI_FIRE_JUMP_LEFT			37
-#define MARIO_ANI_FIRE_ATTACK_RIGHT			38
-#define MARIO_ANI_FIRE_ATTACK_LEFT			39
-#define MARIO_ANI_FIRE_SLIP_LEFT			40
-#define MARIO_ANI_FIRE_SLIP_RIGHT			41
-#define MARIO_ANI_FIRE_BEND_OVER_RIGHT		42
-#define MARIO_ANI_FIRE_BEND_OVER_LEFT		43
+#define MARIO_ANI_FIRE_IDLE_RIGHT			36
+#define MARIO_ANI_FIRE_WALK_RIGHT			37
+#define MARIO_ANI_FIRE_JUMP_RIGHT			38
+#define MARIO_ANI_FIRE_IDLE_LEFT			39
+#define MARIO_ANI_FIRE_WALK_LEFT			40
+#define MARIO_ANI_FIRE_JUMP_LEFT			41
+#define MARIO_ANI_FIRE_ATTACK_RIGHT			42
+#define MARIO_ANI_FIRE_ATTACK_LEFT			43
+#define MARIO_ANI_FIRE_SLIP_LEFT			44
+#define MARIO_ANI_FIRE_SLIP_RIGHT			45
+#define MARIO_ANI_FIRE_BEND_OVER_RIGHT		46
+#define MARIO_ANI_FIRE_BEND_OVER_LEFT		47
 
 #define	MARIO_LEVEL_SMALL		1
 #define	MARIO_LEVEL_BIG			2
@@ -131,10 +138,13 @@ class CMario : public CGameObject
 	bool Iskilling;
 	bool IsRunning;
 	bool IsBendingOver;
-	
 	bool IsLimitFlying;
+	bool IsCatching;
+	bool PrepareCatch;
+	bool SkillOn;
 	FireBullet* firebullet_1 = new FireBullet();
 	FireBullet* firebullet_2 = new FireBullet();
+	CKoopas* Shell;
 	Tail* TailofRaccoon = new Tail();
 public: 
 	bool OnPlatform;

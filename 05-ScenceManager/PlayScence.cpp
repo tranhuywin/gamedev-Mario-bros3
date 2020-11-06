@@ -30,14 +30,15 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define SCENE_SECTION_OBJECTS			6
 #define SCENE_SECTION_TITLE_MAP			7
 
-#define OBJECT_TYPE_MARIO		0
-#define OBJECT_TYPE_BRICK		1
-#define OBJECT_TYPE_GOOMBA		2
-#define OBJECT_TYPE_KOOPAS		3
-#define OBJECT_TYPE_FIRE_BULLET 4
-#define OBJECT_TYPE_GROUND		5
-#define OBJECT_TYPE_LINE		6
-#define OBJECT_TYPE_PORTAL		50
+#define OBJECT_TYPE_MARIO				0
+#define OBJECT_TYPE_BRICK				1
+#define OBJECT_TYPE_GOOMBA				2
+#define OBJECT_TYPE_KOOPAS				3
+#define OBJECT_TYPE_FIRE_BULLET			4
+#define OBJECT_TYPE_GROUND				5
+#define OBJECT_TYPE_LINE				6
+#define OBJECT_TYPE_KOOPA_TROOPAS		8
+#define OBJECT_TYPE_PORTAL				50
 
 #define MAX_SCENE_LINE 1024
 
@@ -182,6 +183,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_GROUND: obj = new Ground(); break;
 	case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 	case OBJECT_TYPE_LINE: obj = new Line(); break;
+	//case OBJECT_TYPE_KOOPA_TROOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());
@@ -282,13 +284,14 @@ void CPlayScene::Update(DWORD dt)
 	CGame* game = CGame::GetInstance();
 	cx -= game->GetScreenWidth() / 2;
 	
-	//if (!player->OnPlatform)
-	//{
-	//	cy -= game->GetScreenHeight()/2;
-	//}
-	//else
+	if (player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))
+	{
+  		cy -= game->GetScreenHeight()/2;
+	}
+	else if(!player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight()))
+		cy -= game->GetScreenHeight() / 2;
+	else
 		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER;
-
 	if (cx < SCREEN_BORDER)
 		cx = SCREEN_BORDER;
 	if (cy < SCREEN_BORDER)
@@ -299,10 +302,9 @@ void CPlayScene::Update(DWORD dt)
 void CPlayScene::Render()
 {
 	tileMap->Draw();
-
-	for (int i = 0; i < objects.size(); i++)
+	for (int i = 1; i < objects.size(); i++)
 		objects[i]->Render();
-
+	objects[0]->Render();
 }
 
 /*
@@ -370,6 +372,8 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		break;
 	case DIK_DOWN:
 		mario->SetState(MARIO_STATE_STAND);
+	case DIK_Q:
+		mario->SetState(MARIO_STATE_SKILL_OFF);
 		break;
 	}
 }
