@@ -104,8 +104,16 @@ void CKoopas::BeCatch(LPGAMEOBJECT mario, float YShell)
 {
 	float XMario, YMario;
 	mario->GetPosition(XMario, YMario);
-	if(mario->vx > 0)
-			this->SetPosition(XMario + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL -  3, YShell);
-	if(mario->vx < 0)
-		this->SetPosition(XMario - KOOPAS_BBOX_WIDTH + 3, YShell);
+	if (mario->nx == 1)		// right
+	{
+		this->SetPosition(XMario + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL - MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
+		if(mario->vx < 0)
+			this->SetPosition(XMario - KOOPAS_BBOX_WIDTH + MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
+	}
+	if (mario->nx == -1)		//left
+	{
+		this->SetPosition(XMario - KOOPAS_BBOX_WIDTH + MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
+		if(mario->vx > 0)
+			this->SetPosition(XMario + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL - MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
+	}
 }

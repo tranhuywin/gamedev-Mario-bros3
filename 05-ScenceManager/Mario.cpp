@@ -93,7 +93,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (YHolding - y > MARIO_DISTANCE_JUMP)
 		AllowJump = false;
 	if (IsCatching && Shell != NULL)
-		Shell->BeCatch(this, this->y + 5);
+		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT/4);
+	DebugOut(L"this->y %f\n", this->y);
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -461,18 +462,23 @@ void CMario::Render()
 
 	if (level == MARIO_LEVEL_RACCOON && nx == 1)			// tru` di vi tri cai duoi
 	{
-		if (ani == MARIO_ANI_RACCOON_KILL_LEFT)
+		if (vx < 0)
+			animation_set->at(ani)->Render(x, y, alpha);
+		else if (ani == MARIO_ANI_RACCOON_KILL_LEFT)
 			animation_set->at(ani)->Render(x - MARIO_KILL_LEFT_TAIL, y, alpha);
 		else
 			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
-		
+
 	}
-	else if (level == MARIO_LEVEL_RACCOON && nx == -1 && Kill)
+	else if (level == MARIO_LEVEL_RACCOON && nx == -1)
 	{
-		if (ani == MARIO_ANI_RACCOON_KILL_RIGHT)
+		if (vx > 0)
+			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+		else if (ani == MARIO_ANI_RACCOON_KILL_RIGHT)
 			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
 		else
 			animation_set->at(ani)->Render(x, y, alpha);
+		
 	}
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
@@ -536,7 +542,7 @@ void CMario::SetState(int state)
 			vx = MARIO_WALKING_SPEED;
 		if (IsRunning && vx < MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
 			vx += 0.0014f;
-		if(vx > 0)
+		//if(vx > 0)
 			nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT: 
@@ -553,7 +559,7 @@ void CMario::SetState(int state)
 			vx = -MARIO_WALKING_SPEED;
 		if (IsRunning && vx != -MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
 			vx -= 0.0014f;
-		if(vx < 0)
+		//if(vx < 0)
 			nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
@@ -666,10 +672,10 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	case MARIO_LEVEL_BIG:
 		right = x + MARIO_BIG_BBOX_WIDTH;
 		bottom = y + MARIO_BIG_BBOX_HEIGHT;
-		if (IsBendingOver == true)
+		if (IsBendingOver)
 		{
-			right = x + 14.0f;
-			bottom = y + 18.0f;
+			right = x + MARIO_BIG_BBOX_BEND_OVER_WIDTH;
+			bottom = y + MARIO_BIG_BBOX_BEND_OVER_HEIGHT;
 		}
 		break;
 	case MARIO_LEVEL_RACCOON:
@@ -682,10 +688,10 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 			right = x + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL;
 		}
 		bottom = y + MARIO_RACCOON_BBOX_HEIGHT;
-		if (IsBendingOver == true)
+		if (IsBendingOver)
 		{
-			right = x + 22.0f;
-			bottom = y + 18.0f;
+			right = x + MARIO_RACCOON_BBOX_BEND_OVER_WIDTH;
+			bottom = y + MARIO_RACCOON_BBOX_BEND_OVER_HEIGHT;
 		}
 		break;
 	case MARIO_LEVEL_SMALL:
