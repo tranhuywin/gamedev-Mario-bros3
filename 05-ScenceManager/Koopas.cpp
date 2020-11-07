@@ -8,7 +8,6 @@
 CKoopas::CKoopas()
 {
 	SetState(KOOPAS_STATE_WALKING);
-	this->SetAnimationSet(CAnimationSets::GetInstance()->Get(8));
 }
 
 void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &bottom)
@@ -17,7 +16,7 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 	top = y;
 	right = x + KOOPAS_BBOX_WIDTH;
 
-	if (state == KOOPAS_STATE_SHELL)
+	if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_ROTATORY)
 		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL;
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT;
@@ -25,7 +24,7 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	//vy = 0.01f * dt;
+	vy = 0.01f * dt;
 	CGameObject::Update(dt);
 	if (vx < 0 && x < 0) {
 		x = 0; vx = -vx;
@@ -34,10 +33,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	if (vx > 0 && x > 290) {
 		x = 290; vx = -vx;
 	}
+
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
-	//CalcPotentialCollisions(coObjects, coEvents);
+	if(state != KOOPAS_STATE_DIE)
+		CalcPotentialCollisions(coObjects, coEvents);
 
 	if (coEvents.size() == 0)
 	{
@@ -51,9 +52,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		float rdy = 0;
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-			x += min_tx * dx + nx * 0.4f;
-			y += min_ty * dy + ny * 0.4f;
-		vx = -vx;
+		x += min_tx * dx + nx * 0.4f;
+		y += min_ty * dy + ny * 0.4f;
 		if (nx != 0)
 			vx = 0;
 		if (ny != 0)
@@ -79,8 +79,7 @@ void CKoopas::Render()
 	else if (vx <= 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_LEFT;
 
 	animation_set->at(ani)->Render(x, y);
-
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void CKoopas::SetState(int state)
@@ -89,14 +88,18 @@ void CKoopas::SetState(int state)
 	switch (state)
 	{
 	case KOOPAS_STATE_SHELL:
-		//y += KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL + 1;
 		vx = 0;
 		vy = 0;
 		break;
 	case KOOPAS_STATE_ROTATORY:
-		vx = KOOPAS_ROTATORY_SPEED;
+		vx = 0.3f;
+		break;
 	case KOOPAS_STATE_WALKING:
 		vx = KOOPAS_WALKING_SPEED;
+		break;
+	case KOOPAS_STATE_DIE:
+		vy = 0.1f;
+		break;
 	}
 }
 

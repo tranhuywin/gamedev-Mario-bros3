@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "Line.h"
 #include "Goomba.h"
+#include "Koopas.h"
 
 FireBullet::FireBullet()
 {
@@ -85,6 +86,17 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					XExplode = x;
 					YExplode = y;
 				}
+			}
+			else if (dynamic_cast<CKoopas*>(e->obj))
+			{
+				CKoopas* Koopas = dynamic_cast<CKoopas*>(e->obj);
+				if(Koopas->GetState() == KOOPAS_STATE_SHELL && !Explode)
+					Koopas->SetState(KOOPAS_STATE_DIE);
+				else
+				Koopas->SetState(KOOPAS_STATE_SHELL);
+				StartExplode();
+				XExplode = x;
+				YExplode = y;
 			}
 		}
 

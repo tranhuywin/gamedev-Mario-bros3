@@ -30,7 +30,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (!Iskilling && SkillOn)
 	{
 		PrepareCatch = true;
-		IsFlying = false;
 	}
 	firebullet_1->Update(dt, coObjects);
 	firebullet_2->Update(dt, coObjects);
@@ -94,7 +93,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		AllowJump = false;
 	if (IsCatching && Shell != NULL)
 		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT/4);
-	DebugOut(L"this->y %f\n", this->y);
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -227,6 +225,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<CKoopas*>(e->obj))
 			{
 				Shell = dynamic_cast<CKoopas*>(e->obj);
+				if (Shell->GetState() == KOOPAS_STATE_SHELL && !PrepareCatch)
+				{
+					Shell->SetState(KOOPAS_STATE_ROTATORY);
+				}
 				if (e->nx != 0 && Iskilling)
 				{
 					Shell->SetState(KOOPAS_STATE_SHELL);
@@ -235,10 +237,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					if (PrepareCatch)
 					{
-						//if (e->nx == -1)
-						//	Shell->SetPosition(this->x + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL + 2.5, this->y + 5);
-						//else
-						//	Shell->SetPosition(this->x - KOOPAS_BBOX_WIDTH - 2.5, this->y + 5);
 						IsCatching = true;
 					}
 				}
@@ -255,10 +253,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 }
 
 void CMario::Render()
-{	//TO DO: Check render slip mario x
+{
 	firebullet_1->Render();
 	firebullet_2->Render();
 	TailofRaccoon->Render();
+	float Xrender = this->x;
 	int ani = -1;
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
@@ -329,11 +328,12 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_RIGHT;
-					if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
+					if (GetTickCount() - Kill_start > 49 && GetTickCount() - Kill_start < 450)
 					{
-						ani = MARIO_ANI_RACCOON_KILL_LEFT;
+ 						Xrender = this->x + 5;
 					}
-						
+					else
+						Xrender = this->x - 2;
 				}
 				if (IsCatching)
 					ani = MARIO_ANI_RACCOON_CATCHING_IDLE_RIGHT;
@@ -342,14 +342,14 @@ void CMario::Render()
 			}
 			else 
 			{
-				ani = MARIO_ANI_RACCOON_IDLE_LEFT; 
+				ani = MARIO_ANI_RACCOON_IDLE_LEFT;
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
 				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
-					if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
+					if (GetTickCount() - Kill_start > 150 && GetTickCount() - Kill_start < 350)
 					{
-						ani = MARIO_ANI_RACCOON_KILL_RIGHT;
+						Xrender = this->x - 7;
 					}
 				}
 				if (IsCatching)
@@ -365,11 +365,12 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
-				if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
+				if (GetTickCount() - Kill_start > 50 && GetTickCount() - Kill_start < 550 + 1)
 				{
-					ani = MARIO_ANI_RACCOON_KILL_LEFT;
+					Xrender = this->x + 5;
 				}
-
+				else
+					Xrender = this->x - 2;
 			}
 			if (vx < 0.1 && nx == -1)
 				ani = MARIO_ANI_RACCOON_SLIP_RIGHT;
@@ -463,27 +464,22 @@ void CMario::Render()
 	if (level == MARIO_LEVEL_RACCOON && nx == 1)			// tru` di vi tri cai duoi
 	{
 		if (vx < 0)
-			animation_set->at(ani)->Render(x, y, alpha);
-		else if (ani == MARIO_ANI_RACCOON_KILL_LEFT)
-			animation_set->at(ani)->Render(x - MARIO_KILL_LEFT_TAIL, y, alpha);
+			animation_set->at(ani)->Render(Xrender, y, alpha);
 		else
-			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
-
+			animation_set->at(ani)->Render(Xrender - MARIO_RACCOON_BBOX_TAIL, y, alpha);
 	}
 	else if (level == MARIO_LEVEL_RACCOON && nx == -1)
 	{
 		if (vx > 0)
-			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
-		else if (ani == MARIO_ANI_RACCOON_KILL_RIGHT)
-			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+			animation_set->at(ani)->Render(Xrender - MARIO_RACCOON_BBOX_TAIL, y, alpha);
 		else
-			animation_set->at(ani)->Render(x, y, alpha);
+			animation_set->at(ani)->Render(Xrender, y, alpha);
 		
 	}
 	else
-		animation_set->at(ani)->Render(x, y, alpha);
+		animation_set->at(ani)->Render(Xrender, y, alpha);
 	
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void CMario::SetState(int state)
@@ -521,7 +517,6 @@ void CMario::SetState(int state)
 					firebullet_1->attack(this->x, this->y, false);
 				StartFireAttack();
 			}
-			
 			break;
 		}
 	case MARIO_STATE_FAST_RUN:
@@ -542,7 +537,6 @@ void CMario::SetState(int state)
 			vx = MARIO_WALKING_SPEED;
 		if (IsRunning && vx < MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
 			vx += 0.0014f;
-		//if(vx > 0)
 			nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT: 
@@ -559,7 +553,6 @@ void CMario::SetState(int state)
 			vx = -MARIO_WALKING_SPEED;
 		if (IsRunning && vx != -MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
 			vx -= 0.0014f;
-		//if(vx < 0)
 			nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
@@ -593,6 +586,7 @@ void CMario::SetState(int state)
 		SkillOn = false;
 		PrepareCatch = false;
 		IsCatching = false;
+		IsRunning = false;
 		break;
 	case MARIO_STATE_STAND:
 		if (IsBendingOver)
@@ -611,7 +605,6 @@ void CMario::SetState(int state)
 		}
 		IsBendingOver = true;
 	case MARIO_STATE_IDLE: 
-		IsRunning = false;
 		IsLimitRunning = false;
 		if (x - XHolding > MARIO_DISTANCE_INERTIA) // khoan cach bi vang
 		{

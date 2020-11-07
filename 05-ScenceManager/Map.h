@@ -13,11 +13,7 @@ class TileMap
 	LPCWSTR filePath_data;
 	LPCWSTR filePath_texture;
 
-	int id;
-	int NumRowOnTilemap, NumColOnTilemap;
-	int NumRowOnTexture, NumColOnTextture;
-	int TileSetWidth, TileSetHeight;
-
+	int id, NumRowOnTilemap, NumColOnTilemap, NumRowOnTexture, NumColOnTextture, TileSetWidth, TileSetHeight;
 	int tilemap[ArrTileMap][ArrTileMap];
 
 public:

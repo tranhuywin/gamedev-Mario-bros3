@@ -3,7 +3,6 @@
 TileMap::TileMap(int ID, LPCWSTR filePath_texture, LPCWSTR filePath_data, int NumRowOnTexture, int NumColOnTextture, int NumRowOnTilemap, int NumColOnTilemap, int TileSetWidth, int TileSetHeight)
 {
 	id = ID;
-
 	this->filePath_texture = filePath_texture;
 	this->filePath_data = filePath_data;
 
@@ -23,41 +22,33 @@ TileMap::~TileMap()
 }
 void TileMap::LoadFilePath()
 {
-	ifstream fs(filePath_data, ios::in);
-
-	if (fs.fail())
+	ifstream IfStream(filePath_data, ios::in);
+	if (IfStream.fail())
 	{
-		fs.close();
+		IfStream.close();
 		return;
 	}
-
 	for (int i = 0; i < NumRowOnTilemap; i++)
 	{
 		for (int j = 0; j < NumColOnTilemap; j++)
-			fs >> tilemap[i][j];
+			IfStream >> tilemap[i][j];
 	}
+	IfStream.close();
 
-	fs.close();
 }
 
 void TileMap::LoadTextureToSprites()
 {
-	//CTextures* texture = CTextures::GetInstance();
 	CTextures::GetInstance()->Add(id, filePath_texture, D3DCOLOR_XRGB(255, 0, 255));
-
-	LPDIRECT3DTEXTURE9 texTileMap = CTextures::GetInstance()->Get(id);
-
-	int SpritesID = 0;
-
-	for (UINT i = 0; i < NumRowOnTexture; i++)
-	{
-		for (UINT j = 0; j < NumColOnTextture; j++)
+	LPDIRECT3DTEXTURE9 tex = CTextures::GetInstance()->Get(id);
+	int spriteIDstart = 0;
+	for(int i = 0; i < NumRowOnTexture; i++)
+		for (int j = 0; j < NumColOnTextture; j++)
 		{
-			int idSpriteTexture = id + SpritesID;
-			CSprites::GetInstance()->Add(idSpriteTexture, TileSetWidth * j, TileSetHeight * i, TileSetWidth * (j + 1), TileSetHeight * (i + 1), texTileMap);
-			SpritesID++;
+			int IDsprite = spriteIDstart + id;
+			CSprites::GetInstance()->Add(IDsprite, TileSetWidth * j, TileSetWidth * i, TileSetWidth*(j + 1), TileSetWidth*(i + 1), tex);
+			spriteIDstart++;
 		}
-	}
 }
 
 void TileMap::Draw()
@@ -72,7 +63,7 @@ void TileMap::Draw()
 	{
 		for (int currentColumn = FirstCol; currentColumn <= LastCol; currentColumn++)
 		{
-			float x = TileSetWidth * (currentColumn - FirstCol) + CGame::GetInstance()->GetCamPosX() - (int)(CGame::GetInstance()->GetCamPosX()) % TileSetWidth;
+			float x = TileSetWidth * (currentColumn - FirstCol) + CGame::GetInstance()->GetCamPosX() -(int)(CGame::GetInstance()->GetCamPosX()) % TileSetWidth;
 			float y = TileSetHeight * (currentRow - FirstRow) + CGame::GetInstance()->GetCamPosY() - (int)(CGame::GetInstance()->GetCamPosY()) % TileSetHeight;
 			CSprites::GetInstance()->Get(tilemap[currentRow][currentColumn] + id)->Draw(x, y);
 		}
