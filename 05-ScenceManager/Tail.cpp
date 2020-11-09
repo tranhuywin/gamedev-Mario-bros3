@@ -6,6 +6,7 @@
 
 #include "Tail.h"
 #include "Goomba.h"
+#include "Koopas.h"
 
 Tail::Tail()
 {
@@ -14,37 +15,47 @@ Tail::Tail()
 void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
-	vector<LPCOLLISIONEVENT> coEvents;
-	vector<LPCOLLISIONEVENT> coEventsResult;
-	coEvents.clear();
-	CalcPotentialCollisions(coObjects, coEvents);
 
-	if (coEvents.size() != 0)
+	vector<LPGAMEOBJECT> coEventsResult;
+	coEventsResult.clear();
+	if(IsKilling)
+		CalCollisions(coObjects, coEventsResult);
+	int sizeCo = coEventsResult.size();
+
+	if (sizeCo != 0)
 	{
-		float min_tx, min_ty, nx = 0, ny;
-		float rdx = 0;
-		float rdy = 0;
-		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-		for (UINT i = 0; i < coEventsResult.size(); i++)
+		for (UINT i = 0; i < sizeCo; i++)
 		{
-			LPCOLLISIONEVENT e = coEventsResult[i];
-			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
+			LPGAMEOBJECT e = coEventsResult[i];
+			if (dynamic_cast<CGoomba*>(e)) // if e->obj is Goomba 
 			{
-				
-				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+				CGoomba* goomba = dynamic_cast<CGoomba*>(e);
 				if (goomba->GetState() != GOOMBA_STATE_DIE)
 				{
 					goomba->SetState(GOOMBA_STATE_DIE);
 				}
 			}
+			else if (dynamic_cast<CKoopas*>(e))
+			{
+				CKoopas* Koopas = dynamic_cast<CKoopas*>(e);
+				if (Koopas->GetState() == KOOPAS_STATE_SHELL)
+				{
+					Koopas->vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
+				}
+				else
+				{
+					Koopas->SetState(KOOPAS_STATE_SHELL);
+					Koopas->vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
+				}
+
+			}
 		}
+		IsKilling = false;
 	}
-	// clean up collision events
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
 void Tail::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	left = x - TAIL_BBOX_WIDTH;
+	left = x - TAIL_BBOX_WIDTH/2;
 	top = y;
 	right = x + TAIL_BBOX_WIDTH;
 	bottom = y + RACCOON_BBOX_HIGHT;
@@ -67,3 +78,4 @@ void Tail::Attack(float x, float y, bool IsKilling)
 		this->y = OUTSIDE_MAP;
 	}
 }
+

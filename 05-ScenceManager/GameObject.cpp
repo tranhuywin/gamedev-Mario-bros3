@@ -25,6 +25,10 @@ void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 /*
 	Extension of original SweptAABB to deal with two moving objects
 */
+bool CGameObject::AABB(float left_obj_1, float top_obj_1, float right_obj_1, float bottom_obj_1, float left_obj_2, float top_obj_2, float right_obj_2, float bottom_obj_2)
+{
+	return left_obj_1 < right_obj_2 && right_obj_1 > left_obj_2 && top_obj_1 < bottom_obj_2 && bottom_obj_1 > top_obj_2;
+}
 LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 {
 	float sl, st, sr, sb;		// static object bbox
@@ -55,6 +59,28 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 
 	CCollisionEvent * e = new CCollisionEvent(t, nx, ny, rdx, rdy, coO);
 	return e;
+}
+
+void CGameObject::CalCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPGAMEOBJECT>& coEventsResult)
+{
+	float l, t, r, b;
+	float coObjects_l, coObjects_t, coObjects_r, coObjects_b;
+
+	int Total_coObjects = coObjects->size();
+
+	GetBoundingBox(l, t, r, b);
+
+	for (UINT i = 0; i < Total_coObjects; i++)
+	{
+		coObjects->at(i)->GetBoundingBox(coObjects_l, coObjects_t, coObjects_r, coObjects_b);
+
+		if (CGameObject::AABB(l, t, r, b, coObjects_l, coObjects_t, coObjects_r, coObjects_b))
+		{
+			//DebugOut(L"Collision: %d\n", coObjects->at(i)->GetState());
+			coEventsResult.push_back(coObjects->at(i));
+		}
+	}
+
 }
 
 /*

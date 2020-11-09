@@ -24,8 +24,10 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	vy = 0.01f * dt;
+	if(!IsCatching)
+		vy += KOOPAS_GRAVITY * dt;
 	CGameObject::Update(dt);
+	IsCatching = false;
 	if (vx < 0 && x < 0) {
 		x = 0; vx = -vx;
 	}
@@ -92,7 +94,7 @@ void CKoopas::SetState(int state)
 		vy = 0;
 		break;
 	case KOOPAS_STATE_ROTATORY:
-		vx = 0.3f;
+		vx = KOOPAS_ROTATORY_SPEED;
 		break;
 	case KOOPAS_STATE_WALKING:
 		vx = KOOPAS_WALKING_SPEED;
@@ -112,11 +114,13 @@ void CKoopas::BeCatch(LPGAMEOBJECT mario, float YShell)
 		this->SetPosition(XMario + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL - MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
 		if(mario->vx < 0)
 			this->SetPosition(XMario - KOOPAS_BBOX_WIDTH + MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
+		IsCatching = true;
 	}
 	if (mario->nx == -1)		//left
 	{
 		this->SetPosition(XMario - KOOPAS_BBOX_WIDTH + MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
 		if(mario->vx > 0)
 			this->SetPosition(XMario + MARIO_RACCOON_BBOX_WIDTH - MARIO_RACCOON_BBOX_TAIL - MARIO_RACCOON_BBOX_WIDTH / 6, YShell);
+		IsCatching = true;
 	}
 }

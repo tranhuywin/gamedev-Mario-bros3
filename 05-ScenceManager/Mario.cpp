@@ -11,6 +11,7 @@
 #include "Tail.h"
 #include "Line.h"
 #include "Koopas.h"
+#include "Ground.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -26,7 +27,7 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	// Calculate dx, dy 
+	KickShell = false;
 	if (!Iskilling && SkillOn)
 	{
 		PrepareCatch = true;
@@ -140,8 +141,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
-		//if (vy == 0.0f)
-		//OnPlatform = true;
 	}
 	else
 	{
@@ -164,7 +163,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (ny!=0)
 			vy = 0;
 		// check mario on a platform, because Mario is pushed, so need to check IsJunping
-		if (ny == -1 && !IsJumping) 
+		if (ny == -1 && !AllowJump) 
 		{
 			OnPlatform = true;
 			IsLimitFlying = false;
@@ -225,21 +224,50 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<CKoopas*>(e->obj))
 			{
 				Shell = dynamic_cast<CKoopas*>(e->obj);
-				if (Shell->GetState() == KOOPAS_STATE_SHELL && !PrepareCatch)
+				if (Shell->GetState() == KOOPAS_STATE_SHELL && !PrepareCatch && e->nx != 0)
 				{
 					Shell->SetState(KOOPAS_STATE_ROTATORY);
+					if(this->nx == 1)
+						Shell->vx = KOOPAS_ROTATORY_SPEED;
+					if(this->nx == -1)
+						Shell->vx = -KOOPAS_ROTATORY_SPEED;
+					KickShell = true;
 				}
-				if (e->nx != 0 && Iskilling)
+				else if (e->nx != 0 && Iskilling)
 				{
 					Shell->SetState(KOOPAS_STATE_SHELL);
+					Shell->vy = -KOOPAS_DIE_DEFLECT_SPEED;
 				}
-				if (e->nx != 0 && Shell->GetState() == KOOPAS_STATE_SHELL)
+				else if (e->nx != 0 && Shell->GetState() == KOOPAS_STATE_SHELL)
 				{
 					if (PrepareCatch)
 					{
 						IsCatching = true;
 					}
 				}
+				else if (e->ny < 0)
+				{
+					if (Shell->GetState() == KOOPAS_STATE_SHELL)
+					{
+						Shell->SetState(KOOPAS_STATE_ROTATORY);
+						if (this->x <= Shell->x)
+							Shell->vx = KOOPAS_ROTATORY_SPEED;
+						if (this->x > Shell->x)
+							Shell->vx = -KOOPAS_ROTATORY_SPEED;
+					}
+					else if (Shell->GetState() == KOOPAS_STATE_ROTATORY)
+					{
+						Shell->SetState(KOOPAS_STATE_SHELL);
+						this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
+					}
+					else
+					{
+						Shell->SetState(KOOPAS_STATE_SHELL);
+						this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
+					}	
+				}
+				else
+					StartUntouchable();
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
@@ -292,6 +320,12 @@ void CMario::Render()
 				ani = MARIO_ANI_BIG_JUMP_RIGHT;
 			if (IsBendingOver)
 				ani = MARIO_ANI_BIG_BEND_OVER_RIGHT;
+			if (IsLimitRunning)
+			{
+				ani = MARIO_ANI_BIG_MAX_SPEED_RUNNING_RIGHT;
+				if (AllowJump)
+					ani = MARIO_ANI_BIG_MAX_SPEED_JUMP_RIGHT;
+			}
 
 		}
 		else {
@@ -302,6 +336,12 @@ void CMario::Render()
 				ani = MARIO_ANI_BIG_JUMP_LEFT;
 			if (IsBendingOver)
 				ani = MARIO_ANI_BIG_BEND_OVER_LEFT;
+			if (IsLimitRunning)
+			{
+				ani = MARIO_ANI_BIG_MAX_SPEED_RUNNING_LEFT;
+				if (AllowJump)
+					ani = MARIO_ANI_BIG_MAX_SPEED_JUMP_LEFT;
+			}
 		}
 	}
 	else if (level == MARIO_LEVEL_SMALL)
@@ -326,15 +366,12 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
 				if(!AllowJump && !OnPlatform)
 					ani = MARIO_ANI_RACCOON_DROP_RIGHT;
-				if (Iskilling && Kill) {
+				if (Iskilling && Kill) 
+				{
 					ani = MARIO_ANI_RACCOON_KILL_RIGHT;
-					if (GetTickCount() - Kill_start > 49 && GetTickCount() - Kill_start < 450)
-					{
- 						Xrender = this->x + 5;
-					}
-					else
-						Xrender = this->x - 2;
 				}
+				if (KickShell)
+					ani = MARIO_ANI_RACCOON_KICK_RIGHT;
 				if (IsCatching)
 					ani = MARIO_ANI_RACCOON_CATCHING_IDLE_RIGHT;
 				if (IsBendingOver)
@@ -347,11 +384,9 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
 				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
-					if (GetTickCount() - Kill_start > 150 && GetTickCount() - Kill_start < 350)
-					{
-						Xrender = this->x - 7;
-					}
 				}
+				if (KickShell)
+					ani = MARIO_ANI_RACCOON_KICK_LEFT;
 				if (IsCatching)
 					ani = MARIO_ANI_RACCOON_CATCHING_IDLE_LEFT;
 				if (IsBendingOver)
@@ -365,15 +400,11 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
-				if (GetTickCount() - Kill_start > 50 && GetTickCount() - Kill_start < 550 + 1)
-				{
-					Xrender = this->x + 5;
-				}
-				else
-					Xrender = this->x - 2;
 			}
 			if (vx < 0.1 && nx == -1)
 				ani = MARIO_ANI_RACCOON_SLIP_RIGHT;
+			if (KickShell)
+				ani = MARIO_ANI_RACCOON_KICK_RIGHT;
 			if (IsCatching)
 				ani = MARIO_ANI_RACCOON_CATCHING_WALKING_RIGHT;
 			if (IsBendingOver)
@@ -386,13 +417,11 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_JUMP_LEFT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;
-				if (GetTickCount() - Kill_start > MARIO_KILL_TIME / 2)
-				{
-					ani = MARIO_ANI_RACCOON_KILL_RIGHT;
-				}
 			}
 			if (vx > -0.1 && nx == 1)
 				ani = MARIO_ANI_RACCOON_SLIP_LEFT;
+			if (KickShell)
+				ani = MARIO_ANI_RACCOON_KICK_LEFT;
 			if (IsCatching)
 				ani = MARIO_ANI_RACCOON_CATCHING_WALKING_LEFT;
 			if (IsBendingOver)
@@ -478,7 +507,6 @@ void CMario::Render()
 	}
 	else
 		animation_set->at(ani)->Render(Xrender, y, alpha);
-	
 	//RenderBoundingBox();
 }
 
@@ -500,7 +528,6 @@ void CMario::SetState(int state)
 		}
 		if (level == MARIO_LEVEL_FIRE)
 		{
-			
 			if (!firebullet_2->IsBeingFired && firebullet_1->IsBeingFired)		// vien 1 dc ban chua, r thi ban vien 2
 			{
 				if (nx == 1)
@@ -520,7 +547,6 @@ void CMario::SetState(int state)
 			break;
 		}
 	case MARIO_STATE_FAST_RUN:
-		if(level == MARIO_LEVEL_RACCOON)
 			IsRunning = true;
 		break;
 	case MARIO_STATE_WALKING_RIGHT:

@@ -2,9 +2,10 @@
 
 #include "GameObject.h"
 
-#define KOOPAS_WALKING_SPEED 0.03f;
-#define KOOPAS_ROTATORY_SPEED 0.1f;
-
+#define KOOPAS_WALKING_SPEED	0.05f
+#define KOOPAS_ROTATORY_SPEED	0.2f
+#define KOOPAS_DIE_DEFLECT_SPEED 0.02f
+#define KOOPAS_GRAVITY			0.001f
 #define KOOPAS_BBOX_WIDTH 16
 #define KOOPAS_BBOX_HEIGHT  26
 #define KOOPAS_BBOX_HEIGHT_SHELL 16
@@ -24,7 +25,7 @@ class CKoopas : public CGameObject
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
-
+	bool IsCatching;
 public:
 	CKoopas();
 	virtual void SetState(int state);
