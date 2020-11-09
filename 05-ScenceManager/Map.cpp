@@ -22,18 +22,26 @@ TileMap::~TileMap()
 }
 void TileMap::LoadFilePath()
 {
-	ifstream IfStream(filePath_data, ios::in);
-	if (IfStream.fail())
+	ifstream fs;
+	fs.open(filePath_data, ios::in);
+
+	if (fs.fail())
 	{
-		IfStream.close();
+		fs.close();
 		return;
 	}
-	for (int i = 0; i < NumRowOnTilemap; i++)
+	int RowRead = 0, ColRead = 0;
+	while (!fs.eof())
 	{
-		for (int j = 0; j < NumColOnTilemap; j++)
-			IfStream >> tilemap[i][j];
+		if (ColRead >= NumColOnTilemap)
+		{
+			RowRead++;
+			ColRead = 0;
+		}
+		fs >> tilemap[RowRead][ColRead];
+		ColRead++;
 	}
-	IfStream.close();
+	fs.close();
 
 }
 

@@ -35,9 +35,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	firebullet_1->Update(dt, coObjects);
 	firebullet_2->Update(dt, coObjects);
 	TailofRaccoon->Update(dt, coObjects);
-	if (y < 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2 && level == MARIO_LEVEL_RACCOON)
+	if (y < 0.0f && IsFlying && level == MARIO_LEVEL_RACCOON)
 	{
-		y = 0.0f - MARIO_RACCOON_BBOX_HEIGHT / 2;
+		y = 0.0f;
  		IsLimitFlying = true;
 	}
 	CGameObject::Update(dt);
