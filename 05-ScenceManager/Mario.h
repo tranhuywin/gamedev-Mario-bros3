@@ -142,6 +142,7 @@ class CMario : public CGameObject
 	float XHolding;
 	float YHolding;
 
+	bool IsRendering;
 	bool HaveInertia;
 	bool IsJumping;
 	bool IsSlowDropping;

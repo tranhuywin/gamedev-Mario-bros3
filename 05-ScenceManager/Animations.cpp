@@ -14,7 +14,6 @@ void CAnimation::Add(int spriteId, DWORD time)
 	{
 		DebugOut(L"[ERROR] Sprite ID %d cannot be found!\n", spriteId);
 	}
-
 	LPANIMATION_FRAME frame = new CAnimationFrame(sprite, t);
 	frames.push_back(frame);
 }
@@ -35,12 +34,27 @@ void CAnimation::Render(float x, float y, int alpha)
 		{
 			currentFrame++;
 			lastFrameTime = now;
-			if (currentFrame == frames.size()) currentFrame = 0;
+			if (currentFrame == frames.size())
+			{
+				currentFrame = 0;
+			}
 		}
 	}
-
 	frames[currentFrame]->GetSprite()->Draw(x, y, alpha);
 }
+
+//int CAnimation::GetTimesRender()
+//{
+//	if (currentFrame == -1)
+//	{
+//		return 0;
+//	}
+//	DWORD t = GetTickCount();
+//	if (t - aniStartTime > totalFrameTime)
+//		return 1;
+//	else 
+//		return 0;
+//}
 
 CAnimations * CAnimations::__instance = NULL;
 

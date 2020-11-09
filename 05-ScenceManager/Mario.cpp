@@ -101,7 +101,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state!=MARIO_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
 	// reset untouchable timer if untouchable time has passed
-	if ( GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
+	if (GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
 	{
 		untouchable_start = 0;
 		untouchable = 0;
@@ -112,6 +112,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Kill = 0;
 		Iskilling = false;
 		TailofRaccoon->Attack(this->x, this->y, Iskilling);
+		animation_set->at(MARIO_ANI_RACCOON_KILL_RIGHT)->ResetcurrentFrame();		// loi currentFrame co luc k phai la -1
 	}
 	if (GetTickCount() - Fly_start > MARIO_FLY_TIME)	// con thoi gian thi dc bay, nhan 1 cai tinh thoi gian lai
 	{
@@ -163,9 +164,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (ny!=0)
 			vy = 0;
 		// check mario on a platform, because Mario is pushed, so need to check IsJunping
-		if (ny == -1 && !AllowJump) 
+		if (ny == -1) 
 		{
-			OnPlatform = true;
+			if(!AllowJump)
+				OnPlatform = true;
 			IsLimitFlying = false;
 		}
 		else
