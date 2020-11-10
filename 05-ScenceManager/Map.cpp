@@ -1,6 +1,6 @@
 ﻿#include "Map.h"
 
-TileMap::TileMap(int ID, LPCWSTR filePath_texture, LPCWSTR filePath_data, int NumRowOnTexture, int NumColOnTextture, int NumRowOnTilemap, int NumColOnTilemap, int TileSetWidth, int TileSetHeight)
+TileMap::TileMap(int ID, LPCWSTR filePath_texture, LPCWSTR filePath_data, int NumRowOnTexture, int NumColOnTextture, int TileSetWidth, int TileSetHeight)
 {
 	id = ID;
 	this->filePath_texture = filePath_texture;
@@ -8,11 +8,10 @@ TileMap::TileMap(int ID, LPCWSTR filePath_texture, LPCWSTR filePath_data, int Nu
 
 	this->NumRowOnTexture = NumRowOnTexture;
 	this->NumColOnTextture = NumColOnTextture;
-	this->NumRowOnTilemap = NumRowOnTilemap;
-	this->NumColOnTilemap = NumColOnTilemap;
 	this->TileSetWidth = TileSetWidth;
 	this->TileSetHeight = TileSetHeight;
 
+	SetNumColOnTilemap();
 	LoadFilePath();
 	LoadTextureToSprites();
 }
@@ -30,19 +29,20 @@ void TileMap::LoadFilePath()
 		fs.close();
 		return;
 	}
+
 	int RowRead = 0, ColRead = 0;
 	while (!fs.eof())
 	{
 		if (ColRead >= NumColOnTilemap)
 		{
-			RowRead++;
 			ColRead = 0;
+			RowRead++;
+			NumRowOnTilemap = RowRead;
 		}
 		fs >> tilemap[RowRead][ColRead];
 		ColRead++;
 	}
 	fs.close();
-
 }
 
 void TileMap::LoadTextureToSprites()
@@ -58,7 +58,6 @@ void TileMap::LoadTextureToSprites()
 			spriteIDstart++;
 		}
 }
-
 void TileMap::Draw()
 {	
 	int FirstCol = (int)CGame::GetInstance()->GetCamPosX() / TileSetWidth;
@@ -76,6 +75,22 @@ void TileMap::Draw()
 			CSprites::GetInstance()->Get(tilemap[currentRow][currentColumn] + id)->Draw(x, y);
 		}
 	}
+}
+void TileMap::SetNumColOnTilemap()
+{
+	ifstream fs;
+	fs.open(filePath_data, ios::in);
+
+	if (fs.fail())
+	{
+		fs.close();
+		NumColOnTilemap = 0;
+		return;
+	}
+	string Col;
+	getline(fs, Col);
+	NumColOnTilemap = Col.size() / 2;	// chia khoan trang khoang trang
+	fs.close();
 }
 float TileMap::GetHeightMap()
 {

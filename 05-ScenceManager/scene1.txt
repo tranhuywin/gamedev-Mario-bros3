@@ -375,7 +375,7 @@ bend over left Big
 # GOOMBA
 #2	176	400	3
 #KOOPA Troopas
-3	376	387	7
+3	381	380	7
 #Ground
 5	0	416	1
 5	624	400	1
@@ -428,4 +428,4 @@ bend over left Big
 # type	l	t	ani_set_id	r	b	scene_id
 #50	300	98	0	316	150	2
 [TITLEMAP]
-200000	textures\tile_map.png	textures\tile_map.txt	16	6	28	177	16	16
+200000	textures\tile_map.png	textures\tile_map.txt	16	6	16	16

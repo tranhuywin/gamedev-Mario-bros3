@@ -131,18 +131,18 @@ void CPlayScene::_ParseSection_TITLE_MAP(string line)
 {
 
 	vector<string> tokens = split(line);
-	if (tokens.size() < 9) return; // skip invalid lines
+	if (tokens.size() < 7) return; // skip invalid lines
 
 	int ID = atoi(tokens[0].c_str());
 	wstring filePath_texture = ToWSTR(tokens[1]);
 	wstring filePath_data = ToWSTR(tokens[2]);
 	int num_row_on_texture = atoi(tokens[3].c_str());
 	int num_col_on_textture = atoi(tokens[4].c_str());
-	int num_row_on_Map = atoi(tokens[5].c_str());
-	int num_col_on_Map = atoi(tokens[6].c_str());
-	int tileset_width = atoi(tokens[7].c_str());
-	int tileset_height = atoi(tokens[8].c_str());
-	tileMap = new TileMap(ID, filePath_texture.c_str(), filePath_data.c_str(), num_row_on_texture, num_col_on_textture, num_row_on_Map, num_col_on_Map, tileset_width, tileset_height);
+	//int num_row_on_Map = atoi(tokens[5].c_str());
+	//int num_col_on_Map = atoi(tokens[6].c_str());
+	int tileset_width = atoi(tokens[5].c_str());
+	int tileset_height = atoi(tokens[6].c_str());
+	tileMap = new TileMap(ID, filePath_texture.c_str(), filePath_data.c_str(), num_row_on_texture, num_col_on_textture, tileset_width, tileset_height);
 }
 
 /*
