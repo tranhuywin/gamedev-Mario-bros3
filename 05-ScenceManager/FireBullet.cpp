@@ -6,6 +6,7 @@
 #include "Line.h"
 #include "Goomba.h"
 #include "Koopas.h"
+#include "Ground.h"
 
 FireBullet::FireBullet()
 {
@@ -80,7 +81,16 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					y += dy;
 				}
 
-				if (e->nx != 0 && coEvents.size() == 1)
+				if (e->nx != 0)
+				{
+					StartExplode();
+					XExplode = x;
+					YExplode = y;
+				}
+			}
+			else if (dynamic_cast<Ground*>(e->obj))
+			{
+				if (e->nx != 0)
 				{
 					StartExplode();
 					XExplode = x;

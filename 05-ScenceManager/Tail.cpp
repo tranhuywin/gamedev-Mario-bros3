@@ -56,13 +56,13 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void Tail::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	left = x - TAIL_BBOX_WIDTH/2;
-	top = y;
+	top = y + RACCOON_BBOX_HIGHT / 2;
 	right = x + TAIL_BBOX_WIDTH;
 	bottom = y + RACCOON_BBOX_HIGHT;
 }
 void Tail::Render()
 {
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 void Tail::Attack(float x, float y, bool IsKilling)
 {

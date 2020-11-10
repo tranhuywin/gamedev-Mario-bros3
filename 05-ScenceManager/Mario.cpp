@@ -280,15 +280,23 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+
+	//if (LastAni != ani && ani != -1 && LastAni != -1)
+	//	animation_set->at(ani)->SetaniStartTime(GetTickCount());
 }
 
 void CMario::Render()
 {
+	LastAni = ani;
 	firebullet_1->Render();
 	firebullet_2->Render();
 	TailofRaccoon->Render();
-	float Xrender = this->x;
-	int ani = -1;
+	//if (ani != -1)
+	//	if (!animation_set->at(ani)->RenderedOnce())
+	//	{
+	//		animation_set->at(ani)->Render(x, y, 255);
+	//		return;
+	//	}
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
 	else
@@ -469,10 +477,16 @@ void CMario::Render()
 			ani = MARIO_ANI_FIRE_WALK_RIGHT;
 			if (AllowJump)
 				ani = MARIO_ANI_FIRE_JUMP_RIGHT;
-			if (FireAttack)
-				ani = MARIO_ANI_FIRE_ATTACK_RIGHT;
 			if(vx < 0.1 && nx == -1)
 				ani = MARIO_ANI_FIRE_SLIP_RIGHT;
+			if (IsLimitRunning)
+			{
+				ani = MARIO_ANI_FIRE_MAX_SPEED_RUNNING_RIGHT;
+				if (AllowJump)
+					ani = MARIO_ANI_FIRE_MAX_SPEED_JUMP_RIGHT;
+			}
+			if (FireAttack)
+				ani = MARIO_ANI_FIRE_ATTACK_RIGHT;
 			if (IsBendingOver)
 				ani = MARIO_ANI_FIRE_BEND_OVER_RIGHT;
 		}
@@ -481,10 +495,16 @@ void CMario::Render()
 			ani = MARIO_ANI_FIRE_WALK_LEFT;
 			if (AllowJump)
 				ani = MARIO_ANI_FIRE_JUMP_LEFT;
-			if (FireAttack)
-				ani = MARIO_ANI_FIRE_ATTACK_LEFT;
 			if (vx > -0.1 && nx == 1)
 				ani = MARIO_ANI_FIRE_SLIP_LEFT;
+			if (IsLimitRunning)
+			{
+				ani = MARIO_ANI_FIRE_MAX_SPEED_RUNNING_LEFT;
+				if (AllowJump)
+					ani = MARIO_ANI_FIRE_MAX_SPEED_JUMP_LEFT;
+			}
+			if (FireAttack)
+				ani = MARIO_ANI_FIRE_ATTACK_LEFT;
 			if (IsBendingOver)
 				ani = MARIO_ANI_FIRE_BEND_OVER_LEFT;
 		}
@@ -495,20 +515,20 @@ void CMario::Render()
 	if (level == MARIO_LEVEL_RACCOON && nx == 1)			// tru` di vi tri cai duoi
 	{
 		if (vx < 0)
-			animation_set->at(ani)->Render(Xrender, y, alpha);
+			animation_set->at(ani)->Render(x, y, alpha);
 		else
-			animation_set->at(ani)->Render(Xrender - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
 	}
 	else if (level == MARIO_LEVEL_RACCOON && nx == -1)
 	{
 		if (vx > 0)
-			animation_set->at(ani)->Render(Xrender - MARIO_RACCOON_BBOX_TAIL, y, alpha);
+			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
 		else
-			animation_set->at(ani)->Render(Xrender, y, alpha);
+			animation_set->at(ani)->Render(x, y, alpha);
 		
 	}
 	else
-		animation_set->at(ani)->Render(Xrender, y, alpha);
+		animation_set->at(ani)->Render(x, y, alpha);
 	//RenderBoundingBox();
 }
 
@@ -546,7 +566,7 @@ void CMario::SetState(int state)
 					firebullet_1->attack(this->x, this->y, false);
 				StartFireAttack();
 			}
-			break;
+			
 		}
 	case MARIO_STATE_FAST_RUN:
 			IsRunning = true;
