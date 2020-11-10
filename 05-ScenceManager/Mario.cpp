@@ -113,6 +113,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Iskilling = false;
 		TailofRaccoon->Attack(this->x, this->y, Iskilling);
 		animation_set->at(MARIO_ANI_RACCOON_KILL_RIGHT)->ResetcurrentFrame();		// loi currentFrame co luc k phai la -1
+		animation_set->at(MARIO_ANI_RACCOON_KILL_LEFT)->ResetcurrentFrame();
 	}
 	if (GetTickCount() - Fly_start > MARIO_FLY_TIME)	// con thoi gian thi dc bay, nhan 1 cai tinh thoi gian lai
 	{
@@ -521,7 +522,7 @@ void CMario::Render()
 	}
 	else if (level == MARIO_LEVEL_RACCOON && nx == -1)
 	{
-		if (vx > 0)
+		if (vx > 0 || Kill)
 			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
 		else
 			animation_set->at(ani)->Render(x, y, alpha);
