@@ -14,18 +14,18 @@
 #define LINE_BBOX_WIDTH_11 46
 #define LINE_BBOX_WIDTH_12 46
 
-#define X_LINE_1 231
-#define X_LINE_2 265
-#define X_LINE_3 391
-#define X_LINE_4 455
-#define X_LINE_5 503
-#define X_LINE_6 502
-#define X_LINE_7 1303
-#define X_LINE_8 1256
-#define X_LINE_9 1287
-#define X_LINE_10 1319
-#define X_LINE_11 2136
-#define X_LINE_12 2167
+#define X_LINE_1 240
+#define X_LINE_2 274
+#define X_LINE_3 400	
+#define X_LINE_4 464	
+#define X_LINE_5 512	
+#define X_LINE_6 511	
+#define X_LINE_7 1312	
+#define X_LINE_8 1265	
+#define X_LINE_9 1296	
+#define X_LINE_10 1328	
+#define X_LINE_11 2145	
+#define X_LINE_12 2176	
 class Line : public CGameObject
 {
 	float Width;

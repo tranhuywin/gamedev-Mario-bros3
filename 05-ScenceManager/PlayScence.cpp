@@ -44,7 +44,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 
 #define CAMERA_ON_PLATFORM 64.0f
 
-#define SCREEN_BORDER		16.0f
+#define SCREEN_BORDER		0.0f
 
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {

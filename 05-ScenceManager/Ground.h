@@ -2,7 +2,7 @@
 #include "GameObject.h"
 
 #define GROUND_BBOX_HEIGHT 32
-#define GROUND_BBOX_WIDTH_1 615
+#define GROUND_BBOX_WIDTH_1 624
 #define GROUND_BBOX_WIDTH_2 464
 #define GROUND_BBOX_WIDTH_3 352
 #define GROUND_BBOX_WIDTH_4 80
@@ -10,11 +10,11 @@
 #define GROUND_BBOX_WIDTH_6 558
 
 #define XGROUND_1 0
-#define XGROUND_2 615
-#define XGROUND_3 1143
-#define XGROUND_4 1527
-#define XGROUND_5 1655
-#define XGROUND_6 2247
+#define XGROUND_2 624
+#define XGROUND_3 1152	
+#define XGROUND_4 1536	
+#define XGROUND_5 1664	
+#define XGROUND_6 2256	
 
 class Ground : public CGameObject
 {
