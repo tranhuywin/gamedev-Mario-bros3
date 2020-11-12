@@ -287,9 +287,9 @@ bend over left Big
 #Max speed jump BIG LEFT
 535	10020	100
 #kick right RACCOON
-536	10118	100
+536	10118	10000
 #kick left RACCOON
-537	10168	100
+537	10168	1000
 ################   FIRE MARIO   #################
 #Idle right
 1000	10500	100

@@ -36,35 +36,16 @@ void CAnimation::Render(float x, float y, int alpha)
 		{
 			currentFrame++;
 			lastFrameTime = now;
+			RenderLastFrame = false;
 			if (currentFrame == frames.size())
 			{
 				currentFrame = 0;
+				RenderLastFrame = true;
 			}
 		}
 	}
 	frames[currentFrame]->GetSprite()->Draw(x, y, alpha);
 }
-
-bool CAnimation::RenderedOnce()
-{
-	DWORD now = GetTickCount();
-	if (now - aniStartTime > totalFrameTime)
-		return true;
-	else return false;
-}
-
-//int CAnimation::GetTimesRender()
-//{
-//	if (currentFrame == -1)
-//	{
-//		return 0;
-//	}
-//	DWORD t = GetTickCount();
-//	if (t - aniStartTime > totalFrameTime)
-//		return 1;
-//	else 
-//		return 0;
-//}
 
 CAnimations * CAnimations::__instance = NULL;
 

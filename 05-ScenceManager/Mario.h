@@ -23,6 +23,9 @@
 #define MARIO_RACCOON_STAND_Y		14.0f
 #define MARIO_Y_BEND_OVER			3.0f
 #define MARIO_KILL_LEFT_TAIL		3.0f
+#define MARIO_VY_ASCENDING_SLIP		0.004f
+#define MARIO_VY_ASCENDING_RUN		0.0014f
+
 
 #define MARIO_STATE_IDLE				0
 #define MARIO_STATE_WALKING_RIGHT		100
@@ -125,6 +128,7 @@
 #define MARIO_FLY_TIME					1000
 #define MARIO_SLIP_TIME					1000
 #define MARIO_FIRE_ATTACK_TIME			200
+#define MARIO_KICK_TIME					100
 class CMario : public CGameObject
 {
 	int level;
@@ -140,6 +144,7 @@ class CMario : public CGameObject
 	DWORD Fly_start;
 	DWORD Slip_start;
 	DWORD FireAttack_start;
+	DWORD Kick_start;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y; 

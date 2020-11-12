@@ -27,7 +27,8 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	KickShell = false;
+	if( GetTickCount() - Kick_start > MARIO_KICK_TIME)
+		KickShell = false;
 	if (!Iskilling && SkillOn)
 	{
 		PrepareCatch = true;
@@ -235,6 +236,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if(this->nx == -1)
 						Shell->vx = -KOOPAS_ROTATORY_SPEED;
 					KickShell = true;
+					Kick_start = GetTickCount();
 				}
 				else if (e->nx != 0 && Iskilling)
 				{
@@ -281,23 +283,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-
-	//if (LastAni != ani && ani != -1 && LastAni != -1)
-	//	animation_set->at(ani)->SetaniStartTime(GetTickCount());
 }
 
 void CMario::Render()
 {
-	LastAni = ani;
 	firebullet_1->Render();
 	firebullet_2->Render();
 	TailofRaccoon->Render();
-	//if (ani != -1)
-	//	if (!animation_set->at(ani)->RenderedOnce())
-	//	{
-	//		animation_set->at(ani)->Render(x, y, 255);
-	//		return;
-	//	}
+	int alpha = 255;
+	if (untouchable) alpha = 128;
+
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
 	else
@@ -510,8 +505,6 @@ void CMario::Render()
 				ani = MARIO_ANI_FIRE_BEND_OVER_LEFT;
 		}
 	}
-	int alpha = 255;
-	if (untouchable) alpha = 128;
 
 	if (level == MARIO_LEVEL_RACCOON && nx == 1)			// tru` di vi tri cai duoi
 	{
@@ -526,7 +519,6 @@ void CMario::Render()
 			animation_set->at(ani)->Render(x - MARIO_RACCOON_BBOX_TAIL, y, alpha);
 		else
 			animation_set->at(ani)->Render(x, y, alpha);
-		
 	}
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
@@ -567,7 +559,6 @@ void CMario::SetState(int state)
 					firebullet_1->attack(this->x, this->y, false);
 				StartFireAttack();
 			}
-			
 		}
 	case MARIO_STATE_FAST_RUN:
 			IsRunning = true;
@@ -578,14 +569,14 @@ void CMario::SetState(int state)
 		HaveInertia = true;
 		if (vx < 0.1 && vx != 0)
 		{
-			vx += 0.002f;
+			vx += MARIO_VY_ASCENDING_SLIP;
 			if (vx > 0.1)
 				vx = 0.1;
 		}
 		if (vx == 0 && !IsRunning)
 			vx = MARIO_WALKING_SPEED;
 		if (IsRunning && vx < MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
-			vx += 0.0014f;
+			vx += MARIO_VY_ASCENDING_RUN;
 			nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT: 
@@ -594,14 +585,14 @@ void CMario::SetState(int state)
 		HaveInertia = true;
 		if (vx > -0.1 && vx != 0)
 		{
-			vx -= 0.002f;
+			vx -= MARIO_VY_ASCENDING_SLIP;
 			if (vx < -0.1)
 				vx = -0.1;
 		}
 		if(vx == 0 && !IsRunning)
 			vx = -MARIO_WALKING_SPEED;
 		if (IsRunning && vx != -MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
-			vx -= 0.0014f;
+			vx -= MARIO_VY_ASCENDING_RUN;
 			nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
@@ -743,7 +734,6 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	}
 
 }
-
 /*
 	Reset Mario status to the beginning state of a scene
 */

@@ -34,13 +34,8 @@ public:
 	CAnimation(int defaultTime = 100) { this->defaultTime = defaultTime; lastFrameTime = -1; currentFrame = -1; }
 	void Add(int spriteId, DWORD time = 0);
 	void Render(float x, float y, int alpha = 255);
-	bool RenderedOnce();
-	//int GetTimesRender();
-	//void ReSetTimesRender() { TimesRender = 0; }
+	bool RenderLastFrame;
 	void ResetcurrentFrame() { currentFrame = -1; }
-	//void SetcurrentFrame(int cur) { currentFrame = cur; }
-	void SetaniStartTime(DWORD t) { aniStartTime = t; }
-	//bool IsOver() { return GetTickCount() - aniStartTime >= totalFrameTime; }
 };
 
 typedef CAnimation *LPANIMATION;
