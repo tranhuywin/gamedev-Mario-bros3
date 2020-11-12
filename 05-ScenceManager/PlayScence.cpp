@@ -288,7 +288,7 @@ void CPlayScene::Update(DWORD dt)
 	{
   		cy -= game->GetScreenHeight()/2;
 	}
-	else if(!player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight()))
+	else if(!player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
 		cy -= game->GetScreenHeight() / 2;
 	else
 		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER;

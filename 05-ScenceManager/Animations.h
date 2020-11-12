@@ -35,6 +35,7 @@ public:
 	void Add(int spriteId, DWORD time = 0);
 	void Render(float x, float y, int alpha = 255);
 	bool RenderLastFrame;
+	DWORD GettotalFrameTime() { return totalFrameTime; };
 	void ResetcurrentFrame() { currentFrame = -1; }
 };
 

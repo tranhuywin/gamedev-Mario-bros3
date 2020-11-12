@@ -62,7 +62,7 @@ void Tail::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 }
 void Tail::Render()
 {
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 void Tail::Attack(float x, float y, bool IsKilling)
 {
