@@ -84,6 +84,9 @@
     <ClCompile Include="Tail.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Tube.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -142,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="Tail.h">
       <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Tube.h">
+      <Filter>Header Files\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

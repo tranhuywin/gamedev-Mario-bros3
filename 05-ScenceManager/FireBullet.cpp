@@ -7,6 +7,7 @@
 #include "Goomba.h"
 #include "Koopas.h"
 #include "Ground.h"
+#include "Tube.h"
 
 FireBullet::FireBullet()
 {
@@ -62,6 +63,7 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		else
 			OnPlatform = false;
 		vy = -FIRE_BULLET_SPEED_Y;
+
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -80,7 +82,16 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					vy = vyLine;
 					y += dy;
 				}
+				if (e->nx != 0)
+				{
+					StartExplode();
+					XExplode = x;
+					YExplode = y;
+				}
 
+			}
+			else if (dynamic_cast<Ground*>(e->obj))
+			{
 				if (e->nx != 0)
 				{
 					StartExplode();
@@ -88,7 +99,7 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					YExplode = y;
 				}
 			}
-			else if (dynamic_cast<Ground*>(e->obj))
+			else if (dynamic_cast<Tube*>(e->obj))
 			{
 				if (e->nx != 0)
 				{

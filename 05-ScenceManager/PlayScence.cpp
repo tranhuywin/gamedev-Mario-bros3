@@ -9,6 +9,8 @@
 #include "Ground.h"
 #include "FireBullet.h"
 #include "Line.h"
+#include "Tube.h"
+
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -37,7 +39,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_FIRE_BULLET			4
 #define OBJECT_TYPE_GROUND				5
 #define OBJECT_TYPE_LINE				6
-#define OBJECT_TYPE_KOOPA_TROOPAS		8
+#define OBJECT_TYPE_TUBE				7
 #define OBJECT_TYPE_PORTAL				50
 
 #define MAX_SCENE_LINE 1024
@@ -45,7 +47,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define CAMERA_ON_PLATFORM 64.0f
 
 #define SCREEN_BORDER		0.0f
-
+#define SCREEN_BORDER_RIGHT 16.0f
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
 	vector<string> tokens = split(line);
@@ -104,7 +106,6 @@ void CPlayScene::_ParseSection_ANIMATIONS(string line)
 
 	CAnimations::GetInstance()->Add(ani_id, ani);
 }
-
 void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 {
 	vector<string> tokens = split(line);
@@ -138,8 +139,6 @@ void CPlayScene::_ParseSection_TITLE_MAP(string line)
 	wstring filePath_data = ToWSTR(tokens[2]);
 	int num_row_on_texture = atoi(tokens[3].c_str());
 	int num_col_on_textture = atoi(tokens[4].c_str());
-	//int num_row_on_Map = atoi(tokens[5].c_str());
-	//int num_col_on_Map = atoi(tokens[6].c_str());
 	int tileset_width = atoi(tokens[5].c_str());
 	int tileset_height = atoi(tokens[6].c_str());
 	tileMap = new TileMap(ID, filePath_texture.c_str(), filePath_data.c_str(), num_row_on_texture, num_col_on_textture, tileset_width, tileset_height);
@@ -183,7 +182,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_GROUND: obj = new Ground(); break;
 	case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 	case OBJECT_TYPE_LINE: obj = new Line(); break;
-	//case OBJECT_TYPE_KOOPA_TROOPAS: obj = new CKoopas(); break;
+	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());
@@ -283,7 +282,8 @@ void CPlayScene::Update(DWORD dt)
 
 	CGame* game = CGame::GetInstance();
 	cx -= game->GetScreenWidth() / 2;
-	
+	if (cx > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
+		cx = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
 	if (player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))
 	{
   		cy -= game->GetScreenHeight()/2;

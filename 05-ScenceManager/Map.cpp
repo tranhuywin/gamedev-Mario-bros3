@@ -96,4 +96,8 @@ float TileMap::GetHeightMap()
 {
 	return NumRowOnTilemap * TileSetHeight;
 }
+float TileMap::GetWidthMap()
+{
+	return NumColOnTilemap * TileSetWidth;
+}
 

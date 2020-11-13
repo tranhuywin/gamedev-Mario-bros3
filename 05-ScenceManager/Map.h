@@ -25,4 +25,5 @@ public:
 	void Draw();
 	void SetNumColOnTilemap();
 	float GetHeightMap();
+	float GetWidthMap();
 };

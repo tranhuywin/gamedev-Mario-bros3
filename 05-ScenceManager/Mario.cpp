@@ -27,6 +27,9 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (x < CGame::GetInstance()->GetCamPosX())
+		x = CGame::GetInstance()->GetCamPosX();
+	TailofRaccoon->Attack(this->x, this->y, Iskilling);
 	if (!Iskilling && SkillOn)
 	{
 		PrepareCatch = true;
@@ -100,9 +103,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state!=MARIO_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
 	// reset untouchable timer if untouchable time has passed
-	if ((ani == MARIO_ANI_RACCOON_KICK_RIGHT || ani == MARIO_ANI_RACCOON_KICK_LEFT) && GetTickCount() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
+	if (KickShell && GetTickCount() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
 		KickShell = false;
-	if ((ani == MARIO_ANI_RACCOON_KILL_RIGHT || ani == MARIO_ANI_RACCOON_KILL_LEFT) && GetTickCount() - Kill_start > animation_set->at(ani)->GettotalFrameTime())
+	if (Kill && GetTickCount() - Kill_start > animation_set->at(ani)->GettotalFrameTime())
 	{
 		Kill_start = 0;
 		Kill = 0;
@@ -111,7 +114,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		animation_set->at(MARIO_ANI_RACCOON_KILL_RIGHT)->ResetcurrentFrame();		// loi currentFrame co luc k phai la -1
 		animation_set->at(MARIO_ANI_RACCOON_KILL_LEFT)->ResetcurrentFrame();
 	}
-	if ((ani == MARIO_ANI_FIRE_ATTACK_RIGHT || ani == MARIO_ANI_FIRE_ATTACK_LEFT) && GetTickCount() - FireAttack_start > animation_set->at(ani)->GettotalFrameTime())
+	if (FireAttack && GetTickCount() - FireAttack_start > animation_set->at(ani)->GettotalFrameTime())
 	{
 		FireAttack_start = 0;
 		FireAttack = 0;
@@ -388,6 +391,8 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_IDLE_LEFT;
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
+				if (!AllowJump && !OnPlatform)
+					ani = MARIO_ANI_RACCOON_DROP_LEFT;
 				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
 				}
@@ -404,6 +409,8 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_RIGHT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
+			if (!AllowJump && !OnPlatform)
+				ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
 			}
@@ -421,6 +428,8 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_LEFT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_LEFT;
+			if (!AllowJump && !OnPlatform)
+				ani = MARIO_ANI_RACCOON_DROP_LEFT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;
 			}
@@ -537,7 +546,6 @@ void CMario::SetState(int state)
 		{
 			SkillOn = true;
 			Iskilling = true;
-			TailofRaccoon->Attack(this->x, this->y, Iskilling);
 			StartKill();
 			PrepareCatch = false;
 		}
