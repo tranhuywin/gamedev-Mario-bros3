@@ -5,6 +5,7 @@
 20	textures\misc.png	176	224	248
 10	textures\enemies.png	3	26	110
 11	textures\enemiesRight.png	3	26	110
+40	textures\Miscc.png	166	185	255
 # id	left	top	right	bottom	texture_id
 [SPRITES]
 #################### BIG MARIO ##########################
@@ -204,6 +205,13 @@
 60016	71	139	89	156	10
 60017	50	139	66	156	10
 60018	71	139	89	156	10
+########################    question brick    #########################
+10000	157	188	173	204	40
+10001	176	188	192	204	40
+10002	196	188	212	204	40
+10003	215	188	231	204	40
+## brick without question
+10004	235	188	251	204	40
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 1	1	100
@@ -354,6 +362,9 @@ bend over left Big
 904	60016	100	60017	100	60018	100
 #shell
 905	60005	100
+####################           bick question     #########################
+100000	10000	100	10001	100	10002	100	10003	100
+100001	10004	100
 # id	ani1	ani2	ani3
 #
 [ANIMATION_SETS]
@@ -371,9 +382,11 @@ bend over left Big
 6	1
 #KOOPA Troopas
 7	901	902	903	904	905
+# bick question
+8	100000	100001
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
-# type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube
+# type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
 # MARIO
 0	50.0	350.0	1
 # GOOMBA
@@ -427,18 +440,24 @@ bend over left Big
 7	2320	384	6
 # BRICK 
 # --- platform (hint: I created the list using Excel!) ----
-1	0	432	2
-1	16	432	2
-1	32	432	2
-1	48	432	2
-1	64	432	2
-1	80	432	2
-1	96	432	2
-1	112	432	2
-1	128	432	2
-
-
-
+#1	0	432	2
+#1	16	432	2
+#1	32	432	2
+#1	48	432	2
+#1	64	432	2
+#1	80	432	2
+#1	96	432	2
+#1	112	432	2
+#1	128	432	2
+# bick question
+8	176	352	8
+8	192	352	8
+8	224	304	8
+8	240	304	8
+8	416	320	8
+8	656	384	8
+8	704	352	8
+8	1472	368	8
 # ---- fire bullet	----
 4	-100	0	4
 # --- SCENE PORTAL ----

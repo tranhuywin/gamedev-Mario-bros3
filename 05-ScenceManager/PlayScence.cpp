@@ -40,6 +40,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_GROUND				5
 #define OBJECT_TYPE_LINE				6
 #define OBJECT_TYPE_TUBE				7
+#define OBJECT_TYPE_QUESTION_BRICK		8
+
 #define OBJECT_TYPE_PORTAL				50
 
 #define MAX_SCENE_LINE 1024
@@ -62,7 +64,6 @@ void CPlayScene::_ParseSection_TEXTURES(string line)
 
 	CTextures::GetInstance()->Add(texID, path.c_str(), D3DCOLOR_XRGB(R, G, B));
 }
-
 void CPlayScene::_ParseSection_SPRITES(string line)
 {
 	vector<string> tokens = split(line);
@@ -85,14 +86,11 @@ void CPlayScene::_ParseSection_SPRITES(string line)
 
 	CSprites::GetInstance()->Add(ID, l, t, r, b, tex);
 }
-
 void CPlayScene::_ParseSection_ANIMATIONS(string line)
 {
 	vector<string> tokens = split(line);
 
 	if (tokens.size() < 3) return; // skip invalid lines - an animation must at least has 1 frame and 1 frame time
-
-	//DebugOut(L"--> %s\n",ToWSTR(line).c_str());
 
 	LPANIMATION ani = new CAnimation();
 
@@ -183,6 +181,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 	case OBJECT_TYPE_LINE: obj = new Line(); break;
 	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
+	case OBJECT_TYPE_QUESTION_BRICK: obj = new CBrick(); break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());
@@ -291,7 +290,7 @@ void CPlayScene::Update(DWORD dt)
 	else if(!player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
 		cy -= game->GetScreenHeight() / 2;
 	else
-		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER;
+		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight()/4;
 	if (cx < SCREEN_BORDER)
 		cx = SCREEN_BORDER;
 	if (cy < SCREEN_BORDER)

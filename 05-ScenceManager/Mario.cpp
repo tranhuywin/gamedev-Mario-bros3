@@ -277,6 +277,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				else
 					StartUntouchable();
 			}
+			else if (dynamic_cast<CBrick*>(e->obj))
+			{
+				CBrick* brick = dynamic_cast<CBrick*>(e->obj);
+				if (brick->GetState() == BRICK_STATE_QUESTION_ON && e->ny > 0)
+					brick->SetState(BRICK_STATE_QUESTION_OFF);
+			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
