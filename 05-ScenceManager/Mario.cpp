@@ -154,7 +154,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float rdx = 0;
 		float rdy = 0;
 		float vyLine = vy;
-		// TODO: This is a very ugly designed function!!!!
+
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?

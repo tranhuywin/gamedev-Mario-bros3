@@ -10,6 +10,7 @@
 #include "FireBullet.h"
 #include "Line.h"
 #include "Tube.h"
+#include "WoodenBrick.h"
 
 using namespace std;
 
@@ -41,6 +42,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_LINE				6
 #define OBJECT_TYPE_TUBE				7
 #define OBJECT_TYPE_QUESTION_BRICK		8
+#define OBJECT_TYPE_WOODEN_BRICK		9
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -182,6 +184,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_LINE: obj = new Line(); break;
 	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 	case OBJECT_TYPE_QUESTION_BRICK: obj = new CBrick(); break;
+	case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());
