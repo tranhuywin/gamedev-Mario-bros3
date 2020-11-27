@@ -11,6 +11,7 @@
 #include "Line.h"
 #include "Tube.h"
 #include "WoodenBrick.h"
+#include "Brick.h"
 
 using namespace std;
 
@@ -161,7 +162,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	CAnimationSets * animation_sets = CAnimationSets::GetInstance();
 
-	CGameObject *obj = NULL;
+	CGameObject *obj = NULL;	
 
 	switch (object_type)
 	{
@@ -177,13 +178,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object created!\n");
 		break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
-	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
+	case OBJECT_TYPE_BRICK: obj = new Brick(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_GROUND: obj = new Ground(); break;
 	case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 	case OBJECT_TYPE_LINE: obj = new Line(); break;
 	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
-	case OBJECT_TYPE_QUESTION_BRICK: obj = new CBrick(); break;
+	case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 	case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
 	case OBJECT_TYPE_PORTAL:
 		{	
@@ -290,7 +291,7 @@ void CPlayScene::Update(DWORD dt)
 	{
   		cy -= game->GetScreenHeight()/2;
 	}
-	else if(!player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
+	else if(player->IsLimitFlying /*&& cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER)*/)
 		cy -= game->GetScreenHeight() / 2;
 	else
 		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight()/4;

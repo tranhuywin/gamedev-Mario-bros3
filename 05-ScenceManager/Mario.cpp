@@ -7,7 +7,7 @@
 
 #include "Goomba.h"
 #include "Portal.h"
-#include "Brick.h"
+#include "QuestionBrick.h"
 #include "Tail.h"
 #include "Line.h"
 #include "Koopas.h"
@@ -161,8 +161,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
 		// block every object first!
-		x += min_tx*dx + nx*0.4f;
-		y += min_ty*dy + ny*0.4f;
+		x += min_tx*dx + nx*0.3f;
+		y += min_ty*dy + ny*0.3f;
 
 		if (nx!=0 && !OnPlatform)
 			vx = 0;
@@ -277,9 +277,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				else
 					StartUntouchable();
 			}
-			else if (dynamic_cast<CBrick*>(e->obj))
+			else if (dynamic_cast<QuestionBrick*>(e->obj))
 			{
-				CBrick* brick = dynamic_cast<CBrick*>(e->obj);
+				QuestionBrick* brick = dynamic_cast<QuestionBrick*>(e->obj);
 				if (brick->GetState() == BRICK_STATE_QUESTION_ON && e->ny > 0)
 					brick->SetState(BRICK_STATE_QUESTION_OFF);
 			}

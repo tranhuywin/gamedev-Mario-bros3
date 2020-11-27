@@ -28,13 +28,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		vy += KOOPAS_GRAVITY * dt;
 	CGameObject::Update(dt);
 	IsCatching = false;
-	if (vx < 0 && x < 0) {
-		x = 0; vx = -vx;
-	}
+	//if (vx < 0 && x < 0) {
+	//	x = 0; vx = -vx;
+	//}
 
-	if (vx > 0 && x > 290) {
-		x = 290; vx = -vx;
-	}
+	//if (vx > 0 && x > 290) {
+	//	x = 290; vx = -vx;
+	//}
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
