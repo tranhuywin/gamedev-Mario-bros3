@@ -29,8 +29,11 @@
 class Line : public CGameObject
 {
 	float Width;
+	float X_Left, X_Right;
 public:
 	virtual void Render();
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
+	int GetX_Left() { return X_Left; };
+	float GetX_Right() { return X_Right; };
 };
 

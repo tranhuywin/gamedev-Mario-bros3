@@ -38,6 +38,7 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<CKoopas*>(e))
 			{
 				CKoopas* Koopas = dynamic_cast<CKoopas*>(e);
+				Koopas->TailAttack = true;
 				if (Koopas->GetState() == KOOPAS_STATE_SHELL)
 				{
 					Koopas->vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;

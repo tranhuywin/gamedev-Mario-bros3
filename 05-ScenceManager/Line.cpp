@@ -1,8 +1,6 @@
 #include "Line.h"
 void Line::Render()
 {
-	//animation_set->at(5)->Render(x, y);
-	//RenderBoundingBox();
 }
 
 void Line::GetBoundingBox(float& l, float& t, float& r, float& b)
@@ -10,7 +8,7 @@ void Line::GetBoundingBox(float& l, float& t, float& r, float& b)
 	l = x;
 	t = y;
 	b = y + LINE_BBOX_HEIGHT;
-
+	X_Left = l;
 	switch ((int)x)
 	{
 	case X_LINE_1:
@@ -50,5 +48,5 @@ void Line::GetBoundingBox(float& l, float& t, float& r, float& b)
 		r = x + LINE_BBOX_WIDTH_12;
 		break;
 	}
-
+	X_Right = r;
 }

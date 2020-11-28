@@ -20,6 +20,9 @@
 #define KOOPAS_ANI_ROTATORY_RIGHT		2
 #define KOOPAS_ANI_ROTATORY_LEFT		3
 #define KOOPAS_ANI_SHELL				4
+#define KOOPAS_ANI_SHELL_TAIL_ATTACK	5
+#define KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY	6
+#define KOOPAS_ANI_SHELL_TAIL_ATTACK_PREPARE_LIVE	7
 class CKoopas : public CGameObject
 {
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
@@ -27,6 +30,7 @@ class CKoopas : public CGameObject
 	virtual void Render();
 	bool IsCatching;
 public:
+	bool TailAttack;
 	CKoopas();
 	virtual void SetState(int state);
 	void BeCatch(LPGAMEOBJECT mario, float YShell);

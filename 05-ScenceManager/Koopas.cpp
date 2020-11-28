@@ -4,6 +4,10 @@
 #include <assert.h>
 #include "Game.h"
 #include "Mario.h"
+#include "Line.h"
+#include "Ground.h"
+#include "Tube.h"
+#include "QuestionBrick.h"
 
 CKoopas::CKoopas()
 {
@@ -28,13 +32,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		vy += KOOPAS_GRAVITY * dt;
 	CGameObject::Update(dt);
 	IsCatching = false;
-	//if (vx < 0 && x < 0) {
-	//	x = 0; vx = -vx;
-	//}
-
-	//if (vx > 0 && x > 290) {
-	//	x = 290; vx = -vx;
-	//}
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -56,10 +53,48 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-		if (nx != 0)
-			vx = 0;
+		/*if (nx != 0)
+			vx = 0;*/
+		float vyLine = vy;
 		if (ny != 0)
 			vy = 0;
+		for (UINT i = 0; i < coEventsResult.size(); i++)
+		{
+			LPCOLLISIONEVENT e = coEventsResult[i];
+
+			if (dynamic_cast<Line*>(e->obj))
+			{
+				Line* line = dynamic_cast<Line*>(e->obj);
+				float XLeftLine = line->GetX_Left();
+				if (vx < 0 && x < XLeftLine && state == KOOPAS_STATE_WALKING) {
+					x = XLeftLine; vx = -vx;
+				}
+				float XRightLine = line->GetX_Right();
+				if (vx > 0 && x > XRightLine - KOOPAS_BBOX_WIDTH && state == KOOPAS_STATE_WALKING) {
+					x = XRightLine - KOOPAS_BBOX_WIDTH; vx = -vx;
+				}
+				if (e->ny > 0)
+				{
+					if (e->ny > 0)		// o duoi len
+					{
+						vy = vyLine;
+						y += dy;
+					}
+				}
+			}
+			if (!dynamic_cast<CMario*>(e->obj)) {
+				if (e->nx != 0)
+				{
+					vx = -vx;
+				}
+				if (dynamic_cast<QuestionBrick*>(e->obj))
+				{
+					QuestionBrick* questionBrick = dynamic_cast<QuestionBrick*>(e->obj);
+					if (questionBrick->GetState() == BRICK_STATE_QUESTION_ON)
+						questionBrick->SetState(BRICK_STATE_QUESTION_OFF);
+				}
+			}
+		}
 	}
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
@@ -69,13 +104,23 @@ void CKoopas::Render()
 	int ani = KOOPAS_ANI_WALKING_LEFT;
 	if (state == KOOPAS_STATE_SHELL) {
 		ani = KOOPAS_ANI_SHELL;
+		if(TailAttack)
+			ani = KOOPAS_ANI_SHELL_TAIL_ATTACK;
 	}
 	else if (state == KOOPAS_STATE_ROTATORY)
 	{
 		if (vx > 0)
+		{
 			ani = KOOPAS_ANI_ROTATORY_RIGHT;
+			if (TailAttack)
+				ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY;
+		}
 		else
-			ani = KOOPAS_ANI_ROTATORY_LEFT; 
+		{
+			ani = KOOPAS_ANI_ROTATORY_LEFT;
+			if (TailAttack)
+				ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY;
+		}
 	}
 	else if (vx > 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_RIGHT;
 	else if (vx <= 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_LEFT;
