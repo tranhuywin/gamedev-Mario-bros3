@@ -94,8 +94,28 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (YHolding - y > MARIO_DISTANCE_JUMP)
 		AllowJump = false;
-	if (IsCatching && Shell != NULL)
-		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT/4);
+	if (IsCatching && Shell->GetState() != KOOPAS_STATE_WALKING)
+	{
+		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT / 4);
+	}
+	else if (IsCatching && Shell->GetState() == KOOPAS_STATE_WALKING)
+	{
+		if (level > MARIO_LEVEL_SMALL)
+		{
+			level = MARIO_LEVEL_SMALL;
+			StartUntouchable();
+		}
+		else
+			SetState(MARIO_STATE_DIE);
+	}
+	if(Shell != NULL)
+		if (!IsCatching && Shell->GetState() == KOOPAS_STATE_SHELL && Shell->IsCatching)
+		{
+			Shell->SetState(KOOPAS_STATE_ROTATORY);
+			Shell->vx = KOOPAS_ROTATORY_SPEED * nx;
+			Shell->IsCatching = false;
+		}
+		
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -244,7 +264,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				else if (e->nx != 0 && Iskilling)
 				{
 					Shell->SetState(KOOPAS_STATE_SHELL);
-					Shell->vy = -KOOPAS_DIE_DEFLECT_SPEED;
+					Shell->vy -= KOOPAS_DIE_DEFLECT_SPEED;
 				}
 				else if (e->nx != 0 && Shell->GetState() == KOOPAS_STATE_SHELL)
 				{

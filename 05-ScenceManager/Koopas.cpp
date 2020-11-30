@@ -20,10 +20,10 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 	top = y;
 	right = x + KOOPAS_BBOX_WIDTH;
 
-	if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_ROTATORY)
-		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL;
-	else
+	if (state == KOOPAS_STATE_WALKING)
 		bottom = y + KOOPAS_BBOX_HEIGHT;
+	else
+		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL;
 }
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
@@ -31,8 +31,29 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	if(!IsCatching)
 		vy += KOOPAS_GRAVITY * dt;
 	CGameObject::Update(dt);
-	IsCatching = false;
-
+	if (state == KOOPAS_STATE_PREPARE_WAKE_UP)
+	{
+		if(ShakingLeft)
+			x -= 3.0f;
+		else
+			x += 3.0f;
+		ShakingLeft = !ShakingLeft;
+	}
+	if (GetTickCount() - Sleep_start > 5000 && state == KOOPAS_STATE_SHELL)
+	{
+		Sleep_start = 0;
+		Sleep = 0;
+		state = KOOPAS_STATE_PREPARE_WAKE_UP;
+		StartPrepareWakeUp();
+	}
+	if (GetTickCount() - PrepareWakeUp_start > 2000 && state == KOOPAS_STATE_PREPARE_WAKE_UP)
+	{
+		PrepareWakeUp_start = 0;
+		PrepareWakeUp = 0;
+		y -= 12.0f;
+		state = KOOPAS_STATE_WALKING;
+		vx = KOOPAS_WALKING_SPEED;
+	}
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -122,6 +143,9 @@ void CKoopas::Render()
 				ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY;
 		}
 	}
+	else if(state == KOOPAS_STATE_PREPARE_WAKE_UP) {
+		ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_PREPARE_WAKE_UP;
+	}
 	else if (vx > 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_RIGHT;
 	else if (vx <= 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_LEFT;
 
@@ -137,6 +161,7 @@ void CKoopas::SetState(int state)
 	case KOOPAS_STATE_SHELL:
 		vx = 0;
 		vy = 0;
+		StartSleep();
 		break;
 	case KOOPAS_STATE_ROTATORY:
 		vx = KOOPAS_ROTATORY_SPEED;
