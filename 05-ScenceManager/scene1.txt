@@ -217,6 +217,15 @@
 60023	250	96	266	112	10
 60024	229	95	245	111	10
 60025	205	96	221	112	10
+###################    Fire Piranha plant #######################
+#right top
+61000	301	71	317	103	11
+#right bot
+61001	301	33	317	65	11
+#left top
+61002	7	71	23	103	10
+#left bot
+61003	7	33	23	65	10
 ########################    question brick    #########################
 70000	157	188	173	204	40
 70001	176	188	192	204	40
@@ -354,7 +363,19 @@ bend over left Big
 
 # ==== QUESTION MARK BRICK =========
 602	40001	1000	40001	100	40002	100	40003	100	40004	100
-
+######## fire paranha plant
+#right top
+603	61000	100
+#right bot
+604	61001	100
+#right find
+605	61000	300	61001	300
+#left top
+606	61002	100
+#left bot
+607	61003	100
+#left find
+608	61002	300	61003	300
 # ==== GOOMBA  =========
 # walk
 701	30001	100	30002	100
@@ -402,6 +423,8 @@ bend over left Big
 7	901	902	903	904	905	906	907	908
 # bick question
 8	100000	100001
+#fire piranha plant
+9	603	604	605	606	607	608
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
@@ -513,6 +536,8 @@ bend over left Big
 9	2272	304	8
 9	2256	368	8
 9	2272	368	8
+#fire piranha plant
+10	360	320	9
 # ---- fire bullet	----
 4	-100	0	4
 # --- SCENE PORTAL ----

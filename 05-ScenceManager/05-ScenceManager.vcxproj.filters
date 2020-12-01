@@ -93,6 +93,9 @@
     <ClCompile Include="Brick.cpp">
       <Filter>Source Files\Map</Filter>
     </ClCompile>
+    <ClCompile Include="FirePiranhaPlant.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="Brick.h">
       <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="FirePiranhaPlant.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

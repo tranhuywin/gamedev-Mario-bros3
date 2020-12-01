@@ -28,9 +28,9 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		x = 16; vx = -vx;
 	}
 
-	if (vx > 0 && x > 335) {
-		x = 335; vx = -vx;
-	}
+	//if (vx > 0 && x > 335) {
+	//	x = 335; vx = -vx;
+	//}
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -52,7 +52,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
 		if (nx != 0)
-			vx = 0;
+			vx = -vx;
 		if (ny != 0)
 			vy = 0;
 	}

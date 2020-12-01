@@ -46,7 +46,6 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	else
 	{
-		DebugOut(L"CoEvents%d\n", coEvents.size());
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
