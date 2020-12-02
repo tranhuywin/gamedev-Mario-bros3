@@ -29,7 +29,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (x < CGame::GetInstance()->GetCamPosX())
 		x = CGame::GetInstance()->GetCamPosX();
-	TailofRaccoon->Attack(this->x, this->y, Iskilling);
+	if(ani != -1)
+	TailofRaccoon->Attack(this->x, this->y, Iskilling, animation_set->at(ani)->GetcurrentFrame());
 	if (!Iskilling && SkillOn)
 	{
 		PrepareCatch = true;
@@ -115,7 +116,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			Shell->vx = KOOPAS_ROTATORY_SPEED * nx;
 			Shell->IsCatching = false;
 		}
-		
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -125,12 +125,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// reset untouchable timer if untouchable time has passed
 	if (KickShell && GetTickCount() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
 		KickShell = false;
+	//DebugOut(L"animation_set->at(ani)%d\n", animation_set->at(MARIO_ANI_RACCOON_KILL_RIGHT)->GetcurrentFrame());
 	if (Kill && GetTickCount() - Kill_start > animation_set->at(ani)->GettotalFrameTime())
 	{
 		Kill_start = 0;
 		Kill = 0;
 		Iskilling = false;
-		TailofRaccoon->Attack(this->x, this->y, Iskilling);
+		TailofRaccoon->Attack(this->x, this->y, Iskilling, animation_set->at(ani)->GetcurrentFrame());
 		animation_set->at(MARIO_ANI_RACCOON_KILL_RIGHT)->ResetcurrentFrame();		// loi currentFrame co luc k phai la -1
 		animation_set->at(MARIO_ANI_RACCOON_KILL_LEFT)->ResetcurrentFrame();
 	}
@@ -155,11 +156,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Slip_start = 0;
 		Slip = 0;
 	}
-	if (GetTickCount() - Slip_start > MARIO_SLIP_TIME)
-	{
-		Slip_start = 0;
-		Slip = 0;
-	}
+	//if (GetTickCount() - Slip_start > MARIO_SLIP_TIME)
+	//{
+	//	Slip_start = 0;
+	//	Slip = 0;
+	//}
 	//ny = 0;
 	// No collision occured, proceed normally
 	//DebugOut(L"Vy%f\n", vy);

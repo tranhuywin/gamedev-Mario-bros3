@@ -65,10 +65,10 @@ void Tail::Render()
 {
 	//RenderBoundingBox();
 }
-void Tail::Attack(float x, float y, bool IsKilling)
+void Tail::Attack(float x, float y, bool IsKilling, int CurrentFrame)
 {
 	this->IsKilling = IsKilling;
-	if (this->IsKilling)
+	if (this->IsKilling && CurrentFrame == 2)
 	{
 		this->x = x;
 		this->y = y;

@@ -38,7 +38,10 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if ((coEventsResultCo.size() == 1 || coEventsResultCo.size() == 2) && !IsAtack)
 			vy = FIRE_PIRANHA_PLANT_SPEED_VY * dt;
 		if (Attack && coEventsResultCo.size() == 1)
+		{
 			vy = 0;
+			Bullet->attack(this->x - 30,this->y, true);
+		}
 		
 	}
 	else
@@ -65,28 +68,6 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-	/*vector<LPGAMEOBJECT> coEventsResult;
-	coEventsResult.clear();
-	CalCollisions(coObjects, coEventsResult);
-	int sizeCo = coEventsResult.size();
-	if (sizeCo == 3)
-	{
-		vy = -FIRE_PIRANHA_PLANT_SPEED_VY * dt;
-		IsAtack = true;
-		StartAttack();
-	}
-	else if (sizeCo == 1)
-	{
-
-			if (Attack)
-				vy = 0;
-			else
-			{
-				vy = FIRE_PIRANHA_PLANT_SPEED_VY * dt;
-			}
-	}*/
-
-
 }
 
 void FirePiranhaPlant::Render()

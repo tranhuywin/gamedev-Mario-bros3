@@ -37,6 +37,7 @@ public:
 	bool RenderLastFrame;
 	DWORD GettotalFrameTime() { return totalFrameTime; };
 	void ResetcurrentFrame() { currentFrame = -1; }
+	int GetcurrentFrame() { return currentFrame; }
 };
 
 typedef CAnimation *LPANIMATION;
