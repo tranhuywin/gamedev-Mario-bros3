@@ -13,8 +13,8 @@
 class CPlayScene: public CScene
 {
 protected: 
-	CMario *player;					// A play scene has to have player, right? 
 	TileMap *tileMap;
+	CMario* player;					// A play scene has to have player, right? 
 
 	vector<LPGAMEOBJECT> objects;
 
@@ -27,6 +27,7 @@ protected:
 
 	
 public: 
+	
 	CPlayScene(int id, LPCWSTR filePath);
 
 	virtual void Load();

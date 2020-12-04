@@ -177,6 +177,7 @@ public:
 
 	void SetState(int state);
 	void SetLevel(int l) { level = l; }
+	int GetLevel() { return level; }
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 	void StartKill() { Kill = 1; Kill_start = GetTickCount(); }
 	void Startfly() { Fly = 1; Fly_start = GetTickCount(); }

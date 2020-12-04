@@ -187,7 +187,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 	case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 	case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
-	case OBJECT_TYPE_FIRE_PIRANHA_PLANT: obj = new FirePiranhaPlant(); break;
+	case OBJECT_TYPE_FIRE_PIRANHA_PLANT: obj = new FirePiranhaPlant(player); break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());

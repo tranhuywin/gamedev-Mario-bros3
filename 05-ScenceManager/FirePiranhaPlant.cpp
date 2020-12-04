@@ -2,6 +2,7 @@
 #include "Tube.h"
 #include "Ground.h"
 #include "Game.h"
+#include "PlayScence.h"
 
 void FirePiranhaPlant::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -15,7 +16,9 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	y += dy;
 	CGameObject::Update(dt);
-	
+	coObjects->push_back(mario);
+	Bullet->Update(dt, coObjects);
+
 	if (GetTickCount() - Attack_start > 5000)
 	{
 		Attack_start = 0;
@@ -40,9 +43,8 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (Attack && coEventsResultCo.size() == 1)
 		{
 			vy = 0;
-			Bullet->attack(this->x - 30,this->y, true);
-		}
-		
+			Bullet->Attack(this->x, this->y, mario->x, mario->y, false, Attack);
+		}		
 	}
 	else
 	{
@@ -72,8 +74,24 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void FirePiranhaPlant::Render()
 {
+	Bullet->Render();
 	if(this->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()/2)
 		animation_set->at(0)->Render(x, y);
 	else
-		animation_set->at(3)->Render(x, y);
+		animation_set->at(3)->Render(x, y);  
+}
+
+FirePiranhaPlant::FirePiranhaPlant(CMario* mario)
+{
+	this->mario = mario;
+}
+
+void FirePiranhaPlant::SetState(int state)
+{
+	CGameObject::SetState(state);
+
+	switch (state)
+	{
+	case FIRE_PIRANHA_PLANT_RIGHT_UP:
+	}
 }

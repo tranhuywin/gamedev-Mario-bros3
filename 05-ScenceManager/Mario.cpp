@@ -12,6 +12,7 @@
 #include "Line.h"
 #include "Koopas.h"
 #include "Ground.h"
+#include "BulletPiranhaPlant.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -30,7 +31,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (x < CGame::GetInstance()->GetCamPosX())
 		x = CGame::GetInstance()->GetCamPosX();
 	if(ani != -1)
-	TailofRaccoon->Attack(this->x, this->y, Iskilling, animation_set->at(ani)->GetcurrentFrame());
+		TailofRaccoon->Attack(this->x, this->y, Iskilling, animation_set->at(ani)->GetcurrentFrame());
 	if (!Iskilling && SkillOn)
 	{
 		PrepareCatch = true;
@@ -303,6 +304,20 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				QuestionBrick* brick = dynamic_cast<QuestionBrick*>(e->obj);
 				if (brick->GetState() == BRICK_STATE_QUESTION_ON && e->ny > 0)
 					brick->SetState(BRICK_STATE_QUESTION_OFF);
+			}
+			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj))
+			{
+				BulletPiranhaPlant* Bullet = dynamic_cast<BulletPiranhaPlant*>(e->obj);
+				if (untouchable == 0)
+				{
+					if (level > MARIO_LEVEL_SMALL)
+					{
+						level = MARIO_LEVEL_SMALL;
+						StartUntouchable();
+					}
+					else
+						SetState(MARIO_STATE_DIE);
+				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
