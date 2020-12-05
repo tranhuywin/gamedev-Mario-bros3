@@ -1,27 +1,36 @@
 #include "QuestionBrick.h"
 #include "Utils.h"
+#include "Mario.h"
 
 QuestionBrick::QuestionBrick() {
-	state = BRICK_STATE_QUESTION_ON;
+	this->SetState(BRICK_STATE_QUESTION_ON);
+	YCollition = y;
 }
 void QuestionBrick::Render()
 {
-	animation_set->at(state)->Render(x,y);
-	//RenderBoundingBox();
+	int ani = -1;
+	switch (state)
+	{
+	case BRICK_STATE_QUESTION_OFF:
+		ani = BRICK_ANI_QUESTION_OFF;
+		break;
+	default:
+		ani = BRICK_ANI_QUESTION_ON;
+		break;
+	}
+	animation_set->at(ani)->Render(x,y);
 }
 
 void QuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	PreviousState = state;
 	CGameObject::Update(dt);
-	if (OntoOff)
-	{
-		this->vy -= 0.001 * dt;
-		if (this->vy < 3 * (-0.001 * dt))
-			this->vy += 0.001 * dt;
-		
-	}
 	y += dy;
+
+	if ( YCollition - y >= BRICK_DISTANCE_DEFLECT && state == BRICK_STATE_QUESTION_ON_UP)
+		this->SetState(BRICK_STATE_QUESTION_ON_DOWN);
+	if (y > YCollition && state == BRICK_STATE_QUESTION_ON_DOWN)
+		this->SetState(BRICK_STATE_QUESTION_OFF);
+
 }
 
 void QuestionBrick::GetBoundingBox(float &l, float &t, float &r, float &b)
@@ -34,12 +43,23 @@ void QuestionBrick::GetBoundingBox(float &l, float &t, float &r, float &b)
 
 void QuestionBrick::SetState(int state)
 {
-	if (PreviousState == BRICK_STATE_QUESTION_ON && state == BRICK_STATE_QUESTION_OFF)
-		OntoOff = true;
+	CGameObject::SetState(state);
 
-	this->state = BRICK_STATE_QUESTION_ON;
-	if (state == BRICK_STATE_QUESTION_OFF && this->state == BRICK_STATE_QUESTION_ON)
-		OntoOff = true;
-	if (state == BRICK_STATE_QUESTION_OFF)
-		this->state = BRICK_STATE_QUESTION_OFF;
+	switch (state)
+	{
+		case BRICK_STATE_QUESTION_OFF:
+			vy = 0;
+			y = YCollition;
+			break;
+		case BRICK_STATE_QUESTION_ON_UP:
+			vy = -BRICK_DEFLECT_SPEED * dt;
+			break;
+		case BRICK_STATE_QUESTION_ON_DOWN:
+			vy = BRICK_DEFLECT_SPEED * dt;
+			break;
+		case BRICK_STATE_QUESTION_ON:
+			vy = 0;
+			break;
+	}
+
 }

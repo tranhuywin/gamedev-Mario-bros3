@@ -90,8 +90,4 @@ void FirePiranhaPlant::SetState(int state)
 {
 	CGameObject::SetState(state);
 
-	switch (state)
-	{
-	case FIRE_PIRANHA_PLANT_RIGHT_UP:
-	}
 }

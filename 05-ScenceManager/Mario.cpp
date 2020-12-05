@@ -302,8 +302,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<QuestionBrick*>(e->obj))
 			{
 				QuestionBrick* brick = dynamic_cast<QuestionBrick*>(e->obj);
-				if (brick->GetState() == BRICK_STATE_QUESTION_ON && e->ny > 0)
-					brick->SetState(BRICK_STATE_QUESTION_OFF);
+				if (brick->GetState() == BRICK_STATE_QUESTION_ON && e->ny > 0 && brick->vy == 0)
+				{
+					brick->SetState(BRICK_STATE_QUESTION_ON_UP);
+					brick->YCollition = brick->y;
+				}
 			}
 			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj))
 			{
