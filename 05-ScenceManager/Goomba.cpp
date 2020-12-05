@@ -1,4 +1,5 @@
 #include "Goomba.h"
+#include "Utils.h"
 CGoomba::CGoomba()
 {
 	SetState(GOOMBA_STATE_WALKING);
@@ -18,9 +19,15 @@ void CGoomba::GetBoundingBox(float &left, float &top, float &right, float &botto
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	vy += 0.001 * dt;
+	vy += GOOMBA_GRAVITY * dt;
 	CGameObject::Update(dt);
-
+	if(state == GOOMBA_STATE_DIE)
+		if (Die && GetTickCount() - Die_start > animation_set->at(GOOMBA_ANI_DIE)->GettotalFrameTime())
+		{
+			Die_start = 0;
+			Die = 0;
+			Died = true;
+		}
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
@@ -34,7 +41,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
-	if (state != 1)
+	if (/*state != GOOMBA_STATE_DIE &&*/ !Died)	//neu khac chet == song
 		CalcPotentialCollisions(coObjects, coEvents);
 
 	if (coEvents.size() == 0)
@@ -67,8 +74,6 @@ void CGoomba::Render()
 	}
 
 	animation_set->at(ani)->Render(x,y);
-
-	//RenderBoundingBox();
 }
 
 void CGoomba::SetState(int state)
@@ -77,9 +82,9 @@ void CGoomba::SetState(int state)
 	switch (state)
 	{
 		case GOOMBA_STATE_DIE:
-			y += GOOMBA_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE + 1;
+			StartDie();
+			y += GOOMBA_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE;
 			vx = 0;
-			vy = 0;
 			break;
 		case GOOMBA_STATE_WALKING: 
 			vx = -GOOMBA_WALKING_SPEED;
