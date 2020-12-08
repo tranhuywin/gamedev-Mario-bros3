@@ -203,7 +203,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	// General object setup
 	obj->SetPosition(x, y);
-
+	obj->SetXYStartLive(x, y);
 	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 
 	obj->SetAnimationSet(ani_set);
@@ -264,18 +264,54 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
-	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
-	// TO-DO: This is a "dirty" way, need a more organized way 
-
-	vector<LPGAMEOBJECT> coObjects;
-	for (size_t i = 1; i < objects.size(); i++)
-	{
-		coObjects.push_back(objects[i]);
-	}
-
+	//If obj die, Obj will be reset at X start, Y start
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		objects[i]->Update(dt, &coObjects);
+		if (objects[i]->y < CGame::GetInstance()->GetCamPosY() || (objects[i]->y > CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()))			// Obj rot ra man hinh theo chieu Y == die
+		{
+			if (objects[i]->XStartLive < CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT || objects[i]->XStartLive > CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
+				{
+					LPGAMEOBJECT e = objects[i];
+					objects[i]->Active = false;
+					if (dynamic_cast<CGoomba*>(e))
+					{
+						objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
+						objects[i]->SetState(GOOMBA_STATE_WALKING);
+					}
+					else if (dynamic_cast<CKoopas*>(e))
+					{
+						objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
+						objects[i]->SetState(KOOPAS_STATE_WALKING);
+					}
+				}
+			
+		}
+	}
+	vector<LPGAMEOBJECT> coObjects;
+
+	//Push nhung Obj trong man hinh vao coObjects de xet va cham 
+	for (size_t i = 1; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT e = objects[i];
+		if (dynamic_cast<Ground*>(e) || dynamic_cast<Line*>(e) || dynamic_cast<Tube*>(e) || dynamic_cast<Brick*>(e) || dynamic_cast<QuestionBrick*>(e))
+		{
+			coObjects.push_back(objects[i]);
+		}
+		else {
+			if (objects[i]->x > CGame::GetInstance()->GetCamPosX())
+				if (objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())
+					coObjects.push_back(objects[i]);
+		}
+		
+	}
+
+	// Update Obj is Active in screen
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		if (objects[i]->x > CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT && objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
+			objects[i]->Active = true;
+		if(objects[i]->Active)
+			objects[i]->Update(dt, &coObjects);
 	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)

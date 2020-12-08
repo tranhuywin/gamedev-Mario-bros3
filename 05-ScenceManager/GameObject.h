@@ -47,6 +47,7 @@ public:
 
 	float x; 
 	float y;
+	float XStartLive, YStartLive;
 
 	float dx;	// dx = vx*dt
 	float dy;	// dy = vy*dt
@@ -58,13 +59,14 @@ public:
 	int ny;
 
 	int state;
-
+	bool Active;
 	DWORD dt; 
 
 	LPANIMATION_SET animation_set;
 
 public: 
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
+	void SetXYStartLive(float xSstartLive, float yStartLive){ this->XStartLive = xSstartLive, this->YStartLive = yStartLive; }
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }

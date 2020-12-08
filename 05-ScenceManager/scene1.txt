@@ -432,6 +432,8 @@ bend over left Big
 0	50.0	350.0	1
 # GOOMBA
 2	176	400	3
+2	832	384	3
+2	900	384	3
 #KOOPA Troopas
 3	560	355	7
 #Ground
@@ -537,7 +539,7 @@ bend over left Big
 9	2256	368	8
 9	2272	368	8
 #fire piranha plant
-10	360	320	9
+10	360	368	9
 # ---- fire bullet	----
 4	-100	0	4
 # --- SCENE PORTAL ----
