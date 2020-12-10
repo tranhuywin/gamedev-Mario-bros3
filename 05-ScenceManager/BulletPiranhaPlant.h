@@ -7,12 +7,13 @@
 
 class BulletPiranhaPlant : public CGameObject
 {
-	bool MarioUp;
+
 public:
+	bool AllowAttack, IsAttack;
 	BulletPiranhaPlant();
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
-	void Attack(float x, float y, float Xtarget, float Ytarget, bool IsRight, bool AttackIsAtive);
+	void Attack(int PosAttack, bool AttackIsAtive);
 };
 

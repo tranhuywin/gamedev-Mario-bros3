@@ -423,8 +423,8 @@ bend over left Big
 7	901	902	903	904	905	906	907	908
 # bick question
 8	100000	100001
-#fire piranha plant
-9	603	604	605	606	607	608
+#fire piranha plant	603	604	605	606	607	608
+9	603	604	606	607
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick

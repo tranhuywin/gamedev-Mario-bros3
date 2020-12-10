@@ -8,17 +8,19 @@ void FirePiranhaPlant::GetBoundingBox(float& left, float& top, float& right, flo
 {
 	left = x;
 	top = y;
-	right = x + 16;
-	bottom = y + 32;
+	right = x + FIRE_PIRANHA_PLANT_WIDTH;
+	bottom = y + FIRE_PIRANHA_PLANT_HIGHT;
 }
 
 void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	y += dy;
 	CGameObject::Update(dt);
-	coObjects->push_back(mario);
-	Bullet->Update(dt, coObjects);
+	//coObjects->push_back(mario);
 
+	CheckPositionMarioToAttack();
+	
+	Bullet->Update(dt, coObjects);
 	if (GetTickCount() - Attack_start > 5000)
 	{
 		Attack_start = 0;
@@ -43,8 +45,8 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (Attack && coEventsResultCo.size() == 1)
 		{
 			vy = 0;
-			Bullet->Attack(this->x, this->y, mario->x, mario->y, false, Attack);
-		}		
+			Bullet->Attack(PosAttack, Attack);
+		}
 	}
 	else
 	{
@@ -75,10 +77,21 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void FirePiranhaPlant::Render()
 {
 	Bullet->Render();
-	if(this->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()/2)
-		animation_set->at(0)->Render(x, y);
-	else
-		animation_set->at(3)->Render(x, y);  
+	switch (state)
+	{
+	case FIRE_PIRANHA_PLANT_ANI_LEFT_UP:
+		animation_set->at(FIRE_PIRANHA_PLANT_ANI_LEFT_UP)->Render(x, y);
+		break;
+	case FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN:
+		animation_set->at(FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN)->Render(x, y);
+		break;
+	case FIRE_PIRANHA_PLANT_ANI_RIGHT_UP:
+		animation_set->at(FIRE_PIRANHA_PLANT_ANI_RIGHT_UP)->Render(x, y);
+		break;
+	case FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN:
+		animation_set->at(FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN)->Render(x, y);
+		break;
+	}
 }
 
 FirePiranhaPlant::FirePiranhaPlant(CMario* mario)
@@ -89,5 +102,58 @@ FirePiranhaPlant::FirePiranhaPlant(CMario* mario)
 void FirePiranhaPlant::SetState(int state)
 {
 	CGameObject::SetState(state);
+	/*switch (state)
+	{
+	case FIRE_PIRANHA_PLANT_ANI_LEFT_UP:
+		break;
+	case FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN:
+		break;
+	case FIRE_PIRANHA_PLANT_ANI_RIGHT_UP:
+		break;
+	case FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN:
+		break;
+	}*/
 
+}
+
+void FirePiranhaPlant::CheckPositionMarioToAttack()
+{
+	if (mario->x < this->x)	// LEFT
+	{
+		if (mario->y < this->y)	//TOP
+		{
+			SetState(FIRE_PIRANHA_PLANT_ANI_LEFT_UP);
+			if (this->x - mario->x > 80)
+				PosAttack = MARIO_LEFT_TOP_TOP;
+			else
+				PosAttack = MARIO_LEFT_TOP_BOT;
+		}
+		else
+		{
+			SetState(FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN);
+			if (this->x - mario->x > 80)
+				PosAttack = MARIO_LEFT_BOT_TOP;
+			else
+				PosAttack = MARIO_LEFT_BOT_BOT;
+		}
+	}
+	else
+	{
+		if (mario->y < this->y)
+		{
+			SetState(FIRE_PIRANHA_PLANT_ANI_RIGHT_UP);
+			if ( mario->x - this->x > 80)
+				PosAttack = MARIO_RIGHT_TOP_TOP;
+			else
+				PosAttack = MARIO_RIGHT_TOP_BOT;
+		}
+		else
+		{
+			SetState(FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN);
+			if (mario->x - this->x > 80)
+				PosAttack = MARIO_RIGHT_TOP_TOP;
+			else
+				PosAttack = MARIO_RIGHT_TOP_BOT;
+		}
+	}
 }

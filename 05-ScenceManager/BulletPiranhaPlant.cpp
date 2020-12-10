@@ -1,10 +1,13 @@
 #include "BulletPiranhaPlant.h"
 #include "Mario.h"
 #include "Utils.h"
+#include "FirePiranhaPlant.h"
 
 BulletPiranhaPlant::BulletPiranhaPlant()
 {
 	this->SetAnimationSet(CAnimationSets::GetInstance()->Get(4));
+	x = -1;
+	y = -1;
 }
 
 void BulletPiranhaPlant::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -17,8 +20,16 @@ void BulletPiranhaPlant::GetBoundingBox(float& left, float& top, float& right, f
 
 void BulletPiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	CGameObject::Update(dt);
-	vector<LPCOLLISIONEVENT> coEvents;
+	x += dx;
+	y += dy;
+	if ((this->x < CGame::GetInstance()->GetCamPosX() || this->x > CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()) && !IsAttack)
+	{
+		AllowAttack = true;
+	}
+	if ((this->y < CGame::GetInstance()->GetCamPosY() || this->y > CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()) && !IsAttack)
+		AllowAttack = true;
+ 	CGameObject::Update(dt);
+	/*vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
 	CalcPotentialCollisions(coObjects, coEvents);
@@ -53,7 +64,7 @@ void BulletPiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 	}
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];*/
 }
 
 void BulletPiranhaPlant::Render()
@@ -62,20 +73,70 @@ void BulletPiranhaPlant::Render()
 	RenderBoundingBox();
 }
 
-void BulletPiranhaPlant::Attack(float XStart, float YStart, float Xtarget, float Ytarget, bool IsRight, bool AttackIsAtive)
+void BulletPiranhaPlant::Attack(int PosAttack, bool AttackIsAtive)
 {
-	// TODO: Fixing attack
-	if (AttackIsAtive)
-	{
-		x = XStart;
-		y = YStart;
-		vx = 0.00001f * dt;
-		vy = 0.00001f * dt;
-	}
-	else
-	{
-		x = -OUTSIDE_MAP;
-		y = OUTSIDE_MAP;
-	}
+	if(AllowAttack)
+		if (AttackIsAtive)
+		{
+			IsAttack = true;
+			switch (PosAttack)
+			{
+			case MARIO_LEFT_TOP_TOP:
+				vx = -0.005 * dt;
+				vy = -0.005 * dt;
+				this->x = 352.0f;
+				this->y = 336.0f;
+				break;
+			case MARIO_LEFT_TOP_BOT:
+				vx = -0.005 * dt;
+				vy = -0.001 * dt;
+				this->x = 352.0f;
+				this->y = 336.0f;
+				break;
+			case MARIO_LEFT_BOT_TOP:
+				vx = -0.005 * dt;
+				vy = 0.001 * dt;
+				this->x = 352.0f;
+				this->y = 344.0f;
+				break;
+			case MARIO_LEFT_BOT_BOT:
+				vx = -0.005 * dt;
+				vy = 0.005 * dt;
+				this->x = 352.0f;
+				this->y = 344.0f;
+				break;
+
+			case MARIO_RIGHT_TOP_TOP:
+				vx = 0.005 * dt;
+				vy = -0.005 * dt;
+				this->x = 376.0f;
+				this->y = 336.0f;
+				break;
+			case MARIO_RIGHT_TOP_BOT:
+				vx = 0.005 * dt;
+				vy = -0.001 * dt;
+				this->x = 376.0f;
+				this->y = 336.0f;
+				break;
+			case MARIO_RIGHT_BOT_TOP:
+				vx = 0.005 * dt;
+				vy = 0.001 * dt;
+				this->x = 376.0f;
+				this->y = 344.0f;
+				break;
+			case MARIO_RIGHT_BOT_BOT:
+				vx = 0.005 * dt;
+				vy = 0.005 * dt;
+				this->x = 376.0f;
+				this->y = 344.0f;
+				break;
+			}
+		}
+		else
+		{
+			x = -1;
+			y = -1;
+		}
 }
+
 
