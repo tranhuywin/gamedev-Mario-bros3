@@ -187,7 +187,15 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 	case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 	case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
-	case OBJECT_TYPE_FIRE_PIRANHA_PLANT: obj = new FirePiranhaPlant(player); break;
+	case OBJECT_TYPE_FIRE_PIRANHA_PLANT: 
+		{
+			// TODO: Get Possition from file
+			int aniPlant = atoi(tokens[4].c_str());
+			BulletPiranhaPlant* objBullet = new BulletPiranhaPlant(aniPlant);
+			objects.push_back(objBullet);
+			obj = new FirePiranhaPlant(player, objBullet);
+		}
+		break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());
@@ -344,7 +352,10 @@ void CPlayScene::Render()
 {
 	tileMap->Draw();
 	for (int i = 1; i < objects.size(); i++)
+	{
+
 		objects[i]->Render();
+	}
 	objects[0]->Render();
 }
 

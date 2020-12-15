@@ -16,18 +16,21 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	y += dy;
 	CGameObject::Update(dt);
-	//coObjects->push_back(mario);
 
 	CheckPositionMarioToAttack();
-	
+
 	Bullet->Update(dt, coObjects);
-	if (GetTickCount() - Attack_start > 5000)
+	if (GetTickCount() - Attack_start > FIRE_PIRANHA_PLANT_TIME_ATTACK)
 	{
 		Attack_start = 0;
 		Attack = 0;
 		IsAtack = false;
 	}
-
+	if (GetTickCount() - WaitAttack_start > FIRE_PIRANHA_PLANT_TIME_WAIT_ATTACK)
+	{
+		WaitAttack_start = 0;
+		WaitAttack = 0;
+	}
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -45,7 +48,8 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (Attack && coEventsResultCo.size() == 1)
 		{
 			vy = 0;
-			Bullet->Attack(PosAttack, Attack);
+			if(!WaitAttack)
+				Bullet->Attack(PosAttack, Attack);
 		}
 	}
 	else
@@ -65,6 +69,7 @@ void FirePiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				vy = -FIRE_PIRANHA_PLANT_SPEED_VY * dt;
 				IsAtack = true;
 				StartAttack();
+				StartWaitAttack();
 			}
 			else if (vy != FIRE_PIRANHA_PLANT_SPEED_VY * dt || vy != -FIRE_PIRANHA_PLANT_SPEED_VY * dt)
 				vy = FIRE_PIRANHA_PLANT_SPEED_VY *dt;
@@ -80,23 +85,25 @@ void FirePiranhaPlant::Render()
 	switch (state)
 	{
 	case FIRE_PIRANHA_PLANT_ANI_LEFT_UP:
-		animation_set->at(FIRE_PIRANHA_PLANT_ANI_LEFT_UP)->Render(x, y);
+			ani = FIRE_PIRANHA_PLANT_ANI_LEFT_UP;
 		break;
 	case FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN:
-		animation_set->at(FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN)->Render(x, y);
+			ani = FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN;
 		break;
 	case FIRE_PIRANHA_PLANT_ANI_RIGHT_UP:
-		animation_set->at(FIRE_PIRANHA_PLANT_ANI_RIGHT_UP)->Render(x, y);
+			ani = FIRE_PIRANHA_PLANT_ANI_RIGHT_UP;
 		break;
 	case FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN:
-		animation_set->at(FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN)->Render(x, y);
+			ani = FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN;
 		break;
 	}
+	animation_set->at(ani)->Render(x, y);
 }
 
-FirePiranhaPlant::FirePiranhaPlant(CMario* mario)
+FirePiranhaPlant::FirePiranhaPlant(CMario* mario, BulletPiranhaPlant* bullet)
 {
 	this->mario = mario;
+	this->Bullet = bullet;
 }
 
 void FirePiranhaPlant::SetState(int state)
@@ -122,16 +129,18 @@ void FirePiranhaPlant::CheckPositionMarioToAttack()
 	{
 		if (mario->y < this->y)	//TOP
 		{
-			SetState(FIRE_PIRANHA_PLANT_ANI_LEFT_UP);
-			if (this->x - mario->x > 80)
+			if(vy == 0)
+				SetState(FIRE_PIRANHA_PLANT_ANI_LEFT_UP);
+			if (this->x - mario->x > FIRE_PIRANHA_PLANT_DISTANCE_ATTACK_MARIO)
 				PosAttack = MARIO_LEFT_TOP_TOP;
 			else
 				PosAttack = MARIO_LEFT_TOP_BOT;
 		}
 		else
 		{
-			SetState(FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN);
-			if (this->x - mario->x > 80)
+			if (vy == 0)
+				SetState(FIRE_PIRANHA_PLANT_ANI_LEFT_DOWN);
+			if (this->x - mario->x > FIRE_PIRANHA_PLANT_DISTANCE_ATTACK_MARIO)
 				PosAttack = MARIO_LEFT_BOT_TOP;
 			else
 				PosAttack = MARIO_LEFT_BOT_BOT;
@@ -141,16 +150,18 @@ void FirePiranhaPlant::CheckPositionMarioToAttack()
 	{
 		if (mario->y < this->y)
 		{
-			SetState(FIRE_PIRANHA_PLANT_ANI_RIGHT_UP);
-			if ( mario->x - this->x > 80)
+			if (vy == 0)
+				SetState(FIRE_PIRANHA_PLANT_ANI_RIGHT_UP);
+			if ( mario->x - this->x > FIRE_PIRANHA_PLANT_DISTANCE_ATTACK_MARIO)
 				PosAttack = MARIO_RIGHT_TOP_TOP;
 			else
 				PosAttack = MARIO_RIGHT_TOP_BOT;
 		}
 		else
 		{
-			SetState(FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN);
-			if (mario->x - this->x > 80)
+			if (vy == 0)
+				SetState(FIRE_PIRANHA_PLANT_ANI_RIGHT_DOWN);
+			if (mario->x - this->x > FIRE_PIRANHA_PLANT_DISTANCE_ATTACK_MARIO)
 				PosAttack = MARIO_RIGHT_TOP_TOP;
 			else
 				PosAttack = MARIO_RIGHT_TOP_BOT;

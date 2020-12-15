@@ -13,6 +13,7 @@
 #include "Koopas.h"
 #include "Ground.h"
 #include "BulletPiranhaPlant.h"
+#include "FirePiranhaPlant.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -322,6 +323,20 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						SetState(MARIO_STATE_DIE);
 				}
 			}
+			else if (dynamic_cast<FirePiranhaPlant*>(e->obj))
+			{
+				FirePiranhaPlant* Plant = dynamic_cast<FirePiranhaPlant*>(e->obj);
+				if (untouchable == 0)
+				{
+					if (level > MARIO_LEVEL_SMALL)
+					{
+						level = MARIO_LEVEL_SMALL;
+						StartUntouchable();
+					}
+					else
+						SetState(MARIO_STATE_DIE);
+				}
+			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
@@ -402,12 +417,28 @@ void CMario::Render()
 	{
 		if (vx == 0)
 		{
-			if (nx>0) ani = MARIO_ANI_SMALL_IDLE_RIGHT;
-			else ani = MARIO_ANI_SMALL_IDLE_LEFT;
+			if (nx > 0) {
+				ani = MARIO_ANI_SMALL_IDLE_RIGHT;
+				if (AllowJump)
+					ani = MARIO_ANI_SMALL_JUMP_RIGHT;
+			}
+			else {
+				ani = MARIO_ANI_SMALL_IDLE_LEFT;
+				if (AllowJump)
+					ani = MARIO_ANI_SMALL_JUMP_LEFT;
+			}
 		}
 		else if (vx > 0)
+		{
 			ani = MARIO_ANI_SMALL_WALKING_RIGHT;
-		else ani = MARIO_ANI_SMALL_WALKING_LEFT;
+			if (AllowJump)
+				ani = MARIO_ANI_SMALL_JUMP_RIGHT;
+		}
+		else {
+			ani = MARIO_ANI_SMALL_WALKING_LEFT;
+			if (AllowJump)
+				ani = MARIO_ANI_SMALL_JUMP_LEFT;
+		}
 	}
 	else if (level == MARIO_LEVEL_RACCOON)
 	{
