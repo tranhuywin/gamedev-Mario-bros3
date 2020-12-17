@@ -176,6 +176,17 @@
 30002	32	11	48	27	10
 #die
 30003	54	18	70	27	10
+###### para goomba ############
+#walking Wing
+30011	164	40	184	59	11
+30012	188	40	208	59	11
+30013	214	35	234	59	11
+30014	238	35	258	59	11
+#walking no
+30016	183	70	199	86	11
+30017	204	70	220	86	11
+#die
+30020	163	77	179	86	11
 #brick with question mark animation
 40001	300	117	316	133	20
 40002	318	117	334	133	20
@@ -393,6 +404,15 @@ bend over left Big
 702	30003	1000
 ############    Tube ###########
 703	70006	100
+# ==== PARA GOOMBA  =========
+#walking wing big
+705	30013	100	30014	100
+# small
+706	30011	100	30012	100
+#walking nor
+707	30016	100	30017	100
+#die
+708	30020	2000
 ############ FIRE BULLET   #################
 800	50001	100	50002	100	50003	100	50004	100
 801	50005	100	50006	100	50007	100	50008	100
@@ -426,7 +446,7 @@ bend over left Big
 # QUESTION MARK BRICK 
 22	602
 # GOOMBA
-3	701	702
+3	701	702	705	706	707	708
 # FIRE BULLET
 4	800	801
 #line
@@ -439,15 +459,18 @@ bend over left Big
 9	603	604	606	607
 #Tube
 10	703
+# PARA GOOMBA
+11	705	706	707	708
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
 # MARIO
 0	50.0	350.0	1
 # GOOMBA
-2	176	400	3
-2	832	384	3
-2	900	384	3
+2	176	400	3	1
+2	832	384	3	1
+2	900	384	3	1
+2	200	340	3	2
 #KOOPA Troopas
 3	560	355	7
 #Ground
@@ -482,19 +505,6 @@ bend over left Big
 6	2145	368	6
 #12
 6	2176	272	6
-#Tube
-#1
-7	352	368	6
-#2
-7	1792	385	6
-#3
-7	1856	368	6
-#4
-7	2256	112	6
-#5
-7	2255	383	6
-#6
-7	2320	384	6
 # BRICK 
 # --- platform (hint: I created the list using Excel!) ----
 1	1440	128	2
@@ -552,8 +562,23 @@ bend over left Big
 9	2272	304	8
 9	2256	368	8
 9	2272	368	8
+#para goomba
+11	200	340	11
 # ----- fire piranha plant, ani bullet = 4, ani Tube = 10, x tube, y tube ------
 10	360	368	9	4	10	352	368
+#Tube
+#1
+7	352	368	6
+#2
+7	1792	385	6
+#3
+7	1856	368	6
+#4
+7	2256	112	6
+#5
+7	2255	383	6
+#6
+7	2320	384	6
 # ---- fire bullet	----
 4	-100	0	4
 # --- SCENE PORTAL ----

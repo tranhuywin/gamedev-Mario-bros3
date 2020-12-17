@@ -69,7 +69,16 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-				goomba->SetState(GOOMBA_STATE_DIE);
+				if(goomba->TypeGoomba == GOOMBA_NORMAL)
+					goomba->SetState(GOOMBA_STATE_DIE);
+				else if (goomba->TypeGoomba == PARA_GOOMBA)
+				{
+					if (goomba->LevelParaGoomba == 1)
+					{
+						goomba->SetState(GOOMBA_STATE_WALKING);
+						goomba->LevelParaGoomba--;
+					}
+				}
 				StartExplode();
 				XExplode = x;
 				YExplode = y;

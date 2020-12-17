@@ -45,6 +45,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_QUESTION_BRICK		8
 #define OBJECT_TYPE_WOODEN_BRICK		9
 #define OBJECT_TYPE_FIRE_PIRANHA_PLANT	10
+#define OBJECT_TYPE_RED_PARAGOOMBA		11
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -178,7 +179,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		DebugOut(L"[INFO] Player object created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
 	case OBJECT_TYPE_BRICK: obj = new Brick(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_GROUND: obj = new Ground(); break;
@@ -187,11 +187,21 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 	case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 	case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+	//case OBJECT_TYPE_RED_PARAGOOMBA: obj = new RedParaGoomba(); break;
+	case OBJECT_TYPE_GOOMBA: 
+		{
+		int TypeGoomba = atoi(tokens[4].c_str());
+		obj = new CGoomba(TypeGoomba);
+		}
+		break;
 	case OBJECT_TYPE_FIRE_PIRANHA_PLANT: 
 		{
 			// TODO: Get Possition from file
 			int aniPlant = atoi(tokens[4].c_str());
-			BulletPiranhaPlant* objBullet = new BulletPiranhaPlant(aniPlant);
+			BulletPiranhaPlant* objBullet = new BulletPiranhaPlant();
+			LPANIMATION_SET aniPlant_set = animation_sets->Get(aniPlant);
+			objBullet->SetAnimationSet(aniPlant_set);
+
 			objects.push_back(objBullet);
 			obj = new FirePiranhaPlant(player, objBullet);
 		}
@@ -211,7 +221,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	// General object setup
 	obj->SetPosition(x, y);
-	obj->SetXYStartLive(x, y);
+	//obj->SetXYStartLive(x, y);
 	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 
 	obj->SetAnimationSet(ani_set);
@@ -273,52 +283,52 @@ void CPlayScene::Load()
 void CPlayScene::Update(DWORD dt)
 {
 	//If obj die, Obj will be reset at X start, Y start
-	for (size_t i = 0; i < objects.size(); i++)
-	{
-		if (objects[i]->y < CGame::GetInstance()->GetCamPosY() || (objects[i]->y > CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()))			// Obj rot ra man hinh theo chieu Y == die
-		{
-			if (objects[i]->XStartLive < CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT || objects[i]->XStartLive > CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
-				{
-					LPGAMEOBJECT e = objects[i];
-					objects[i]->Active = false;
-					if (dynamic_cast<CGoomba*>(e))
-					{
-						objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
-						objects[i]->SetState(GOOMBA_STATE_WALKING);
-					}
-					else if (dynamic_cast<CKoopas*>(e))
-					{
-						objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
-						objects[i]->SetState(KOOPAS_STATE_WALKING);
-					}
-				}
-			
-		}
-	}
+	//for (size_t i = 0; i < objects.size(); i++)
+	//{
+	//	if (objects[i]->y < CGame::GetInstance()->GetCamPosY() || (objects[i]->y > CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()))			// Obj rot ra man hinh theo chieu Y == die
+	//	{
+	//		if (objects[i]->XStartLive < CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT || objects[i]->XStartLive > CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
+	//			{
+	//				LPGAMEOBJECT e = objects[i];
+	//				objects[i]->Active = false;
+	//				if (dynamic_cast<CGoomba*>(e))
+	//				{
+	//					objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
+	//					objects[i]->SetState(GOOMBA_STATE_WALKING);
+	//				}
+	//				else if (dynamic_cast<CKoopas*>(e))
+	//				{
+	//					objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
+	//					objects[i]->SetState(KOOPAS_STATE_WALKING);
+	//				}
+	//			}
+	//		
+	//	}
+	//}
 	vector<LPGAMEOBJECT> coObjects;
 
 	//Push nhung Obj trong man hinh vao coObjects de xet va cham 
 	for (size_t i = 1; i < objects.size(); i++)
 	{
-		LPGAMEOBJECT e = objects[i];
+		/*LPGAMEOBJECT e = objects[i];
 		if (dynamic_cast<Ground*>(e) || dynamic_cast<Line*>(e) || dynamic_cast<Tube*>(e) || dynamic_cast<Brick*>(e) || dynamic_cast<QuestionBrick*>(e))
 		{
 			coObjects.push_back(objects[i]);
 		}
 		else {
 			if (objects[i]->x > CGame::GetInstance()->GetCamPosX())
-				if (objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())
-					coObjects.push_back(objects[i]);
-		}
+				if (objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())*/
+		coObjects.push_back(objects[i]);
+		//}
 		
 	}
 
 	// Update Obj is Active in screen
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		if (objects[i]->x > CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT && objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
-			objects[i]->Active = true;
-		if(objects[i]->Active)
+		//if (objects[i]->x > CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT && objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
+		//	objects[i]->Active = true;
+		//if(objects[i]->Active)
 			objects[i]->Update(dt, &coObjects);
 	}
 

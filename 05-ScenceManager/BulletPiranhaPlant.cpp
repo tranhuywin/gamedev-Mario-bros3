@@ -3,9 +3,8 @@
 #include "Utils.h"
 #include "FirePiranhaPlant.h"
 
-BulletPiranhaPlant::BulletPiranhaPlant(int ani)
+BulletPiranhaPlant::BulletPiranhaPlant()
 {
-	this->SetAnimationSet(CAnimationSets::GetInstance()->Get(ani));
 	x = 0;
 	y = 0;
 	vx = 0; vy = 0;
