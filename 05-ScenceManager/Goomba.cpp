@@ -13,18 +13,14 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 	if (TypeGoomba == GOOMBA_NORMAL)
 	{
 		right = x + GOOMBA_BBOX_WIDTH;
-
-		if (state == GOOMBA_STATE_DIE)
-			bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
-		else
-			bottom = y + GOOMBA_BBOX_HEIGHT;
+		bottom = y + GOOMBA_BBOX_HEIGHT;
 	}
 	else if (TypeGoomba == PARA_GOOMBA)
 	{
 		if (LevelParaGoomba == PARAGOOMBA_LEVEL)
 		{
 			right = x + GOOMBA_BBOX_WIDTH;
-			bottom = y + GOOMBA_BBOX_WIDTH;
+			bottom = y + GOOMBA_BBOX_HEIGHT;
 		}
 		else if (LevelParaGoomba == PARAGOOMBA_WINGED_LEVEL)
 		{
@@ -36,6 +32,9 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 			bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
 		}
 	}
+
+	if (state == GOOMBA_STATE_DIE)
+		bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
 }
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
@@ -43,7 +42,8 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	vy += GOOMBA_GRAVITY * dt;
 	CGameObject::Update(dt);
 	if(state == GOOMBA_STATE_DIE)
-		if (Die && GetTickCount() - Die_start > animation_set->at(GOOMBA_ANI_DIE)->GettotalFrameTime())
+		//if(ani == GOOMBA_ANI_DIE || ani == PARAGOOMBA_DIE_ANI)
+		if (Die && GetTickCount() - Die_start > animation_set->at(ani)->GettotalFrameTime())
 		{
 			Die_start = 0;
 			Die = 0;
@@ -52,13 +52,13 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	
 	if (TypeGoomba == PARA_GOOMBA) {
 		if (LevelParaGoomba == PARAGOOMBA_WINGED_LEVEL)
-			if (vy > -0.05f && vy < 0.05f)
+			if (vy > -PARAGOOMBA_VY_WING_BIG && vy < PARAGOOMBA_VY_WING_BIG)
 			{
 				ani = PARAGOOMBA_WINGED_BIG_ANI;
 			}
 			else ani = PARAGOOMBA_WINGED_ANI;
 
-		if (JumpCount == 3)
+		if (JumpCount == PARAGOOMBA_JUMP_COUNT)
 		{
 			SetState(PARAGOOMBA_WINGED_STATE_JUMP_HEIGHT);
 			JumpCount = 0;
@@ -137,7 +137,6 @@ void CGoomba::SetState(int state)
 	{
 		case GOOMBA_STATE_DIE:
 			StartDie();
-			y += GOOMBA_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE;
 			vx = 0;
 			break;
 		case GOOMBA_STATE_WALKING: 
