@@ -27,13 +27,19 @@ void VenusFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CheckPositionMarioToAttack();
 
 	Bullet->Update(dt, coObjects);
-	if (GetTickCount() - Attack_start > VENUS_FIRE_TRAP_TIME_ATTACK)
+	int TimeAttack = 1950, TimeWaitAttack = 0;
+	if (TypeVenusFireTrap != TYPE_VENUS_FIRE_TRAP_GREEN_BITE)
+	{
+		TimeAttack = VENUS_FIRE_TRAP_TIME_ATTACK;
+		TimeWaitAttack = VENUS_FIRE_TRAP_TIME_WAIT_ATTACK;
+	}
+	if (GetTickCount() - Attack_start > TimeAttack)
 	{
 		Attack_start = 0;
 		Attack = 0;
 		IsAtack = false;
 	}
-	if (GetTickCount() - WaitAttack_start > VENUS_FIRE_TRAP_TIME_WAIT_ATTACK)
+	if (GetTickCount() - WaitAttack_start > TimeWaitAttack)
 	{
 		WaitAttack_start = 0;
 		WaitAttack = 0;
@@ -66,7 +72,8 @@ void VenusFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					Bullet_Y = this->y + BULLET_BBOX / 2;
 				else
 					Bullet_Y = this->y + BULLET_BBOX  + BULLET_BBOX / 2;
-				Bullet->Attack(PosAttack, Attack, Bullet_X, Bullet_Y);
+				if(TypeVenusFireTrap != TYPE_VENUS_FIRE_TRAP_GREEN_BITE)
+					Bullet->Attack(PosAttack, Attack, Bullet_X, Bullet_Y);
 			}
 		}
 	}
@@ -88,6 +95,7 @@ void VenusFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				IsAtack = true;
 				StartAttack();
 				StartWaitAttack();
+
 			}
 			else if (vy != VENUS_FIRE_TRAP_SPEED_VY * dt || vy != -VENUS_FIRE_TRAP_SPEED_VY * dt)
 				vy = VENUS_FIRE_TRAP_SPEED_VY *dt;
@@ -117,7 +125,7 @@ void VenusFireTrap::Render()
 			break;
 		}
 	}
-	else {
+	else if(TypeVenusFireTrap == TYPE_VENUS_FIRE_TRAP_GREEN) {
 		switch (state)
 		{
 		case VENUS_FIRE_TRAP_ANI_LEFT_UP:
@@ -133,6 +141,9 @@ void VenusFireTrap::Render()
 			ani = GREEN_VENUS_FIRE_TRAP_ANI_RIGHT_DOWN;
 			break;
 		}
+	}
+	else {
+		ani = GREENVENUS_FIRE_TRAP_ANI_BITE;
 	}
 	animation_set->at(ani)->Render(x, y);
 }
