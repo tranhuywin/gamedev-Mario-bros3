@@ -15,7 +15,7 @@ class CPlayScene: public CScene
 protected: 
 	TileMap *tileMap;
 	CMario* player;					// A play scene has to have player, right? 
-
+	vector<LPGAMEOBJECT> objectsItem;
 	vector<LPGAMEOBJECT> objects;
 	void _ParseSection_TEXTURES(string line);
 	void _ParseSection_SPRITES(string line);

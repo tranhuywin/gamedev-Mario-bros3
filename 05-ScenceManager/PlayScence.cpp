@@ -13,6 +13,7 @@
 #include "WoodenBrick.h"
 #include "Brick.h"
 #include "FirePiranhaPlant.h"
+#include "Items.h";
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -45,7 +46,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_QUESTION_BRICK		8
 #define OBJECT_TYPE_WOODEN_BRICK		9
 #define OBJECT_TYPE_FIRE_PIRANHA_PLANT	10
-#define OBJECT_TYPE_RED_PARAGOOMBA		11
+#define OBJECT_TYPE_ITEM				11
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -165,36 +166,41 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	CAnimationSets * animation_sets = CAnimationSets::GetInstance();
 
 	CGameObject *obj = NULL;	
-
+	CGameObject* objItem = NULL;
 	switch (object_type)
-	{
-	case OBJECT_TYPE_MARIO:
-		if (player!=NULL) 
 		{
-			DebugOut(L"[ERROR] MARIO object was created before!\n");
-			return;
-		}
-		obj = new CMario(x,y); 
-		player = (CMario*)obj;  
+		case OBJECT_TYPE_MARIO:
+			if (player != NULL)
+			{
+				DebugOut(L"[ERROR] MARIO object was created before!\n");
+				return;
+			}
+			obj = new CMario(x, y);
+			player = (CMario*)obj;
 
-		DebugOut(L"[INFO] Player object created!\n");
-		break;
-	case OBJECT_TYPE_BRICK: obj = new Brick(); break;
-	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
-	case OBJECT_TYPE_GROUND: obj = new Ground(); break;
-	case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
-	case OBJECT_TYPE_LINE: obj = new Line(); break;
-	case OBJECT_TYPE_TUBE: obj = new Tube(); break;
-	case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
-	case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
-	//case OBJECT_TYPE_RED_PARAGOOMBA: obj = new RedParaGoomba(); break;
-	case OBJECT_TYPE_GOOMBA: 
+			DebugOut(L"[INFO] Player object created!\n");
+			break;
+		case OBJECT_TYPE_BRICK: obj = new Brick(); break;
+		case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
+		case OBJECT_TYPE_GROUND: obj = new Ground(); break;
+		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
+		case OBJECT_TYPE_LINE: obj = new Line(); break;
+		case OBJECT_TYPE_TUBE: obj = new Tube(); break;
+		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
+		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_ITEM:
 		{
-		int TypeGoomba = atoi(tokens[4].c_str());
-		obj = new CGoomba(TypeGoomba);
+			int IdItem = atoi(tokens[4].c_str());
+			objItem = new Items(IdItem);
 		}
 		break;
-	case OBJECT_TYPE_FIRE_PIRANHA_PLANT: 
+		case OBJECT_TYPE_GOOMBA:
+		{
+			int TypeGoomba = atoi(tokens[4].c_str());
+			obj = new CGoomba(TypeGoomba);
+		}
+		break;
+		case OBJECT_TYPE_FIRE_PIRANHA_PLANT:
 		{
 			// TODO: Get Possition from file
 			int aniPlant = atoi(tokens[4].c_str());
@@ -206,26 +212,39 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			obj = new FirePiranhaPlant(player, objBullet);
 		}
 		break;
-	case OBJECT_TYPE_PORTAL:
-		{	
+		case OBJECT_TYPE_PORTAL:
+		{
 			float r = atof(tokens[4].c_str());
 			float b = atof(tokens[5].c_str());
 			int scene_id = atoi(tokens[6].c_str());
 			obj = new CPortal(x, y, r, b, scene_id);
 		}
 		break;
-	default:
-		DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
-		return;
+		default:
+			DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
+			return;
+		}
+	if (obj != NULL)
+	{
+		// General object setup
+		obj->SetPosition(x, y);
+		//obj->SetXYStartLive(x, y);
+		LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
+
+		obj->SetAnimationSet(ani_set);
+		objects.push_back(obj);
 	}
+	if (objItem != NULL)
+	{
+		objItem->SetPosition(x, y);
+		//obj->SetXYStartLive(x, y);
+		LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 
-	// General object setup
-	obj->SetPosition(x, y);
-	//obj->SetXYStartLive(x, y);
-	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
+		objItem->SetAnimationSet(ani_set);
+		objectsItem.push_back(objItem);
+	}
+		
 
-	obj->SetAnimationSet(ani_set);
-	objects.push_back(obj);
 }
 
 void CPlayScene::Load()
@@ -306,7 +325,7 @@ void CPlayScene::Update(DWORD dt)
 	//	}
 	//}
 	vector<LPGAMEOBJECT> coObjects;
-
+	vector<LPGAMEOBJECT> coObjectsItem;
 	//Push nhung Obj trong man hinh vao coObjects de xet va cham 
 	for (size_t i = 1; i < objects.size(); i++)
 	{
@@ -319,17 +338,24 @@ void CPlayScene::Update(DWORD dt)
 			if (objects[i]->x > CGame::GetInstance()->GetCamPosX())
 				if (objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())*/
 		coObjects.push_back(objects[i]);
-		//}
-		
 	}
-
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		coObjectsItem.push_back(objects[i]);
+	}
+	for (size_t i = 0; i < objectsItem.size(); i++)
+	{
+		objectsItem[i]->Update(dt, &coObjectsItem);
+	}
 	// Update Obj is Active in screen
 	for (size_t i = 0; i < objects.size(); i++)
 	{
 		//if (objects[i]->x > CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT && objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
 		//	objects[i]->Active = true;
 		//if(objects[i]->Active)
-			objects[i]->Update(dt, &coObjects);
+
+		objects[i]->Update(dt, &coObjects);
+
 	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
@@ -361,10 +387,15 @@ void CPlayScene::Update(DWORD dt)
 void CPlayScene::Render()
 {
 	tileMap->Draw();
+	
 	for (int i = 1; i < objects.size(); i++)
 	{
 
 		objects[i]->Render();
+	}
+	for (size_t i = 0; i < objectsItem.size(); i++)
+	{
+		objectsItem[i]->Render();
 	}
 	objects[0]->Render();
 }
@@ -439,7 +470,6 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		break;
 	}
 }
-
 
 void CPlayScenceKeyHandler::KeyState(BYTE *states)
 {
