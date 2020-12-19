@@ -14,6 +14,7 @@
 #include "Ground.h"
 #include "BulletPiranhaPlant.h"
 #include "VenusFireTrap.h"
+#include "Items.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -345,6 +346,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 					else
 						SetState(MARIO_STATE_DIE);
+				}
+			}
+			else if (dynamic_cast<Items*>(e->obj)) 
+			{
+				Items* item = dynamic_cast<Items*>(e->obj);
+				// jump on top >> kill Goomba and deflect a bit 
+				if (e->ny < 0)
+				{
+					item->SetState(ITEM_SWITCH_STATE_OFF);
 				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))

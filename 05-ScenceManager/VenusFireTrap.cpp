@@ -212,9 +212,9 @@ void VenusFireTrap::CheckPositionMarioToAttack()
 			if (vy == 0)
 				SetState(VENUS_FIRE_TRAP_ANI_RIGHT_DOWN);
 			if (mario->x - this->x > VENUS_FIRE_TRAP_DISTANCE_ATTACK_MARIO)
-				PosAttack = MARIO_RIGHT_TOP_TOP;
+				PosAttack = MARIO_RIGHT_BOT_TOP;
 			else
-				PosAttack = MARIO_RIGHT_TOP_BOT;
+				PosAttack = MARIO_RIGHT_BOT_BOT;
 		}
 	}
 }

@@ -181,7 +181,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 			DebugOut(L"[INFO] Player object created!\n");
 			break;
-		case OBJECT_TYPE_BRICK: obj = new Brick(); break;
+		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
 		case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 		case OBJECT_TYPE_GROUND: obj = new Ground(); break;
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
@@ -192,7 +192,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		case OBJECT_TYPE_ITEM:
 		{
 			int IdItem = atoi(tokens[4].c_str());
-			objItem = new Items(IdItem);
+			if(IdItem != ITEM_SWITCH)
+				objItem = new Items(IdItem);
+			else {
+				obj = new Items(IdItem);
+				//ItemSwitch = obj;
+				//obj = ItemSwitch;
+			}
 		}
 		break;
 		case OBJECT_TYPE_GOOMBA:

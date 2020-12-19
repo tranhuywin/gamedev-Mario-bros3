@@ -7,6 +7,8 @@
 #include "Tail.h"
 #include "Goomba.h"
 #include "Koopas.h"
+#include "Brick.h"
+#include "QuestionBrick.h"
 
 Tail::Tail()
 {
@@ -48,7 +50,20 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					Koopas->SetState(KOOPAS_STATE_SHELL);
 					Koopas->vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
 				}
-
+			}
+			else if (dynamic_cast<Brick*>(e))
+			{
+				Brick* brick = dynamic_cast<Brick*>(e);
+				brick->IsBreaked = true;
+			}
+			else if (dynamic_cast<QuestionBrick*>(e))
+			{
+				QuestionBrick* QBrick = dynamic_cast<QuestionBrick*>(e);
+				if (QBrick->GetState() == BRICK_STATE_QUESTION_ON && QBrick->vy == 0)
+				{
+					QBrick->SetState(BRICK_STATE_QUESTION_ON_UP);
+					QBrick->YCollition = QBrick->y;
+				}
 			}
 		}
 		IsKilling = false;
