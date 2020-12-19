@@ -241,6 +241,15 @@
 61002	7	71	23	103	10
 #left bot
 61003	7	33	23	65	10
+###################    Green Piranha plant #######################
+#right top
+61005	302	195	318	219	11
+#right bot
+61006	302	166	318	190	11
+#left top
+61007	6	195	22	219	10
+#left bot
+61008	6	166	22	190	10
 ########################    question brick    #########################
 70000	157	188	173	204	40
 70001	176	188	192	204	40
@@ -408,6 +417,20 @@ bend over left Big
 607	61003	100
 #left find
 608	61002	300	61003	300
+
+########### Green paraha plant
+#right top
+610	61005	100
+#right bot
+611	61006	100
+#right find
+612	61005	300	61006	100
+#left top
+613	61007	100
+#left bot
+614	61008	100
+#left find
+615	61007	300	61008	300
 # ==== GOOMBA  =========
 # walk
 701	30001	100	30002	100
@@ -472,7 +495,7 @@ bend over left Big
 # bick question
 8	100000	100001
 #fire piranha plant	603	604	605	606	607	608
-9	603	604	606	607
+9	603	604	606	607	610	611	613	614
 #Tube
 10	703
 # PARA GOOMBA
@@ -483,7 +506,7 @@ bend over left Big
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
 # MARIO
-0	50.0	350.0	1
+0	1740.0	350.0	1
 # GOOMBA
 2	176	400	3	1
 2	832	384	3	1
@@ -585,8 +608,9 @@ bend over left Big
 9	2272	304	8
 9	2256	368	8
 9	2272	368	8
-# ----- fire piranha plant, ani bullet = 4, ani Tube = 10, x tube, y tube ------
-10	360	368	9	4	10	352	368
+# ----- fire piranha plant, ani bullet = 4 0 = red, 1 = green------
+10	360	368	9	4	0
+10	1864	368	9	4	1
 #Tube
 #1
 7	352	368	6

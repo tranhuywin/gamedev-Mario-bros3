@@ -1,7 +1,7 @@
 #include "BulletPiranhaPlant.h"
 #include "Mario.h"
 #include "Utils.h"
-#include "FirePiranhaPlant.h"
+#include "VenusFireTrap.h"
 
 BulletPiranhaPlant::BulletPiranhaPlant()
 {
@@ -42,7 +42,7 @@ void BulletPiranhaPlant::Render()
 	//RenderBoundingBox();
 }
 
-void BulletPiranhaPlant::Attack(int PosAttack, bool AttackIsAtive)
+void BulletPiranhaPlant::Attack(int PosAttack, bool AttackIsAtive, float Bullet_X, float Bullet_Y)
 {
 	if(AllowAttack && !IsAttack)
 		if (AttackIsAtive)
@@ -53,51 +53,51 @@ void BulletPiranhaPlant::Attack(int PosAttack, bool AttackIsAtive)
 			case MARIO_LEFT_TOP_TOP:
 				vx = -SPEED_VX_BULLET * dt;
 				vy = -SPEED_VY_BULLET_TOP * dt;
-				this->x = BULLET_XLEFT;
-				this->y = BULLET_YTOP;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 			case MARIO_LEFT_TOP_BOT:
 				vx = -SPEED_VX_BULLET * dt;
 				vy = -SPEED_VY_BULLET_BOT * dt;
-				this->x = BULLET_XLEFT;
-				this->y = BULLET_YTOP;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 			case MARIO_LEFT_BOT_TOP:
 				vx = -SPEED_VX_BULLET * dt;
 				vy = SPEED_VY_BULLET_BOT * dt;
-				this->x = BULLET_XLEFT;
-				this->y = BULLET_YBOT;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 			case MARIO_LEFT_BOT_BOT:
 				vx = -SPEED_VX_BULLET * dt;
 				vy = SPEED_VY_BULLET_TOP * dt;
-				this->x = BULLET_XLEFT;
-				this->y = BULLET_YBOT;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 
 			case MARIO_RIGHT_TOP_TOP:
 				vx = SPEED_VX_BULLET * dt;
 				vy = -SPEED_VY_BULLET_TOP * dt;
-				this->x = BULLET_XRIGHT;
-				this->y = BULLET_YTOP;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 			case MARIO_RIGHT_TOP_BOT:
 				vx = SPEED_VX_BULLET * dt;
 				vy = -SPEED_VY_BULLET_BOT * dt;
-				this->x = BULLET_XRIGHT;
-				this->y = BULLET_YTOP;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 			case MARIO_RIGHT_BOT_TOP:
 				vx = SPEED_VX_BULLET * dt;
 				vy = SPEED_VY_BULLET_BOT * dt;
-				this->x = BULLET_XRIGHT;
-				this->y = BULLET_YBOT;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 			case MARIO_RIGHT_BOT_BOT:
 				vx = SPEED_VX_BULLET * dt;
 				vy = SPEED_VY_BULLET_TOP * dt;
-				this->x = BULLET_XRIGHT;
-				this->y = BULLET_YBOT;
+				this->x = Bullet_X;
+				this->y = Bullet_Y;
 				break;
 			}
 		}

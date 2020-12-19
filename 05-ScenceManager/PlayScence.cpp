@@ -12,8 +12,9 @@
 #include "Tube.h"
 #include "WoodenBrick.h"
 #include "Brick.h"
-#include "FirePiranhaPlant.h"
+#include "VenusFireTrap.h"
 #include "Items.h";
+#include "BulletPiranhaPlant.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -204,12 +205,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		{
 			// TODO: Get Possition from file
 			int aniPlant = atoi(tokens[4].c_str());
+			int TypeVenusFireTrap = atoi(tokens[5].c_str());
 			BulletPiranhaPlant* objBullet = new BulletPiranhaPlant();
 			LPANIMATION_SET aniPlant_set = animation_sets->Get(aniPlant);
 			objBullet->SetAnimationSet(aniPlant_set);
 
 			objects.push_back(objBullet);
-			obj = new FirePiranhaPlant(player, objBullet);
+			obj = new VenusFireTrap(player, objBullet, TypeVenusFireTrap);
 		}
 		break;
 		case OBJECT_TYPE_PORTAL:

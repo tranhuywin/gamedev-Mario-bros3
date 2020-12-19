@@ -23,6 +23,7 @@ void Tube::GetBoundingBox(float& l, float& t, float& r, float& b)
 		break;
 	case(X_TUBE_3):
 		b = y + TUBE_BBOX_HIGHT_1;
+		this->SetAnimationSet(CAnimationSets::GetInstance()->Get(10));
 		break;
 	case(X_TUBE_4):
 		b = y + TUBE_BBOX_HIGHT_1;

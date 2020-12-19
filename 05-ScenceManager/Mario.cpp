@@ -13,7 +13,7 @@
 #include "Koopas.h"
 #include "Ground.h"
 #include "BulletPiranhaPlant.h"
-#include "FirePiranhaPlant.h"
+#include "VenusFireTrap.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -333,9 +333,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						SetState(MARIO_STATE_DIE);
 				}
 			}
-			else if (dynamic_cast<FirePiranhaPlant*>(e->obj))
+			else if (dynamic_cast<VenusFireTrap*>(e->obj))
 			{
-				FirePiranhaPlant* Plant = dynamic_cast<FirePiranhaPlant*>(e->obj);
+			VenusFireTrap* Plant = dynamic_cast<VenusFireTrap*>(e->obj);
 				if (untouchable == 0)
 				{
 					if (level > MARIO_LEVEL_SMALL)
