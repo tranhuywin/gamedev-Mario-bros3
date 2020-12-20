@@ -5,6 +5,7 @@
 #define ITEM_TREE_LEAF			0
 #define ITEM_MONEY				1
 #define ITEM_SWITCH				2
+#define ITEM_MONEY_IDLE			3
 
 #define ITEM_BBOX_L				4
 #define ITEM_BBOX_T				4
@@ -14,6 +15,7 @@
 #define ITEM_BBOX_B				17
 #define ITEM_BBOX_SWITCH		16
 #define ITEM_BBOX_SWITCH_B		7
+#define ITEM_BBOX_MONEY_IDLE	16
 
 #define ITEM_DEFLECT_SPEED						0.02f
 #define ITEM_GRAVITY							0.0015f
@@ -29,13 +31,13 @@
 #define ITEM_ANI_MONEY				1
 #define ITEM_ANI_SWITCH_ON			2
 #define ITEM_ANI_SWITCH_OFF			3
+#define ITEM_ANI_MONEY_IDLE			4
 class Items : public CGameObject
 {
 public:
 	int IdItem;
-	bool Active, SetPosStart;
+	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail;
 	float X_Start, Y_Start;
-	//vector <LPGAMEOBJECT> ListEffects;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void Render();

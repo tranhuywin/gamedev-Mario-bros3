@@ -29,6 +29,8 @@ void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 		xBreak = this->x;
 		yBreak = this->y;
 	}
+	if (SwitchOff)
+		SetPosition(0, 0);
 }
 
 void Brick::GetBoundingBox(float& l, float& t, float& r, float& b)

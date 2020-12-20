@@ -17,6 +17,11 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 	{
 		right = x + ITEM_BBOX_R;
 		bottom = y + ITEM_BBOX_B;
+		if (IdItem == ITEM_MONEY_IDLE)
+		{
+			left = x - TAIL_BBOX_WIDTH;
+			bottom = y + ITEM_BBOX_MONEY_IDLE;
+		}
 	}
 	else {
 		right = x + ITEM_BBOX_R_ACTIVE;
@@ -42,6 +47,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGameObject::Update(dt);
 	x += dx;
 	y += dy;
+	if (CollTail)
+		Active = false;
 	if (Active)
 	{
 		if (IdItem == ITEM_TREE_LEAF)
@@ -70,7 +77,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if (dynamic_cast<Brick*>(coObjects->at(i)))
 					{
 						Brick* brick = dynamic_cast<Brick*>(coObjects->at(i));
-						brick->SetPosition(0, 0);
+						brick->SwitchOff = true;
 					}
 				}
 			}
@@ -84,7 +91,9 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		CalCollisions(coObjects, coEventsResult);
 		int sizeCo = coEventsResult.size();
-
+		if(!CollTail)
+		if (sizeCo == 0 && !MarioGetMoney)
+			Active = true;
 		if (sizeCo != 0)
 		{
 			for (UINT i = 0; i < sizeCo; i++)
@@ -109,6 +118,12 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						if (mario->GetLevel() == MARIO_LEVEL_BIG)
 							mario->SetLevel(MARIO_LEVEL_RACCOON);
 					}
+					else if (IdItem == ITEM_MONEY_IDLE)
+					{
+						if(mario->Iskilling)
+							CollTail = true;
+						MarioGetMoney = true;
+					}
 				}
 				else if (dynamic_cast<QuestionBrick*>(e))
 				{
@@ -126,6 +141,12 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						Active = true;
 					}
 				}
+				else if (dynamic_cast<Tail*>(e))
+				{
+					if (IdItem == ITEM_MONEY_IDLE)
+						CollTail = true;
+					//Tail* tail = dynamic_cast<Tail*>(e);
+				}
 			}
 		}
 }
@@ -138,6 +159,8 @@ void Items::Render()
 			ani = ITEM_ANI_TREE_LEAF;
 		else if (IdItem == ITEM_MONEY)
 			ani = ITEM_ANI_MONEY;
+		else if (IdItem == ITEM_MONEY_IDLE)
+			ani = ITEM_ANI_MONEY_IDLE;
 		else if (IdItem == ITEM_SWITCH)
 		{
 			if (state != ITEM_SWITCH_STATE_OFF)
