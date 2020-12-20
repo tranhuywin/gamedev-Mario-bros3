@@ -265,51 +265,60 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<CKoopas*>(e->obj))
 			{
 				Shell = dynamic_cast<CKoopas*>(e->obj);
-				if (Shell->GetState() == KOOPAS_STATE_SHELL && !PrepareCatch && e->nx != 0)
-				{
-					Shell->SetState(KOOPAS_STATE_ROTATORY);
-					if(this->nx == 1)
-						Shell->vx = KOOPAS_ROTATORY_SPEED;
-					if(this->nx == -1)
-						Shell->vx = -KOOPAS_ROTATORY_SPEED;
-					KickShell = true;
-					Kick_start = GetTickCount();
-				}
-				else if (e->nx != 0 && Iskilling)
-				{
-					Shell->SetState(KOOPAS_STATE_SHELL);
-					Shell->vy -= KOOPAS_DIE_DEFLECT_SPEED;
-				}
-				else if (e->nx != 0 && Shell->GetState() == KOOPAS_STATE_SHELL)
-				{
-					if (PrepareCatch)
-					{
-						IsCatching = true;
-					}
-				}
-				else if (e->ny < 0)
-				{
-					if (Shell->GetState() == KOOPAS_STATE_SHELL)
+				if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+					if (Shell->GetState() == KOOPAS_STATE_SHELL && !PrepareCatch && e->nx != 0)
 					{
 						Shell->SetState(KOOPAS_STATE_ROTATORY);
-						if (this->x <= Shell->x)
+						if (this->nx == 1)
 							Shell->vx = KOOPAS_ROTATORY_SPEED;
-						if (this->x > Shell->x)
+						if (this->nx == -1)
 							Shell->vx = -KOOPAS_ROTATORY_SPEED;
+						KickShell = true;
+						Kick_start = GetTickCount();
 					}
-					else if (Shell->GetState() == KOOPAS_STATE_ROTATORY)
+					else if (e->nx != 0 && Iskilling)
 					{
 						Shell->SetState(KOOPAS_STATE_SHELL);
-						this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
+						Shell->vy -= KOOPAS_DIE_DEFLECT_SPEED;
+					}
+					else if (e->nx != 0 && Shell->GetState() == KOOPAS_STATE_SHELL)
+					{
+						if (PrepareCatch)
+						{
+							IsCatching = true;
+						}
+					}
+					else if (e->ny < 0)
+					{
+						if (Shell->GetState() == KOOPAS_STATE_SHELL)
+						{
+							Shell->SetState(KOOPAS_STATE_ROTATORY);
+							if (this->x <= Shell->x)
+								Shell->vx = KOOPAS_ROTATORY_SPEED;
+							if (this->x > Shell->x)
+								Shell->vx = -KOOPAS_ROTATORY_SPEED;
+						}
+						else if (Shell->GetState() == KOOPAS_STATE_ROTATORY)
+						{
+							Shell->SetState(KOOPAS_STATE_SHELL);
+							this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
+						}
+						else
+						{
+							Shell->SetState(KOOPAS_STATE_SHELL);
+							this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
+						}
 					}
 					else
-					{
-						Shell->SetState(KOOPAS_STATE_SHELL);
-						this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
-					}	
+						StartUntouchable();
 				}
-				else
-					StartUntouchable();
+				else if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
+					if (e->ny < 0)
+					{
+						Shell->TypeKoopas = KOOPAS_TYPE_KOOPA_TROOPA_GREEN;
+					}
+				}
+
 			}
 			else if (dynamic_cast<QuestionBrick*>(e->obj))
 			{

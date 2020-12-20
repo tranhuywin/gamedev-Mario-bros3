@@ -44,6 +44,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		this->Y_Start = this->y;
 		SetPosStart = true;
 	}
+	if (IdItem == ITEM_MONEY_IDLE && !OfBrick)
+		Active = true;
 	CGameObject::Update(dt);
 	x += dx;
 	y += dy;
@@ -76,6 +78,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				for (int i = 0; i < coObjects->size(); i++) {
 					if (dynamic_cast<Brick*>(coObjects->at(i)))
 					{
+						//Active = false;
 						Brick* brick = dynamic_cast<Brick*>(coObjects->at(i));
 						brick->SwitchOff = true;
 					}
@@ -120,8 +123,16 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 					else if (IdItem == ITEM_MONEY_IDLE)
 					{
-						if(mario->Iskilling)
+						if (mario->Iskilling)
+						{
 							CollTail = true;
+							//Active = false;
+						}
+						else if(Active)
+						{
+							x = -100; y = -100; vy = 0; vx = 0;
+							Active = false;
+						}
 						MarioGetMoney = true;
 					}
 				}
@@ -141,11 +152,9 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						Active = true;
 					}
 				}
-				else if (dynamic_cast<Tail*>(e))
-				{
-					if (IdItem == ITEM_MONEY_IDLE)
-						CollTail = true;
-					//Tail* tail = dynamic_cast<Tail*>(e);
+				else if (dynamic_cast<Brick*>(e)) {
+					Active = false;
+					OfBrick = true;
 				}
 			}
 		}
@@ -176,14 +185,6 @@ void Items::Render()
 Items::Items(int IdItem)
 {
 	this->IdItem = IdItem;
-	if (this->IdItem == ITEM_SWITCH)
-	{
-		
-	}
-	else if (this->IdItem == ITEM_MONEY)
-	{
-
-	}
 }
 
 void Items::SetState(int state)

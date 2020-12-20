@@ -9,6 +9,7 @@
 #include "Koopas.h"
 #include "Items.h"
 #include "Map.h"
+#include "StatusBar.h"
 
 
 class CPlayScene: public CScene
@@ -16,6 +17,7 @@ class CPlayScene: public CScene
 protected: 
 	TileMap *tileMap;
 	CMario* player;
+	StatusBar* statusBar;// = new StatusBar(player);
 	LPGAMEOBJECT ItemSwitch;
 	vector<LPGAMEOBJECT> objectsItem;
 	vector<LPGAMEOBJECT> objects;
@@ -35,7 +37,7 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-
+	void UpdateCammera();
 	CMario * GetPlayer() { return player; } 
 	//friend class CPlayScenceKeyHandler;
 };

@@ -158,7 +158,7 @@ class CMario : public CGameObject
 	bool IsJumping;
 	bool IsSlowDropping;
 	bool AllowJump;
-	bool IsRunning;
+	
 	bool IsBendingOver;
 	bool IsCatching;
 	bool PrepareCatch;
@@ -174,6 +174,7 @@ public:
 	bool IsLimitRunning;
 	bool IsLimitFlying;
 	bool Iskilling;
+	bool IsRunning;
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();

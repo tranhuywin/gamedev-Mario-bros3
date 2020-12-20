@@ -127,7 +127,7 @@ void CGoomba::Render()
 		}
 	}
 	animation_set->at(ani)->Render(x, YRender);
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void CGoomba::SetState(int state)

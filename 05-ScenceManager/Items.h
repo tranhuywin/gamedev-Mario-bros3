@@ -36,7 +36,7 @@ class Items : public CGameObject
 {
 public:
 	int IdItem;
-	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail;
+	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail, OfBrick;
 	float X_Start, Y_Start;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);

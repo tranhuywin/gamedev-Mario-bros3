@@ -178,17 +178,21 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			}
 			obj = new CMario(x, y);
 			player = (CMario*)obj;
-
+			statusBar = new StatusBar(player);
 			DebugOut(L"[INFO] Player object created!\n");
 			break;
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
-		case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 		case OBJECT_TYPE_GROUND: obj = new Ground(); break;
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 		case OBJECT_TYPE_LINE: obj = new Line(); break;
 		case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_KOOPAS: 
+		{
+			int TypeKoopas = atoi(tokens[4].c_str());
+			obj = new CKoopas(TypeKoopas);
+		}break;
 		case OBJECT_TYPE_ITEM:
 		{
 			int IdItem = atoi(tokens[4].c_str());
@@ -309,42 +313,11 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
-	//If obj die, Obj will be reset at X start, Y start
-	//for (size_t i = 0; i < objects.size(); i++)
-	//{
-	//	if (objects[i]->y < CGame::GetInstance()->GetCamPosY() || (objects[i]->y > CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()))			// Obj rot ra man hinh theo chieu Y == die
-	//	{
-	//		if (objects[i]->XStartLive < CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT || objects[i]->XStartLive > CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
-	//			{
-	//				LPGAMEOBJECT e = objects[i];
-	//				objects[i]->Active = false;
-	//				if (dynamic_cast<CGoomba*>(e))
-	//				{
-	//					objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
-	//					objects[i]->SetState(GOOMBA_STATE_WALKING);
-	//				}
-	//				else if (dynamic_cast<CKoopas*>(e))
-	//				{
-	//					objects[i]->SetPosition(objects[i]->XStartLive, objects[i]->YStartLive);
-	//					objects[i]->SetState(KOOPAS_STATE_WALKING);
-	//				}
-	//			}
-	//		
-	//	}
-	//}
 	vector<LPGAMEOBJECT> coObjects;
 	vector<LPGAMEOBJECT> coObjectsItem;
 	//Push nhung Obj trong man hinh vao coObjects de xet va cham 
 	for (size_t i = 1; i < objects.size(); i++)
 	{
-		/*LPGAMEOBJECT e = objects[i];
-		if (dynamic_cast<Ground*>(e) || dynamic_cast<Line*>(e) || dynamic_cast<Tube*>(e) || dynamic_cast<Brick*>(e) || dynamic_cast<QuestionBrick*>(e))
-		{
-			coObjects.push_back(objects[i]);
-		}
-		else {
-			if (objects[i]->x > CGame::GetInstance()->GetCamPosX())
-				if (objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())*/
 		coObjects.push_back(objects[i]);
 	}
 	for (size_t i = 0; i < objects.size(); i++)
@@ -358,10 +331,6 @@ void CPlayScene::Update(DWORD dt)
 	// Update Obj is Active in screen
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		//if (objects[i]->x > CGame::GetInstance()->GetCamPosX() - SCREEN_BORDER_RIGHT && objects[i]->x < CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth())	// Man hinh ra khoi bi tri bat dau cua Obj die
-		//	objects[i]->Active = true;
-		//if(objects[i]->Active)
-
 		objects[i]->Update(dt, &coObjects);
 
 	}
@@ -370,32 +339,17 @@ void CPlayScene::Update(DWORD dt)
 	if (player == NULL) return; 
 
 	// Update camera to follow mario
-	float cx, cy;
-	player->GetPosition(cx, cy);
-
-	CGame* game = CGame::GetInstance();
-	cx -= game->GetScreenWidth() / 2;
-	if (cx > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
-		cx = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
-	if (player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))
-	{
-  		cy -= game->GetScreenHeight()/2;
-	}
-	else if(player->IsLimitFlying /*&& cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER)*/)
-		cy -= game->GetScreenHeight() / 2;
-	else
-		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight()/4;
-	if (cx < SCREEN_BORDER)
-		cx = SCREEN_BORDER;
-	if (cy < SCREEN_BORDER)
-		cy = SCREEN_BORDER;
-	CGame::GetInstance()->SetCamPos(cx, cy);
+	UpdateCammera();
+	// Update Status bar
+	float XStatusBar = CGame::GetInstance()->GetCamPosX() + 3;
+	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - 30;
+	statusBar->Update(dt, XStatusBar, YStatusBar);
 }
 
 void CPlayScene::Render()
 {
 	tileMap->Draw();
-	
+	statusBar->Render();
 	for (int i = 1; i < objects.size(); i++)
 	{
 
@@ -420,6 +374,39 @@ void CPlayScene::Unload()
 	player = NULL;
 
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
+}
+
+void CPlayScene::UpdateCammera()
+{
+	float cx, cy;
+	player->GetPosition(cx, cy);
+
+	CGame* game = CGame::GetInstance();
+	cx -= game->GetScreenWidth() / 2;
+	if (cx > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
+		cx = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
+	if (player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))
+	{
+		cy -= game->GetScreenHeight() / 2;
+	}
+	else if (player->IsLimitFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
+		cy -= game->GetScreenHeight() / 2;
+	//else
+	//if (player->GetState() == MARIO_STATE_SKILL_ON)
+	//{
+	//	cy -= game->GetScreenHeight() / 2;
+	//}
+	else
+	{
+		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
+		if(player->y < 192)
+			cy -= game->GetScreenHeight();
+	}
+	if (cx < SCREEN_BORDER)
+		cx = SCREEN_BORDER;
+	if (cy < SCREEN_BORDER)
+		cy = SCREEN_BORDER;
+	CGame::GetInstance()->SetCamPos(cx, cy);
 }
 
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)

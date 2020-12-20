@@ -9,9 +9,10 @@
 #include "Tube.h"
 #include "QuestionBrick.h"
 
-CKoopas::CKoopas()
+CKoopas::CKoopas(int TypeKoopas)
 {
 	SetState(KOOPAS_STATE_WALKING);
+	this->TypeKoopas = TypeKoopas;
 }
 
 void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &bottom)
@@ -29,30 +30,35 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	if(!IsCatching)
-		vy += KOOPAS_GRAVITY * dt;
+		vy += KOOPAS_GRAVITY/2 * dt;
 	CGameObject::Update(dt);
-	if (state == KOOPAS_STATE_PREPARE_WAKE_UP)
-	{
-		if(ShakingLeft)
-			x -= 3.0f;
-		else
-			x += 3.0f;
-		ShakingLeft = !ShakingLeft;
+	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+		if (state == KOOPAS_STATE_PREPARE_WAKE_UP)
+		{
+			if (ShakingLeft)
+				x -= 3.0f;
+			else
+				x += 3.0f;
+			ShakingLeft = !ShakingLeft;
+		}
+		if (GetTickCount() - Sleep_start > 5000 && state == KOOPAS_STATE_SHELL)
+		{
+			Sleep_start = 0;
+			Sleep = 0;
+			state = KOOPAS_STATE_PREPARE_WAKE_UP;
+			StartPrepareWakeUp();
+		}
+		if (GetTickCount() - PrepareWakeUp_start > 2000 && state == KOOPAS_STATE_PREPARE_WAKE_UP)
+		{
+			PrepareWakeUp_start = 0;
+			PrepareWakeUp = 0;
+			y -= 12.0f;
+			state = KOOPAS_STATE_WALKING;
+			vx = KOOPAS_WALKING_SPEED;
+		}
 	}
-	if (GetTickCount() - Sleep_start > 5000 && state == KOOPAS_STATE_SHELL)
-	{
-		Sleep_start = 0;
-		Sleep = 0;
-		state = KOOPAS_STATE_PREPARE_WAKE_UP;
-		StartPrepareWakeUp();
-	}
-	if (GetTickCount() - PrepareWakeUp_start > 2000 && state == KOOPAS_STATE_PREPARE_WAKE_UP)
-	{
-		PrepareWakeUp_start = 0;
-		PrepareWakeUp = 0;
-		y -= 12.0f;
-		state = KOOPAS_STATE_WALKING;
-		vx = KOOPAS_WALKING_SPEED;
+	else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
+
 	}
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -86,22 +92,28 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			if (dynamic_cast<Line*>(e->obj))
 			{
 				Line* line = dynamic_cast<Line*>(e->obj);
-				float XLeftLine = line->GetX_Left();
-				if (vx < 0 && x < XLeftLine && state == KOOPAS_STATE_WALKING) {
-					x = XLeftLine; vx = -vx;
-				}
-				float XRightLine = line->GetX_Right();
-				if (vx > 0 && x > XRightLine - KOOPAS_BBOX_WIDTH && state == KOOPAS_STATE_WALKING) {
-					x = XRightLine - KOOPAS_BBOX_WIDTH; vx = -vx;
-				}
-				if (e->ny > 0)
-				{
-					if (e->ny > 0)		// o duoi len
+				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+					float XLeftLine = line->GetX_Left();
+					if (vx < 0 && x < XLeftLine && state == KOOPAS_STATE_WALKING) {
+						x = XLeftLine; vx = -vx;
+					}
+					float XRightLine = line->GetX_Right();
+					if (vx > 0 && x > XRightLine - KOOPAS_BBOX_WIDTH && state == KOOPAS_STATE_WALKING) {
+						x = XRightLine - KOOPAS_BBOX_WIDTH; vx = -vx;
+					}
+					if (e->ny > 0)
 					{
-						vy = vyLine;
-						y += dy;
+						if (e->ny > 0)		// o duoi len
+						{
+							vy = vyLine;
+							y += dy;
+						}
 					}
 				}
+				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
+					vy = -0.01f * dt;
+				}
+
 			}
 			if (!dynamic_cast<CMario*>(e->obj)) {
 				if (e->nx != 0)
@@ -122,33 +134,85 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 void CKoopas::Render()
 {
-	int ani = KOOPAS_ANI_WALKING_LEFT;
-	if (state == KOOPAS_STATE_SHELL) {
-		ani = KOOPAS_ANI_SHELL;
-		if(TailAttack)
-			ani = KOOPAS_ANI_SHELL_TAIL_ATTACK;
+	int ani = KOOPAS_ANI_WALKING_LEFT_RED;
+	if(this->TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED)
+	{
+		if (state == KOOPAS_STATE_SHELL) {
+			ani = KOOPAS_ANI_SHELL_RED;
+			if (TailAttack)
+				ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_RED;
+		}
+		else if (state == KOOPAS_STATE_ROTATORY)
+		{
+			if (vx > 0)
+			{
+				ani = KOOPAS_ANI_ROTATORY_RIGHT_RED;
+				if (TailAttack)
+					ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY_RED;
+			}
+			else
+			{
+				ani = KOOPAS_ANI_ROTATORY_LEFT_RED;
+				if (TailAttack)
+					ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY_RED;
+			}
+		}
+		else if (state == KOOPAS_STATE_PREPARE_WAKE_UP) {
+			ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_PREPARE_WAKE_UP_RED;
+		}
+		else if (vx > 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_RIGHT_RED;
+		else if (vx <= 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_LEFT_RED;
+
 	}
-	else if (state == KOOPAS_STATE_ROTATORY)
+	else if (this->TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_GREEN)
+	{
+		if (state == KOOPAS_STATE_SHELL) {
+			ani = KOOPAS_ANI_SHELL_GREEN;
+			if (TailAttack)
+				ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_GREEN;
+		}
+		else if (state == KOOPAS_STATE_ROTATORY)
+		{
+			if (vx > 0)
+			{
+				ani = KOOPAS_ANI_ROTATORY_RIGHT_GREEN;
+				if (TailAttack)
+					ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY_GREEN;
+			}
+			else
+			{
+				ani = KOOPAS_ANI_ROTATORY_LEFT_GREEN;
+				if (TailAttack)
+					ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY_GREEN;
+			}
+		}
+		else if (state == KOOPAS_STATE_PREPARE_WAKE_UP) {
+			ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_PREPARE_WAKE_UP_GREEN;
+		}
+		else if (vx > 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_RIGHT_GREEN;
+		else if (vx <= 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_LEFT_GREEN;
+
+	}
+	else if (this->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
 	{
 		if (vx > 0)
 		{
-			ani = KOOPAS_ANI_ROTATORY_RIGHT;
-			if (TailAttack)
-				ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY;
+			if (vy < 0) // nhay
+			{
+				ani = KOOPA_PARATROOPA_GREEN_ANI_JUMP_RIGHT;
+			}
+			else
+				ani = KOOPA_PARATROOPA_GREEN_ANI_WING_RIGHT;
 		}
-		else
-		{
-			ani = KOOPAS_ANI_ROTATORY_LEFT;
-			if (TailAttack)
-				ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_ROTATORY;
+		else {
+			if (vy < 0) // nhay
+			{
+				ani = KOOPA_PARATROOPA_GREEN_ANI_JUMP_LEFT;
+			}
+			else
+				ani = KOOPA_PARATROOPA_GREEN_ANI_WING_LEFT;
 		}
 	}
-	else if(state == KOOPAS_STATE_PREPARE_WAKE_UP) {
-		ani = KOOPAS_ANI_SHELL_TAIL_ATTACK_PREPARE_WAKE_UP;
-	}
-	else if (vx > 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_RIGHT;
-	else if (vx <= 0 && state == KOOPAS_STATE_WALKING) ani = KOOPAS_ANI_WALKING_LEFT;
-
 	animation_set->at(ani)->Render(x, y);
 	//RenderBoundingBox();
 }
@@ -167,7 +231,9 @@ void CKoopas::SetState(int state)
 		vx = KOOPAS_ROTATORY_SPEED;
 		break;
 	case KOOPAS_STATE_WALKING:
-		vx = KOOPAS_WALKING_SPEED;
+		vx = -KOOPAS_WALKING_SPEED - 0.01f;
+		if (this->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
+			vx = -0.01f;
 		break;
 	case KOOPAS_STATE_DIE:
 		vy = 0.1f;

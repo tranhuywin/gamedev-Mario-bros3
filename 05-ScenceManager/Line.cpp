@@ -47,6 +47,12 @@ void Line::GetBoundingBox(float& l, float& t, float& r, float& b)
 	case X_LINE_12:
 		r = x + LINE_BBOX_WIDTH_12;
 		break;
+	case 1408:
+		r = x + 64;
+		break;
+	case 1488:
+		r = x + 206;
+		break;
 	}
 	X_Right = r;
 }
