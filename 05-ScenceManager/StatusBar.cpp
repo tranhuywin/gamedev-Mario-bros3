@@ -24,15 +24,15 @@ void StatusBar::Update(DWORD dt, int camX, int camY)
 {
 	posX = camX;
 	posY = camY;
-	score = CGame::GetInstance()->GetScore();
-	money = 00;
-	word = 1;
-	life = CGame::GetInstance()->GetLife();
-	second++;
-	if (second == 60)
+	TotalScore = CGame::GetInstance()->GetScore();
+	TotalMoney = 00;
+	WordMap = 1;
+	Life = CGame::GetInstance()->GetLife();
+	Second++;
+	if (Second == 60)
 	{
-		time--;
-		second = 1;
+		Time--;
+		Second = 1;
 	}
 }
 void StatusBar::DrawPMeter()
@@ -64,23 +64,25 @@ void StatusBar::DrawPMeter()
 }
 void StatusBar::Render()
 {
+	//BackGound
+	CSprites::GetInstance()->Get(SpriteStatusBar + 2)->Draw(posX - 5, posY - 3);
 	// status
 	CSprites::GetInstance()->Get(SpriteStatusBar)->Draw(posX, posY);
 	//card
 	CSprites::GetInstance()->Get(SpriteCardBar)->Draw(posX + X_CARD, posY);
 
-	DrawNumber(posX + X_WORD, posY + Y_WORD, to_string(word), 1);
-	DrawNumber(posX + X_LIFE, posY + Y_LIFE, to_string(life), 1);
-	DrawNumber(posX + X_SCORE, posY + Y_SCORE, to_string(score), 7);
-	DrawNumber(posX + X_MONEY, posY + Y_MONEY, to_string(money), 2);
-	DrawNumber(posX + X_TIME, posY + Y_TIME, to_string(time), 3);
+	DrawNumber(posX + X_WORD, posY + Y_WORD, to_string(WordMap), 1);
+	DrawNumber(posX + X_LIFE, posY + Y_LIFE, to_string(Life), 1);
+	DrawNumber(posX + X_SCORE, posY + Y_SCORE, to_string(TotalScore), 7);
+	DrawNumber(posX + X_MONEY, posY + Y_MONEY, to_string(TotalMoney), 2);
+	DrawNumber(posX + X_TIME, posY + Y_TIME, to_string(Time), 3);
 	DrawPMeter();
 }
 
 StatusBar::StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int SpriteNumber0, int SpritePowerState)
 {
 	Mario = mario;
-	time = CGame::GetInstance()->GetTime();
+	Time = CGame::GetInstance()->GetTime();
 	this->SpriteStatusBar = SpriteStatusBar;
 	this->SpriteCardBar = SpriteCardBar;
 	this->SpriteNumber0 = SpriteNumber0;
@@ -89,5 +91,5 @@ StatusBar::StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int 
 
 void StatusBar::PlusScore(int Score)
 {
-	this->score += Score;
+	this->TotalScore += Score;
 }

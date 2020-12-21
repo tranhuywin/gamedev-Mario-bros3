@@ -24,18 +24,18 @@
 #define Y_TIME					15
 #define X_MONEY					132
 #define Y_MONEY					7
-#define X_CARD					163
+#define X_CARD					193
 class StatusBar
 {
 	LPSPRITE number;
 	int posX;
 	int posY;
-	int score;
-	int money;
-	int word;
-	int life;
-	int time;
-	int second;
+	int TotalScore;
+	int TotalMoney;
+	int WordMap;
+	int Life;
+	int Time;
+	int Second;
 	int SpriteStatusBar, SpriteCardBar, SpriteNumber0, SpritePowerState;
 	void DrawNumber(int x, int y, string stringnumb, int maxsize);
 	void DrawPMeter();

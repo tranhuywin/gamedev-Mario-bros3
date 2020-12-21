@@ -18,7 +18,7 @@ protected:
 	int SpriteEffectStart;
 	TileMap *tileMap;
 	CMario* player;
-	StatusBar* statusBar;// = new StatusBar(player);
+	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
 	vector<LPGAMEOBJECT> objectsItem;
 	vector<LPGAMEOBJECT> objects;

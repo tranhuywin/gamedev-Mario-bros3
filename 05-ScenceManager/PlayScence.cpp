@@ -196,12 +196,16 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			DebugOut(L"[INFO] Player object created!\n");
 			break;
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
-		case OBJECT_TYPE_GROUND: obj = new Ground(); break;
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 		case OBJECT_TYPE_LINE: obj = new Line(); break;
 		case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_GROUND: 
+		{
+			float Width = atoi(tokens[4].c_str());
+			obj = new Ground(Width);
+		}break;
 		case OBJECT_TYPE_KOOPAS: 
 		{
 			int TypeKoopas = atoi(tokens[4].c_str());
@@ -390,19 +394,24 @@ void CPlayScene::Unload()
 {
 	for (int i = 0; i < objects.size(); i++)
 		delete objects[i];
-
 	objects.clear();
+	for (int i = 0; i < objectsItem.size(); i++)
+		delete objectsItem[i];
+	objectsItem.clear();
 	player = NULL;
-
+	tileMap = NULL;
+	statusBar = NULL;
+	ItemSwitch = NULL;
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
 
 void CPlayScene::UpdateCammera()
 {
-	float cx, cy;
-	player->GetPosition(cx, cy);
-
 	CGame* game = CGame::GetInstance();
+	float cx, cy;
+	int CurSecene = game->Getcurrent_scene();
+
+	player->GetPosition(cx, cy);
 	cx -= game->GetScreenWidth() / 2;
 	if (cx > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
 		cx = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
@@ -412,14 +421,12 @@ void CPlayScene::UpdateCammera()
 	}
 	else if (player->IsLimitFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
 		cy -= game->GetScreenHeight() / 2;
-	//else
-	//if (player->GetState() == MARIO_STATE_SKILL_ON)
-	//{
-	//	cy -= game->GetScreenHeight() / 2;
-	//}
 	else
 	{
-		cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
+		if(CurSecene == 1)
+			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
+		else if(CurSecene == 4)
+			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 2;
 		if(player->y < 192)
 			cy -= game->GetScreenHeight();
 	}
@@ -427,6 +434,8 @@ void CPlayScene::UpdateCammera()
 		cx = SCREEN_BORDER;
 	if (cy < SCREEN_BORDER)
 		cy = SCREEN_BORDER;
+	if (CurSecene == 4)
+		cx = 95.0f;
 	CGame::GetInstance()->SetCamPos(cx, cy);
 }
 
@@ -461,6 +470,9 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_4:
 		mario->SetPosition(mario->x, mario->y - MARIO_BIG_BBOX_HEIGHT/2);
 		mario->SetLevel(MARIO_LEVEL_FIRE);
+		break;
+	case DIK_0:
+		mario->SetPosition(2263, 77);
 		break;
 	//case DIK_DOWN:
 	//	mario->SetState(MARIO_STATE_BEND_OVER);
