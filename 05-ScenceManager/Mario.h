@@ -6,7 +6,7 @@
 #include "Koopas.h"
 
 #define MARIO_WALKING_SPEED				0.1f 
-#define MARIO_MAX_SPEED_RUNNING			0.25f 
+#define MARIO_MAX_SPEED_RUNNING			0.2f 
 //0.1f
 #define MARIO_JUMP_SPEED_Y			0.01f
 #define MARIO_JUMP_DEFLECT_SPEED	0.2f

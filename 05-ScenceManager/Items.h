@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Mario.h"
+#include "Effect.h"
 
 #define ITEM_TREE_LEAF			0
 #define ITEM_MONEY				1
@@ -32,16 +33,20 @@
 #define ITEM_ANI_SWITCH_ON			2
 #define ITEM_ANI_SWITCH_OFF			3
 #define ITEM_ANI_MONEY_IDLE			4
+
 class Items : public CGameObject
 {
 public:
+	Effect* effect = NULL;
 	int IdItem;
+	int AniEffect, SpriteEffectStart;
 	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail, OfBrick;
+	bool DrawEffect;
 	float X_Start, Y_Start;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void Render();
-	Items(int IdItem);
+	Items(int IdItem, int SpriteEffectStart);
 	virtual void SetState(int state);
 };
 

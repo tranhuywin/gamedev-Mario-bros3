@@ -11,6 +11,20 @@
 #define SPEED_X_TIRER_6 0.175f
 #define SPEED_X_TIRER_7 0.1875f
 #define SPEED_X_TIRER_8 0.2f
+
+#define X_DISTANCE_PMETER		52
+#define Y_DISTANCE_PMETER		7
+#define X_WORD					37
+#define Y_WORD					7
+#define X_SCORE					52
+#define Y_SCORE					15
+#define X_LIFE					37
+#define Y_LIFE					15
+#define X_TIME					124
+#define Y_TIME					15
+#define X_MONEY					132
+#define Y_MONEY					7
+#define X_CARD					163
 class StatusBar
 {
 	LPSPRITE number;
@@ -22,15 +36,15 @@ class StatusBar
 	int life;
 	int time;
 	int second;
-	
+	int SpriteStatusBar, SpriteCardBar, SpriteNumber0, SpritePowerState;
 	void DrawNumber(int x, int y, string stringnumb, int maxsize);
-	//void DrawAllNumber();
 	void DrawPMeter();
 public:
 	void Update(DWORD dt, int camX, int camY);
 	void Render();
 	CMario* Mario;
-	StatusBar(CMario* mario);
+	StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int SpriteNumber0, int SpritePowerState);
+	void PlusScore(int Score);
 	//~StatusBar();
 };
 

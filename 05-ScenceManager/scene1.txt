@@ -8,6 +8,7 @@
 30	textures\StatusBar.png	255	0	255
 31	textures\PowerState.png	175	232	226
 40	textures\Miscc.png	166	185	255
+50	textures\Points.png	81	255	191
 # id	left	top	right	bottom	texture_id
 [SPRITES]
 #################### BIG MARIO ##########################
@@ -320,6 +321,8 @@
 70022	200	153	216	160	40
 #========STATUS BAR=============
 80000	3	3	155	31	30
+# Card Bar
+80001	163	3	235	31	30
 #========NUMBER STATUS BAR===============
 # num 0
 80010	33	32	41	39	30
@@ -359,11 +362,25 @@
 80026	2	56	66	63	31
 # tier7
 80027	2	65	66	72	31
-##========Turn Off Light=======
-#80030	0	0	1800	831	53
-#80031	0	0	1800	831	54
-#80032	0	0	1800	831	55
-#80033	0	0	1800	831	56
+##########         point     ##############
+#100
+80100	33	25	44	33	50
+#200
+80101	47	25	59	33	50
+#400
+80102	62	25	74	33	50
+#800
+80103	77	25	89	33	50
+#1000
+80104	92	25	107	33	50
+#2000
+80105	110	25	126	33	50
+#4000
+80106	129	25	145	33	50
+#8000
+80107	148	25	164	33	50
+#1UP
+80108	167	25	183	33	50
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 1	1	100
@@ -606,7 +623,6 @@ bend over left Big
 ####################           bick question     #########################
 100000	70000	100	70001	100	70002	100	70003	100
 100001	70004	100
-80000	80000	100
 # id	ani1	ani2	ani3
 #
 [ANIMATION_SETS]
@@ -634,6 +650,8 @@ bend over left Big
 11	705	706	707	708
 #Items
 12	810	811	812	813	814
+[EFFECT]
+80100
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
@@ -833,5 +851,7 @@ bend over left Big
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
 #50	300	98	0	316	150	2
+[STATUS_BAR]
+80000	80001	80010	80020
 [TITLEMAP]
 200000	textures\tile_map.png	textures\tile_map.txt	16	6	16	16

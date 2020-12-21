@@ -6,19 +6,17 @@ void StatusBar::DrawNumber(int x, int y, string stringnumb, int maxsize)
 	stringnumb = string(maxsize - stringnumb.size(), '0').append(stringnumb);
 	for (int i = 0; i < stringnumb.size(); i++)
 	{
-		if (stringnumb[i] == ' ')
-			continue;
-		int numb;
+		int numb; // 48 la gia tri 0 trong bang ma ascii
 		for (int j = 0; j < 10; j++)
 		{
-			numb = 48 + j;     // 48 la gia tri 0 trong bang ma ascii
+			numb = 48 + j;
 			if (stringnumb[i] == numb)
 			{
-				number = CSprites::GetInstance()->Get(80010 + j);
+				number = CSprites::GetInstance()->Get(SpriteNumber0 + j);
 				break;
 			}
 		}
-		number->Draw(x + (i * 8) + 3, y);
+		number->Draw(x + (i * 8), y);
 	}
 }
 
@@ -26,10 +24,10 @@ void StatusBar::Update(DWORD dt, int camX, int camY)
 {
 	posX = camX;
 	posY = camY;
-	score = 0000;
+	score = CGame::GetInstance()->GetScore();
 	money = 00;
 	word = 1;
-	life = 1;
+	life = CGame::GetInstance()->GetLife();
 	second++;
 	if (second == 60)
 	{
@@ -39,45 +37,57 @@ void StatusBar::Update(DWORD dt, int camX, int camY)
 }
 void StatusBar::DrawPMeter()
 {
-/*	if (Mario->IsFlying)
-		CSprites::GetInstance()->Get(80027)->Draw(posX + 52, posY + 7);
-	else*/ if (Mario->IsRunning)
+	float PosXPMeter = posX + X_DISTANCE_PMETER, PosYPMeter = posY + Y_DISTANCE_PMETER;
+	if (Mario->IsFlying)
+		CSprites::GetInstance()->Get(SpritePowerState + 7)->Draw(PosXPMeter, PosYPMeter);
+	else if (Mario->IsRunning)
 	{
 		float marioSpeed = abs(Mario->vx);
-		DebugOut(L"marioSpeed%f\n", marioSpeed);
-		if (marioSpeed < MARIO_MAX_SPEED_RUNNING / 8)
-			CSprites::GetInstance()->Get(80020)->Draw(posX + 52 , posY + 7);
-		else if (marioSpeed < MARIO_MAX_SPEED_RUNNING / 7)
-			CSprites::GetInstance()->Get(80021)->Draw(posX + 52, posY + 7);
-		else if (marioSpeed < MARIO_MAX_SPEED_RUNNING / 6)
-			CSprites::GetInstance()->Get(80022)->Draw(posX + 52, posY + 7);
-		else if (marioSpeed < MARIO_MAX_SPEED_RUNNING / 5)
-			CSprites::GetInstance()->Get(80023)->Draw(posX + 52, posY + 7);
-		else if (marioSpeed < MARIO_MAX_SPEED_RUNNING / 4)
-			CSprites::GetInstance()->Get(80024)->Draw(posX + 52, posY + 7);
-		else if (marioSpeed < MARIO_MAX_SPEED_RUNNING / 3)
-			CSprites::GetInstance()->Get(80025)->Draw(posX + 52, posY + 7);
-		else if (marioSpeed < MARIO_MAX_SPEED_RUNNING / 2)
-			CSprites::GetInstance()->Get(80026)->Draw(posX + 52, posY + 7);
-		else if (marioSpeed < MARIO_MAX_SPEED_RUNNING)
-			CSprites::GetInstance()->Get(80027)->Draw(posX + 52, posY + 7);
+		//DebugOut(L"marioSpeed%f\n", marioSpeed);
+		if (marioSpeed < SPEED_X_TIRER_1)
+			CSprites::GetInstance()->Get(SpritePowerState)->Draw(PosXPMeter, PosYPMeter);
+		else if (marioSpeed < SPEED_X_TIRER_2)
+			CSprites::GetInstance()->Get(SpritePowerState + 1)->Draw(PosXPMeter, PosYPMeter);
+		else if (marioSpeed < SPEED_X_TIRER_3)
+			CSprites::GetInstance()->Get(SpritePowerState + 2)->Draw(PosXPMeter, PosYPMeter);
+		else if (marioSpeed < SPEED_X_TIRER_4)
+			CSprites::GetInstance()->Get(SpritePowerState + 3)->Draw(PosXPMeter, PosYPMeter);
+		else if (marioSpeed < SPEED_X_TIRER_5)
+			CSprites::GetInstance()->Get(SpritePowerState + 4)->Draw(PosXPMeter, PosYPMeter);
+		else if (marioSpeed < SPEED_X_TIRER_6)
+			CSprites::GetInstance()->Get(SpritePowerState + 5)->Draw(PosXPMeter, PosYPMeter);
+		else if (marioSpeed < SPEED_X_TIRER_7)
+			CSprites::GetInstance()->Get(SpritePowerState + 6)->Draw(PosXPMeter, PosYPMeter);
+		else// if (marioSpeed < SPEED_X_TIRER_8)
+			CSprites::GetInstance()->Get(SpritePowerState + 7)->Draw(PosXPMeter, PosYPMeter);
 	}
-
 }
 void StatusBar::Render()
 {
-	CSprites::GetInstance()->Get(80000)->Draw(posX, posY);
+	// status
+	CSprites::GetInstance()->Get(SpriteStatusBar)->Draw(posX, posY);
+	//card
+	CSprites::GetInstance()->Get(SpriteCardBar)->Draw(posX + X_CARD, posY);
 
-	DrawNumber(posX + 37, posY + 7, to_string(word), 1);// word 1,2,3
-	DrawNumber(posX + 29, posY + 15, to_string(life), 1);//so mang con lai
-	DrawNumber(posX + 52, posY + 15, to_string(score), 7);//diem so
-	DrawNumber(posX + 130, posY + 7, to_string(money), 2);//money
-	DrawNumber(posX + 122, posY + 15, to_string(time), 3);//thoi gian
+	DrawNumber(posX + X_WORD, posY + Y_WORD, to_string(word), 1);
+	DrawNumber(posX + X_LIFE, posY + Y_LIFE, to_string(life), 1);
+	DrawNumber(posX + X_SCORE, posY + Y_SCORE, to_string(score), 7);
+	DrawNumber(posX + X_MONEY, posY + Y_MONEY, to_string(money), 2);
+	DrawNumber(posX + X_TIME, posY + Y_TIME, to_string(time), 3);
 	DrawPMeter();
 }
 
-StatusBar::StatusBar(CMario* mario)
+StatusBar::StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int SpriteNumber0, int SpritePowerState)
 {
 	Mario = mario;
-	time = 900;
+	time = CGame::GetInstance()->GetTime();
+	this->SpriteStatusBar = SpriteStatusBar;
+	this->SpriteCardBar = SpriteCardBar;
+	this->SpriteNumber0 = SpriteNumber0;
+	this->SpritePowerState = SpritePowerState;
+}
+
+void StatusBar::PlusScore(int Score)
+{
+	this->score += Score;
 }

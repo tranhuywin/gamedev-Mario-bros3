@@ -15,6 +15,7 @@
 class CPlayScene: public CScene
 {
 protected: 
+	int SpriteEffectStart;
 	TileMap *tileMap;
 	CMario* player;
 	StatusBar* statusBar;// = new StatusBar(player);
@@ -27,8 +28,8 @@ protected:
 	void _ParseSection_ANIMATION_SETS(string line);
 	void _ParseSection_OBJECTS(string line);
 	void _ParseSection_TITLE_MAP(string line);
-
-	
+	void _ParseSection_EFFECT(string line);
+	void _ParseSection_STATUS_BAR(string line);
 public: 
 	
 	CPlayScene(int id, LPCWSTR filePath);

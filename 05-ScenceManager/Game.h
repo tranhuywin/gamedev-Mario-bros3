@@ -39,7 +39,10 @@ class CGame
 
 	int screen_width;
 	int screen_height; 
-
+	int Score = 0;
+	int Money = 0;
+	int Life = 4;
+	int Time = 900;
 	unordered_map<int, LPSCENE> scenes;
 	int current_scene; 
 
@@ -51,7 +54,12 @@ public:
 	void SetKeyHandler(LPKEYEVENTHANDLER handler) { keyHandler = handler; }
 	void Init(HWND hWnd);
 	void Draw(float x, float y, LPDIRECT3DTEXTURE9 texture, int left, int top, int right, int bottom, int alpha = 255);
-
+	int GetScore() { return Score; };
+	void SetScore(int Score) { this->Score = Score; }
+	int GetLife() { return Life; };
+	void SetLife(int Life) { this->Life = Life; }
+	int GetTime() { return Time; };
+	void SetTime(int Life) { this->Time = Time; }
 	int IsKeyDown(int KeyCode);
 	int IsKeyUp(int KeyCode);
 	void ProcessKeyboard();

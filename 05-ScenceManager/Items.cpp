@@ -44,6 +44,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		this->Y_Start = this->y;
 		SetPosStart = true;
 	}
+	if (effect != NULL)
+		effect->Update(dt);
 	if (IdItem == ITEM_MONEY_IDLE && !OfBrick)
 		Active = true;
 	CGameObject::Update(dt);
@@ -64,9 +66,13 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 		else if (IdItem == ITEM_MONEY) {
 			vy += ITEM_GRAVITY * dt;
-			if (y - Y_Start > 0)
+			if (y - Y_Start > 0 && vy != 0)
 			{
-				x = -100; y = -100; vy = 0; vx = 0;
+				int CurentScore = CGame::GetInstance()->GetScore();
+				CGame::GetInstance()->SetScore(CurentScore + 100);
+				AniEffect = SpriteEffectStart + EFFECT_100;
+				effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
+				x = -100; y = -100.0f; vy = 0; vx = 0;
 				Active = false;
 			}
 		}
@@ -87,7 +93,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 	}
 	else {
-		vx = vy = 0;
+		vy = 0; vx = 0;
 	}
 		vector<LPGAMEOBJECT> coEventsResult;
 		coEventsResult.clear();
@@ -95,7 +101,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		CalCollisions(coObjects, coEventsResult);
 		int sizeCo = coEventsResult.size();
 		if(!CollTail)
-		if (sizeCo == 0 && !MarioGetMoney)
+		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE)
 			Active = true;
 		if (sizeCo != 0)
 		{
@@ -108,8 +114,13 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					CMario* mario = dynamic_cast<CMario*>(e);
 					if (IdItem == ITEM_TREE_LEAF)
 					{
+						
 						if (mario->GetLevel() == MARIO_LEVEL_RACCOON && vy > 0)
 						{
+							AniEffect = SpriteEffectStart + EFFECT_1000;
+							effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
+							int CurentScore = CGame::GetInstance()->GetScore();
+							CGame::GetInstance()->SetScore(CurentScore + 1000);
 							x = -100; y = -100; vy = 0; vx = 0;
 							Active = false;
 						}
@@ -130,6 +141,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						}
 						else if(Active)
 						{
+							int CurentScore = CGame::GetInstance()->GetScore();
+							CGame::GetInstance()->SetScore(CurentScore + 100);
 							x = -100; y = -100; vy = 0; vx = 0;
 							Active = false;
 						}
@@ -161,6 +174,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 }
 void Items::Render()
 {
+	if (effect != NULL)
+		effect->Render();
 	//RenderBoundingBox();
 	int ani = -1;
 	if (this->Active)
@@ -182,9 +197,10 @@ void Items::Render()
 		animation_set->at(ani)->Render(x, y);
 }
 
-Items::Items(int IdItem)
+Items::Items(int IdItem, int SpriteEffectStart)
 {
 	this->IdItem = IdItem;
+	this->SpriteEffectStart = SpriteEffectStart;
 }
 
 void Items::SetState(int state)

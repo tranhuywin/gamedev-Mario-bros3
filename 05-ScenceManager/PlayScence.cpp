@@ -35,6 +35,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define SCENE_SECTION_ANIMATION_SETS	5
 #define SCENE_SECTION_OBJECTS			6
 #define SCENE_SECTION_TITLE_MAP			7
+#define SCENE_SECTION_EFFECT			8
+#define SCENE_SECTION_STATUS_BAR		9
 
 #define OBJECT_TYPE_MARIO				0
 #define OBJECT_TYPE_BRICK				1
@@ -135,7 +137,6 @@ void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 }
 void CPlayScene::_ParseSection_TITLE_MAP(string line)
 {
-
 	vector<string> tokens = split(line);
 	if (tokens.size() < 7) return; // skip invalid lines
 
@@ -148,7 +149,21 @@ void CPlayScene::_ParseSection_TITLE_MAP(string line)
 	int tileset_height = atoi(tokens[6].c_str());
 	tileMap = new TileMap(ID, filePath_texture.c_str(), filePath_data.c_str(), num_row_on_texture, num_col_on_textture, tileset_width, tileset_height);
 }
+void CPlayScene::_ParseSection_EFFECT(string line) {
+	vector<string> tokens = split(line);
+	if (tokens.size() < 1) return;
+	SpriteEffectStart = atoi(tokens[0].c_str());
+}
+void CPlayScene::_ParseSection_STATUS_BAR(string line) {
+	vector<string> tokens = split(line);
+	if (tokens.size() < 4) return; // skip invalid lines
 
+	int SpriteStatusBar = atoi(tokens[0].c_str());	// 80000	80001	80010	80020
+	int SpriteCardBar = atoi(tokens[1].c_str());
+	int SpriteNumber0 = atoi(tokens[2].c_str());
+	int SpritePowerState = atoi(tokens[3].c_str());
+	statusBar = new StatusBar(player, SpriteStatusBar, SpriteCardBar, SpriteNumber0, SpritePowerState);
+}
 /*
 	Parse a line in section [OBJECTS] 
 */
@@ -178,7 +193,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			}
 			obj = new CMario(x, y);
 			player = (CMario*)obj;
-			statusBar = new StatusBar(player);
 			DebugOut(L"[INFO] Player object created!\n");
 			break;
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
@@ -197,11 +211,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		{
 			int IdItem = atoi(tokens[4].c_str());
 			if(IdItem != ITEM_SWITCH)
-				objItem = new Items(IdItem);
+				objItem = new Items(IdItem, SpriteEffectStart);
 			else {
-				obj = new Items(IdItem);
-				//ItemSwitch = obj;
-				//obj = ItemSwitch;
+				obj = new Items(IdItem, SpriteEffectStart);
 			}
 		}
 		break;
@@ -288,6 +300,12 @@ void CPlayScene::Load()
 		if (line == "[TITLEMAP]") {
 			section = SCENE_SECTION_TITLE_MAP; continue;
 		}
+		if (line == "[EFFECT]") {
+			section = SCENE_SECTION_EFFECT; continue;
+		}
+		if (line == "[STATUS_BAR]") {
+			section = SCENE_SECTION_STATUS_BAR; continue;
+		}
 		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }	
 
 		//
@@ -301,6 +319,8 @@ void CPlayScene::Load()
 			case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
 			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
 			case SCENE_SECTION_TITLE_MAP: _ParseSection_TITLE_MAP(line); break;
+			case SCENE_SECTION_EFFECT: _ParseSection_EFFECT(line); break;
+			case SCENE_SECTION_STATUS_BAR: _ParseSection_STATUS_BAR(line); break;
 		}
 	}
 
@@ -349,7 +369,7 @@ void CPlayScene::Update(DWORD dt)
 void CPlayScene::Render()
 {
 	tileMap->Draw();
-	statusBar->Render();
+	
 	for (int i = 1; i < objects.size(); i++)
 	{
 
@@ -360,6 +380,7 @@ void CPlayScene::Render()
 		objectsItem[i]->Render();
 	}
 	objects[0]->Render();
+	statusBar->Render();
 }
 
 /*

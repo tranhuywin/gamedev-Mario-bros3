@@ -641,6 +641,7 @@ void CMario::Render()
 
 void CMario::SetState(int state)
 {
+	int PreState = this->GetState();
 	CGameObject::SetState(state);
 
 	switch (state)
@@ -804,6 +805,9 @@ void CMario::SetState(int state)
 	
 	case MARIO_STATE_DIE:
 		vy = -MARIO_DIE_DEFLECT_SPEED;
+		int Life = CGame::GetInstance()->GetLife();
+		CGame::GetInstance()->SetLife(Life - 1);
+
 		break;
 	}
 }
