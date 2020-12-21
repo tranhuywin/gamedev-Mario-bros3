@@ -851,7 +851,7 @@ bend over left Big
 4	-100	0	4
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	334	390	0	344	420	4
+50	2256	110	0	2287	125	4
 [STATUS_BAR]
 80000	80001	80010	80020
 [TITLEMAP]

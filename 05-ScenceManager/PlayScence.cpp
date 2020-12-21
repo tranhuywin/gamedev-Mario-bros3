@@ -373,7 +373,8 @@ void CPlayScene::Update(DWORD dt)
 void CPlayScene::Render()
 {
 	tileMap->Draw();
-	
+	//CSprites::GetInstance()->Get(80003)->Draw(-50.0f, 0);
+	//CSprites::GetInstance()->Get(80003)->Draw(224.0f, 0);
 	for (int i = 1; i < objects.size(); i++)
 	{
 
@@ -434,8 +435,15 @@ void CPlayScene::UpdateCammera()
 		cx = SCREEN_BORDER;
 	if (cy < SCREEN_BORDER)
 		cy = SCREEN_BORDER;
-	if (CurSecene == 4)
+	if (CurSecene == 0)
+	{
+		cx = -50.0f;
+		
+	}
+	else if (CurSecene == 4)
+	{
 		cx = 95.0f;
+	}
 	CGame::GetInstance()->SetCamPos(cx, cy);
 }
 
