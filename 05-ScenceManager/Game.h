@@ -60,6 +60,8 @@ public:
 	void SetLife(int Life) { this->Life = Life; }
 	int GetTime() { return Time; };
 	void SetTime(int Life) { this->Time = Time; }
+	int GetMoney() { return Money; }
+	void SetMoney(int money) { this->Money = money; }
 	int Getcurrent_scene() { return current_scene; }
 	int IsKeyDown(int KeyCode);
 	int IsKeyUp(int KeyCode);

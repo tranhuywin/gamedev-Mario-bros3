@@ -28,8 +28,8 @@
 class StatusBar
 {
 	LPSPRITE number;
-	int posX;
-	int posY;
+	float posX;
+	float posY;
 	int TotalScore;
 	int TotalMoney;
 	int WordMap;
@@ -37,10 +37,10 @@ class StatusBar
 	int Time;
 	int Second;
 	int SpriteStatusBar, SpriteCardBar, SpriteNumber0, SpritePowerState;
-	void DrawNumber(int x, int y, string stringnumb, int maxsize);
+	void DrawNumber(float x, float y, string stringnumb, int maxsize);
 	void DrawPMeter();
 public:
-	void Update(DWORD dt, int camX, int camY);
+	void Update(DWORD dt, float camX, float camY);
 	void Render();
 	CMario* Mario;
 	StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int SpriteNumber0, int SpritePowerState);

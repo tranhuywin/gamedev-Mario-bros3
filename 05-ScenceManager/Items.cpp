@@ -70,6 +70,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				int CurentScore = CGame::GetInstance()->GetScore();
 				CGame::GetInstance()->SetScore(CurentScore + 100);
+				int CurentMoney = CGame::GetInstance()->GetMoney();
+				CGame::GetInstance()->SetMoney(CurentMoney + 1);
 				AniEffect = SpriteEffectStart + EFFECT_100;
 				effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
 				x = -100; y = -100.0f; vy = 0; vx = 0;
@@ -121,6 +123,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
 							int CurentScore = CGame::GetInstance()->GetScore();
 							CGame::GetInstance()->SetScore(CurentScore + 1000);
+							int CurentMoney = CGame::GetInstance()->GetMoney();
+							CGame::GetInstance()->SetMoney(CurentMoney + 1);
 							x = -100; y = -100; vy = 0; vx = 0;
 							Active = false;
 						}
@@ -143,10 +147,20 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						{
 							int CurentScore = CGame::GetInstance()->GetScore();
 							CGame::GetInstance()->SetScore(CurentScore + 100);
+							int CurentMoney = CGame::GetInstance()->GetMoney();
+							CGame::GetInstance()->SetMoney(CurentMoney + 1);
 							x = -100; y = -100; vy = 0; vx = 0;
 							Active = false;
 						}
 						MarioGetMoney = true;
+					}
+					else if (IdItem == ITEM_MONEY_ROTATOR) {
+						Active = false;
+						int CurentScore = CGame::GetInstance()->GetScore();
+						CGame::GetInstance()->SetScore(CurentScore + 100);
+						int CurentMoney = CGame::GetInstance()->GetMoney();
+						CGame::GetInstance()->SetMoney(CurentMoney + 1);
+						x = -100; y = -100.0f; vy = 0; vx = 0;
 					}
 				}
 				else if (dynamic_cast<QuestionBrick*>(e))
@@ -181,7 +195,7 @@ void Items::Render()
 	if (this->Active)
 		if (IdItem == ITEM_TREE_LEAF)
 			ani = ITEM_ANI_TREE_LEAF;
-		else if (IdItem == ITEM_MONEY)
+		else if (IdItem == ITEM_MONEY || IdItem == ITEM_MONEY_ROTATOR)
 			ani = ITEM_ANI_MONEY;
 		else if (IdItem == ITEM_MONEY_IDLE)
 			ani = ITEM_ANI_MONEY_IDLE;
@@ -200,6 +214,8 @@ void Items::Render()
 Items::Items(int IdItem, int SpriteEffectStart)
 {
 	this->IdItem = IdItem;
+	if (IdItem == ITEM_MONEY_ROTATOR)
+		Active = true;
 	this->SpriteEffectStart = SpriteEffectStart;
 }
 

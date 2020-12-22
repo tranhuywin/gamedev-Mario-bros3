@@ -7,6 +7,7 @@
 #define ITEM_MONEY				1
 #define ITEM_SWITCH				2
 #define ITEM_MONEY_IDLE			3
+#define ITEM_MONEY_ROTATOR		4
 
 #define ITEM_BBOX_L				4
 #define ITEM_BBOX_T				4

@@ -191,16 +191,33 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 				DebugOut(L"[ERROR] MARIO object was created before!\n");
 				return;
 			}
-			obj = new CMario(x, y);
-			player = (CMario*)obj;
+			//if (CGame::GetInstance()->Getcurrent_scene() == 0)
+			//{
+			//	obj = new MarioChooseMap();
+			//}
+			//else 
+			{
+				obj = new CMario(x, y);
+				player = (CMario*)obj;
+			}
+			
 			DebugOut(L"[INFO] Player object created!\n");
 			break;
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
-		case OBJECT_TYPE_LINE: obj = new Line(); break;
-		case OBJECT_TYPE_TUBE: obj = new Tube(); break;
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_TUBE: 
+		{
+			float Height = atoi(tokens[4].c_str());
+			int IDAni = atoi(tokens[5].c_str());
+			obj = new Tube(Height, IDAni);
+		} break;
+		case OBJECT_TYPE_LINE: 
+		{
+			float Width = atoi(tokens[4].c_str());
+			obj = new Line(Width);
+		}break;
 		case OBJECT_TYPE_GROUND: 
 		{
 			float Width = atoi(tokens[4].c_str());
@@ -362,11 +379,17 @@ void CPlayScene::Update(DWORD dt)
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
 
+	if (player->x < 0)
+		player->SetPosition(0, player->y);
+	if (player->x > tileMap->GetWidthMap() - MARIO_BIG_BBOX_WIDTH * 2)
+		player->SetPosition(tileMap->GetWidthMap()- MARIO_BIG_BBOX_WIDTH * 2, player->y);
+
 	// Update camera to follow mario
 	UpdateCammera();
 	// Update Status bar
-	float XStatusBar = CGame::GetInstance()->GetCamPosX() + 3;
+	float XStatusBar = CGame::GetInstance()->GetCamPosX() + 5;
 	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - 30;
+	//float YStatusBar = player->y - CGame::GetInstance()->GetScreenHeight() / 2;
 	statusBar->Update(dt, XStatusBar, YStatusBar);
 }
 
@@ -438,11 +461,11 @@ void CPlayScene::UpdateCammera()
 	if (CurSecene == 0)
 	{
 		cx = -50.0f;
-		
 	}
 	else if (CurSecene == 4)
 	{
 		cx = 95.0f;
+		cy = 8.0f;
 	}
 	CGame::GetInstance()->SetCamPos(cx, cy);
 }

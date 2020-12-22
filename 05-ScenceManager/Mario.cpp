@@ -21,7 +21,6 @@ CMario::CMario(float x, float y) : CGameObject()
 	level = MARIO_LEVEL_RACCOON;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
-
 	start_x = x; 
 	start_y = y; 
 	this->x = x; 
@@ -30,8 +29,7 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (x < CGame::GetInstance()->GetCamPosX())
-		x = CGame::GetInstance()->GetCamPosX();
+	DebugOut(L"vy%f\n", vy);
 	if(ani != -1)
 		TailofRaccoon->Attack(this->x, this->y, Iskilling, animation_set->at(ani)->GetcurrentFrame());
 	if (!Iskilling && SkillOn)
@@ -63,7 +61,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		if (!IsLimitFlying)
 		{
-			vy = -MARIO_FLY_SPEED_Y * dt;
+ 			vy = -MARIO_FLY_SPEED_Y * dt;
+			//vy = -0.008 * dt;
 		}
 		else if (nx == 1)
 		{
@@ -88,11 +87,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		if (IsSlowDropping && (y - YHolding < MARIO_DISTANCE_SLOW_DROP) && !OnPlatform)
 		{
-			vy += MARIO_FALL_SLOWLY_SPEED * dt;
+			vy = MARIO_FALL_SLOWLY_SPEED * dt;
+			//if(vy < MARIO_FALL_SLOWLY_SPEED)
+			//vy += MARIO_FALL_SLOWLY_SPEED * dt;
 		}
 		else
 		{
-			vy += MARIO_GRAVITY * dt;
+			if(!StartTeleport)
+				vy += MARIO_GRAVITY * dt;
+			else
+			{
+				vy += MARIO_GRAVITY_TELEPORT * dt;
+			}
 			IsSlowDropping = false;
 		}	
 	}
@@ -159,11 +165,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Slip_start = 0;
 		Slip = 0;
 	}
-	//if (GetTickCount() - Slip_start > MARIO_SLIP_TIME)
-	//{
-	//	Slip_start = 0;
-	//	Slip = 0;
-	//}
 	//ny = 0;
 	// No collision occured, proceed normally
 	//DebugOut(L"Vy%f\n", vy);
@@ -265,7 +266,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<CKoopas*>(e->obj))
 			{
 				Shell = dynamic_cast<CKoopas*>(e->obj);
-				if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+				if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED || Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_GREEN) {
 					if (Shell->GetState() == KOOPAS_STATE_SHELL && !PrepareCatch && e->nx != 0)
 					{
 						Shell->SetState(KOOPAS_STATE_ROTATORY);
@@ -301,21 +302,34 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						else if (Shell->GetState() == KOOPAS_STATE_ROTATORY)
 						{
 							Shell->SetState(KOOPAS_STATE_SHELL);
-							this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
+							this->vy = -MARIO_JUMP_DEFLECT_SPEED*2;
 						}
 						else
 						{
 							Shell->SetState(KOOPAS_STATE_SHELL);
-							this->vy = -MARIO_JUMP_DEFLECT_SPEED - 0.2f;
+							this->vy = -MARIO_JUMP_DEFLECT_SPEED*2;
 						}
 					}
 					else
+					{
+						if (level == MARIO_LEVEL_BIG)
+							level = MARIO_LEVEL_SMALL;
+						if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_RACCOON)
+							level = MARIO_LEVEL_BIG;
 						StartUntouchable();
+					}
 				}
 				else if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
 					if (e->ny < 0)
 					{
 						Shell->TypeKoopas = KOOPAS_TYPE_KOOPA_TROOPA_GREEN;
+						this->vy = -MARIO_JUMP_DEFLECT_SPEED*2;
+					}
+					else if (e->nx != 0 && Iskilling)
+					{
+						Shell->TypeKoopas = KOOPAS_TYPE_KOOPA_TROOPA_GREEN;
+						Shell->SetState(KOOPAS_STATE_SHELL);
+						Shell->vy -= KOOPAS_DIE_DEFLECT_SPEED;
 					}
 				}
 
@@ -368,12 +382,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
-				//if (state == MARIO_STATE_BEND_OVER) 
+			CPortal* p = dynamic_cast<CPortal*>(e->obj);
+				IsWaitingTeleport = true;
+				if (state == MARIO_STATE_BEND_OVER) 
 				{
-					CPortal* p = dynamic_cast<CPortal*>(e->obj);
+					this->y += 3.0f;		// cho vuot qua BBOX cua Portal
+				}
+				if (this->y - start_y > MARIO_RACCOON_BBOX_HEIGHT)
+				{
+					this->vy = 0;
 					CGame::GetInstance()->SwitchScene(p->GetSceneId());
 				}
-				
 			}
 		}
 	}
@@ -494,6 +513,8 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_CATCHING_IDLE_RIGHT;
 				if (IsBendingOver)
 					ani = MARIO_ANI_RACCOON_BEND_OVER_RIGHT;
+				if (StartTeleport)
+					ani = MARIO_ANI_RACCOON_TELEPORT;
 			}
 			else 
 			{
@@ -511,6 +532,8 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_CATCHING_IDLE_LEFT;
 				if (IsBendingOver)
 					ani = MARIO_ANI_RACCOON_BEND_OVER_LEFT;
+				if (StartTeleport)
+					ani = MARIO_ANI_RACCOON_TELEPORT;
 			}
 		}
 		else if (vx > 0)
@@ -640,7 +663,7 @@ void CMario::Render()
 	}
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 void CMario::SetState(int state)
@@ -721,7 +744,7 @@ void CMario::SetState(int state)
 			if(level == MARIO_LEVEL_RACCOON)
 				IsSlowDropping = false;
 		}
-		if (!AllowJump)
+		if (!AllowJump && !IsFlying)
 		{
 			if (level == MARIO_LEVEL_RACCOON)
    				IsSlowDropping = true;
@@ -757,11 +780,19 @@ void CMario::SetState(int state)
 		IsBendingOver = false;	
 		break;
 	case MARIO_STATE_BEND_OVER:
-		if (!IsBendingOver)
-		{
+		if (!IsWaitingTeleport) {
+			if (!IsBendingOver)
+			{
 				this->y += MARIO_Y_BEND_OVER;
+			}
+			IsBendingOver = true;
 		}
-		IsBendingOver = true;
+		else {
+			if(!StartTeleport)
+				start_y = this->y;
+			StartTeleport = true;
+			//this->y += 0.0001f;
+		}
 	case MARIO_STATE_IDLE: 
 		IsLimitRunning = false;
 		if (x - XHolding > MARIO_DISTANCE_INERTIA) // khoan cach bi vang

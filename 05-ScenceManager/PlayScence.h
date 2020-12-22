@@ -18,6 +18,7 @@ protected:
 	int SpriteEffectStart;
 	TileMap *tileMap;
 	CMario* player;
+	//MarioChooseMap* playerChoose;
 	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
 	vector<LPGAMEOBJECT> objectsItem;

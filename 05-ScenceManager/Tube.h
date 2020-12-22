@@ -18,8 +18,10 @@
 #define TUBE_BBOX_HIGHT_6	32
 class Tube : public CGameObject
 {
+	float Height;
+	int SprTure = -1;
 public:
-	int NoTube = -1;
+	Tube(float Height, int SprTure);
 	virtual void Render();
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 };

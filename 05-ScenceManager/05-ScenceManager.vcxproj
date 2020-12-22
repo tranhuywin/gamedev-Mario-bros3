@@ -128,6 +128,7 @@
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="BulletPiranhaPlant.cpp" />
     <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="MarioChooseMap.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="VenusFireTrap.cpp" />
     <ClCompile Include="Items.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Brick.h" />
     <ClInclude Include="BulletPiranhaPlant.h" />
     <ClInclude Include="Effect.h" />
+    <ClInclude Include="MarioChooseMap.h" />
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="VenusFireTrap.h" />
     <ClInclude Include="Items.h" />

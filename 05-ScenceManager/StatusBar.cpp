@@ -1,7 +1,7 @@
 #include "StatusBar.h"
 #include "Utils.h"
 
-void StatusBar::DrawNumber(int x, int y, string stringnumb, int maxsize)
+void StatusBar::DrawNumber(float x, float y, string stringnumb, int maxsize)
 {
 	stringnumb = string(maxsize - stringnumb.size(), '0').append(stringnumb);
 	for (int i = 0; i < stringnumb.size(); i++)
@@ -20,13 +20,13 @@ void StatusBar::DrawNumber(int x, int y, string stringnumb, int maxsize)
 	}
 }
 
-void StatusBar::Update(DWORD dt, int camX, int camY)
+void StatusBar::Update(DWORD dt, float camX, float camY)
 {
 	posX = camX;
 	posY = camY;
 	TotalScore = CGame::GetInstance()->GetScore();
-	TotalMoney = 00;
-	WordMap = 1;
+	TotalMoney = CGame::GetInstance()->GetMoney();
+	WordMap = CGame::GetInstance()->Getcurrent_scene();
 	Life = CGame::GetInstance()->GetLife();
 	Second++;
 	if (Second == 60)
