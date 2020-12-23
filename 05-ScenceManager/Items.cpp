@@ -60,8 +60,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (IdItem == ITEM_MONEY_IDLE && !OfBrick)
 		Active = true;
 	CGameObject::Update(dt);
-	x += dx;
-	y += dy;
+	//x += dx;
+	//y += dy;
 	if (CollTail)
 		Active = false;
 	if (Active)
@@ -90,8 +90,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 		else if (IdItem == ITEM_MUSHROOM_GREEN) {
-			this->vx = -ITEM_MUSHROOM_SPEEED_VX * dt;
-			vy += ITEM_GRAVITY/4 * dt;
+			//this->vx = -ITEM_MUSHROOM_SPEEED_VX * dt;
+			//vy += ITEM_GRAVITY/5 * dt;
 		}
 		else if (IdItem == ITEM_SWITCH)
 		{
@@ -112,47 +112,75 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else {
 		vy = 0; vx = 0;
 	}
-		vector<LPGAMEOBJECT> coEventsResult;
-		coEventsResult.clear();
 
-		CalCollisions(coObjects, coEventsResult);
-		int sizeCo = coEventsResult.size();
-		if(!CollTail)
-		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE)
-			Active = true;
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResultPro;
+	coEvents.clear();
+	if(Active && IdItem == ITEM_MUSHROOM_GREEN)
+		CalcPotentialCollisions(coObjects, coEvents);
+	if (coEvents.size() == 0)
+	{
+		x += dx;
+		y += dy;
+	}
+	else {
+		float min_tx, min_ty, nx = 0, ny;
+		float rdx = 0, rdy = 0;
+		FilterCollision(coEvents, coEventsResultPro, min_tx, min_ty, nx, ny, rdx, rdy);
+		x += min_tx * dx + nx * 0.3f;
+		y += min_ty * dy + ny * 0.3f;
 
-		if (sizeCo != 0)
+		if (nx != 0)
+			vx = 0;
+		if (ny != 0)
+			vy = 0;
+	}
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+
+	vector<LPGAMEOBJECT> coEventsResult;
+	coEventsResult.clear();
+
+	CalCollisions(coObjects, coEventsResult);
+	int sizeCo = coEventsResult.size();
+	if(!CollTail)
+	if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE)
+		Active = true;
+	if (sizeCo == 0 && IdItem == ITEM_MUSHROOM_GREEN)
+	{
+		vx = -0.001f * dt;
+		vy += ITEM_GRAVITY / 6 * dt;
+	}
+	if (sizeCo != 0)
+	{
+		for (UINT i = 0; i < sizeCo; i++)
 		{
-			for (UINT i = 0; i < sizeCo; i++)
+			LPGAMEOBJECT e = coEventsResult[i];
+			if (dynamic_cast<CMario*>(e)) // if e->obj is Goomba 
 			{
-				LPGAMEOBJECT e = coEventsResult[i];
-
-				if (dynamic_cast<CMario*>(e)) // if e->obj is Goomba 
+				CMario* mario = dynamic_cast<CMario*>(e);
+				if (IdItem == ITEM_TREE_LEAF)
 				{
-					CMario* mario = dynamic_cast<CMario*>(e);
-					if (IdItem == ITEM_TREE_LEAF)
+					
+					if (mario->GetLevel() == MARIO_LEVEL_RACCOON && vy > 0)
 					{
-						
-						if (mario->GetLevel() == MARIO_LEVEL_RACCOON && vy > 0)
-						{
-							AniEffect = SpriteEffectStart + EFFECT_1000;
-							effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
-							int CurentScore = CGame::GetInstance()->GetScore();
-							CGame::GetInstance()->SetScore(CurentScore + 1000);
-							int CurentMoney = CGame::GetInstance()->GetMoney();
-							CGame::GetInstance()->SetMoney(CurentMoney + 1);
-							x = -100; y = -100; vy = 0; vx = 0;
-							Active = false;
-						}
-						if(mario->GetLevel() == MARIO_LEVEL_RACCOON && sizeCo == 1)
-						{
-							x = -100; y = -100; vy = 0; vx = 0;
-							Active = false;
-						}
-						if (mario->GetLevel() == MARIO_LEVEL_BIG)
-							mario->SetLevel(MARIO_LEVEL_RACCOON);
+						AniEffect = SpriteEffectStart + EFFECT_1000;
+						effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
+						int CurentScore = CGame::GetInstance()->GetScore();
+						CGame::GetInstance()->SetScore(CurentScore + 1000);
+						int CurentMoney = CGame::GetInstance()->GetMoney();
+						CGame::GetInstance()->SetMoney(CurentMoney + 1);
+						x = -100; y = -100; vy = 0; vx = 0;
+						Active = false;
 					}
-					else if (IdItem == ITEM_MONEY_IDLE)
+					if(mario->GetLevel() == MARIO_LEVEL_RACCOON && sizeCo == 1)
+					{
+						x = -100; y = -100; vy = 0; vx = 0;
+						Active = false;
+					}
+					if (mario->GetLevel() == MARIO_LEVEL_BIG)
+						mario->SetLevel(MARIO_LEVEL_RACCOON);
+				}
+				else if (IdItem == ITEM_MONEY_IDLE)
 					{
 						if (mario->Iskilling)
 						{
@@ -170,55 +198,50 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						}
 						MarioGetMoney = true;
 					}
-					else if (IdItem == ITEM_MONEY_ROTATOR) {
-						Active = false;
-						int CurentScore = CGame::GetInstance()->GetScore();
-						CGame::GetInstance()->SetScore(CurentScore + 100);
-						int CurentMoney = CGame::GetInstance()->GetMoney();
-						CGame::GetInstance()->SetMoney(CurentMoney + 1);
-						x = -100; y = -100.0f; vy = 0; vx = 0;
-					}
-					else if (IdItem == ITEM_MUSHROOM_GREEN && vx != 0) {
-						int CurentLife = CGame::GetInstance()->GetLife();
-						CGame::GetInstance()->SetLife(CurentLife + 1);
-						this->Active = false;
-						x = -100; y = -100.0f; vy = 0; vx = 0;
-					}
-				}
-				else if (dynamic_cast<QuestionBrick*>(e))
-				{
-					QuestionBrick* QBrick = dynamic_cast<QuestionBrick*>(e);
-					if (QBrick->GetState() == BRICK_STATE_QUESTION_ON_UP)
-					{
-						if (IdItem == ITEM_TREE_LEAF || IdItem == ITEM_MONEY)
-							vy = -ITEM_DEFLECT_SPEED * dt;
-						Active = true;
-					}
-					if (QBrick->GetState() == BRICK_STATE_QUESTION_OFF)
-					{
-						if (IdItem == ITEM_SWITCH)
-							vy = -ITEM_SWITCH_VY * dt;
-						Active = true;
-					}
-					if (IdItem == ITEM_MUSHROOM_GREEN && Active && vx != 0 && vy > 0)
-					{
-						vy = 0;
-						this->y -= 0.4f;
-					}
-					else if(IdItem == ITEM_MUSHROOM_GREEN && Active) {
-						vx = 0;
-					}
-				}
-				else if (dynamic_cast<Ground*>(e)) {
-					vy = 0;
-					this->y -= 0.4f;
-				}
-				else if (dynamic_cast<Brick*>(e)) {
+				else if (IdItem == ITEM_MONEY_ROTATOR) {
 					Active = false;
-					OfBrick = true;
+					int CurentScore = CGame::GetInstance()->GetScore();
+					CGame::GetInstance()->SetScore(CurentScore + 100);
+					int CurentMoney = CGame::GetInstance()->GetMoney();
+					CGame::GetInstance()->SetMoney(CurentMoney + 1);
+					x = -100; y = -100.0f; vy = 0; vx = 0;
+				}
+				else if (IdItem == ITEM_MUSHROOM_GREEN && vx != 0) {
+					AniEffect = SpriteEffectStart + EFFECT_1_UP;
+					effect = new Effect(this->x, this->y, AniEffect);
+					int CurentLife = CGame::GetInstance()->GetLife();
+					CGame::GetInstance()->SetLife(CurentLife + 1);
+					this->Active = false;
+					x = -100; y = -100.0f; vy = 0; vx = 0;
 				}
 			}
+			else if (dynamic_cast<QuestionBrick*>(e))
+			{
+				QuestionBrick* QBrick = dynamic_cast<QuestionBrick*>(e);
+				if (QBrick->GetState() == BRICK_STATE_QUESTION_ON_UP)
+				{
+					if (IdItem == ITEM_TREE_LEAF || IdItem == ITEM_MONEY)
+						vy = -ITEM_DEFLECT_SPEED * dt;
+					Active = true;
+				}
+				if (QBrick->GetState() == BRICK_STATE_QUESTION_OFF)
+				{
+					if (IdItem == ITEM_SWITCH)
+						vy = -ITEM_SWITCH_VY * dt;
+					if (IdItem == ITEM_MUSHROOM_GREEN && Active)
+					{
+						vx = 0; vy = -ITEM_MUSHROOM_VY_UP * dt;
+					}
+					Active = true;
+				}
+			}
+
+			else if (dynamic_cast<Brick*>(e)) {
+				Active = false;
+				OfBrick = true;
+			}
 		}
+	}
 }
 void Items::Render()
 {
