@@ -41,8 +41,8 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 		else if (IdItem == ITEM_MUSHROOM_GREEN) {
 			left = x;
 			top = y;
-			right = x + 14;
-			bottom = y + 16;
+			right = x + ITEM_BBOX_MUSHROOM;
+			bottom = y + ITEM_BBOX_MUSHROOM;
 		}
 	}
 }
@@ -147,7 +147,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Active = true;
 	if (sizeCo == 0 && IdItem == ITEM_MUSHROOM_GREEN)
 	{
-		vx = -0.001f * dt;
+		vx = -ITEM_MUSHROOM_VX * dt;
 		vy += ITEM_GRAVITY / 6 * dt;
 	}
 	if (sizeCo != 0)
@@ -288,7 +288,7 @@ void Items::SetState(int state)
 		break;
 	case ITEM_SWITCH_STATE_OFF:
 		if(this->state != ITEM_SWITCH_STATE_OFF)
-		y += 9;
+		y += ITEM_BBOX_SWITCH - ITEM_BBOX_SWITCH_B;
 		break;
 	}
 	CGameObject::SetState(state);
