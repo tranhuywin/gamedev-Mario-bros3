@@ -33,6 +33,10 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 			if (state == ITEM_SWITCH_STATE_OFF)
 				bottom = y + ITEM_BBOX_SWITCH_B;
 		}
+		else if (IdItem == ITEM_MONEY_ROTATOR) {
+			right = x + ITEM_BBOX_MONEY_IDLE - ITEM_BBOX_L;
+			bottom = y + ITEM_BBOX_MONEY_IDLE + ITEM_BBOX_B;
+		}
 	}
 }
 

@@ -18,7 +18,9 @@
 
 CMario::CMario(float x, float y) : CGameObject()
 {
-	level = MARIO_LEVEL_RACCOON;
+	ani = -1;
+	LastAni = -1;
+	level = MARIO_LEVEL_BIG;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 	start_x = x; 
@@ -29,8 +31,10 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	DebugOut(L"vy%f\n", vy);
-	if(ani != -1)
+	CGameObject::Update(dt);
+	if (level != MARIO_LEVEL_MINI)
+	{
+	if (ani != -1)
 		TailofRaccoon->Attack(this->x, this->y, Iskilling, animation_set->at(ani)->GetcurrentFrame());
 	if (!Iskilling && SkillOn)
 	{
@@ -42,9 +46,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (y < 0.0f && IsFlying && level == MARIO_LEVEL_RACCOON)
 	{
 		y = 0.0f;
- 		IsLimitFlying = true;
+		IsLimitFlying = true;
 	}
-	CGameObject::Update(dt);
+
 	// Simple fall down
 	if (vx >= MARIO_MAX_SPEED_RUNNING)
 	{
@@ -61,7 +65,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		if (!IsLimitFlying)
 		{
- 			vy = -MARIO_FLY_SPEED_Y * dt;
+			vy = -MARIO_FLY_SPEED_Y * dt;
 			//vy = -0.008 * dt;
 		}
 		else if (nx == 1)
@@ -88,19 +92,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (IsSlowDropping && (y - YHolding < MARIO_DISTANCE_SLOW_DROP) && !OnPlatform)
 		{
 			vy = MARIO_FALL_SLOWLY_SPEED * dt;
-			//if(vy < MARIO_FALL_SLOWLY_SPEED)
-			//vy += MARIO_FALL_SLOWLY_SPEED * dt;
 		}
 		else
 		{
-			if(!StartTeleport)
+			if (!StartTeleport)
 				vy += MARIO_GRAVITY * dt;
 			else
 			{
 				vy += MARIO_GRAVITY_TELEPORT * dt;
 			}
 			IsSlowDropping = false;
-		}	
+		}
 	}
 	if (YHolding - y > MARIO_DISTANCE_JUMP)
 		AllowJump = false;
@@ -118,19 +120,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		else
 			SetState(MARIO_STATE_DIE);
 	}
-	if(Shell != NULL)
+	if (Shell != NULL)
 		if (!IsCatching && Shell->GetState() == KOOPAS_STATE_SHELL && Shell->IsCatching)
 		{
 			Shell->SetState(KOOPAS_STATE_ROTATORY);
 			Shell->vx = KOOPAS_ROTATORY_SPEED * nx;
 			Shell->IsCatching = false;
 		}
-	vector<LPCOLLISIONEVENT> coEvents;
-	vector<LPCOLLISIONEVENT> coEventsResult;
-	coEvents.clear();
+	
+	
 	// turn off collision when die 
-	if (state!=MARIO_STATE_DIE)
-		CalcPotentialCollisions(coObjects, coEvents);
+	
 	// reset untouchable timer if untouchable time has passed
 	if (KickShell && GetTickCount() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
 		KickShell = false;
@@ -165,9 +165,39 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Slip_start = 0;
 		Slip = 0;
 	}
-	//ny = 0;
-	// No collision occured, proceed normally
-	//DebugOut(L"Vy%f\n", vy);
+	}
+
+	vector<LPGAMEOBJECT> coEventsResultColl;
+	coEventsResultColl.clear();
+	if (state != MARIO_STATE_DIE)
+		CalCollisions(coObjects, coEventsResultColl);
+	else if (level == MARIO_LEVEL_SMALL)
+			CGame::GetInstance()->SwitchScene(0);				// scence Start
+	
+	if (coEventsResultColl.size() != 0)
+	{
+		for (UINT i = 0; i < coEventsResultColl.size(); i++)
+		{
+			LPGAMEOBJECT e = coEventsResultColl[i];
+			if (dynamic_cast<CPortal*>(e) && StartTeleport) // if e->obj is Goomba 
+			{
+				CPortal* p = dynamic_cast<CPortal*>(e);
+				//DebugOut(L"Watinngggg......\n");
+				if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START)
+				{
+					CGame::GetInstance()->SwitchScene(p->GetSceneId());
+				}
+				//else(CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1)
+				return;			// khong return thi coObjects duoi se co 1 vai Obj = NULL
+			}
+		}
+	}
+
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
+	coEvents.clear();
+	if (state != MARIO_STATE_DIE)
+		CalcPotentialCollisions(coObjects, coEvents);
 	if (coEvents.size()==0)
 	{
 		x += dx;
@@ -179,7 +209,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float rdx = 0;
 		float rdy = 0;
 		float vyLine = vy;
-
+		float vxPre = vx;
+		float vyPre = vy;
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
@@ -382,29 +413,27 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
-			CPortal* p = dynamic_cast<CPortal*>(e->obj);
-				IsWaitingTeleport = true;
-				if (state == MARIO_STATE_BEND_OVER) 
-				{
-					this->y += 3.0f;		// cho vuot qua BBOX cua Portal
-				}
-				if (this->y - start_y > MARIO_RACCOON_BBOX_HEIGHT)
-				{
-					this->vy = 0;
-					CGame::GetInstance()->SwitchScene(p->GetSceneId());
-				}
+				CPortal* p = dynamic_cast<CPortal*>(e->obj);
+				vx = vxPre;
+				vy = vyPre;
+				x += dx; y += dy;
 			}
 		}
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+
+	
 }
 
 void CMario::Render()
 {
-	firebullet_1->Render();
-	firebullet_2->Render();
-	TailofRaccoon->Render();
+	if (level != MARIO_LEVEL_MINI)
+	{
+		firebullet_1->Render();
+		firebullet_2->Render();
+		TailofRaccoon->Render();
+	}
 	int alpha = 255;
 	if (untouchable) alpha = 128;
 
@@ -646,7 +675,9 @@ void CMario::Render()
 				ani = MARIO_ANI_FIRE_BEND_OVER_LEFT;
 		}
 	}
-
+	else if (level == MARIO_LEVEL_MINI) {
+		ani = MARIO_MINI_ANI;
+	}
 	if (level == MARIO_LEVEL_RACCOON && nx == 1)			// tru` di vi tri cai duoi
 	{
 		if (vx < 0)
@@ -668,10 +699,35 @@ void CMario::Render()
 
 void CMario::SetState(int state)
 {
-	int PreState = this->GetState();
+	//int PreState = this->GetState();
 	CGameObject::SetState(state);
-
-	switch (state)
+	if (level == MARIO_LEVEL_MINI)
+	{
+		switch (state)
+		{
+		case MARIO_MINI_STATE_UP:
+			vy = -MARIO_MINI_SPEED;
+			vx = 0;
+			break;
+		case MARIO_MINI_STATE_DOWN:
+			vy = MARIO_MINI_SPEED;
+			vx = 0;
+			break;
+		case MARIO_MINI_STATE_LEFT:
+			vy = 0;
+			vx = -MARIO_MINI_SPEED;
+			break;
+		case MARIO_MINI_STATE_RIGHT:
+			vy = 0;
+			vx = MARIO_MINI_SPEED;
+			break;
+		case MARIO_MINI_STATE_TELEPORT:
+			StartTeleport = true;
+			break;
+		}
+	}
+	else {
+		switch (state)
 	{
 	case MARIO_STATE_KILL:
 
@@ -842,8 +898,9 @@ void CMario::SetState(int state)
 		vy = -MARIO_DIE_DEFLECT_SPEED;
 		int Life = CGame::GetInstance()->GetLife();
 		CGame::GetInstance()->SetLife(Life - 1);
-
+		//if (CGame::GetInstance()->GetLife() == 0)
 		break;
+	}
 	}
 }
 
@@ -882,6 +939,10 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	case MARIO_LEVEL_SMALL:
 		right = x + MARIO_SMALL_BBOX_WIDTH;
 		bottom = y + MARIO_SMALL_BBOX_HEIGHT;
+		break;
+	case MARIO_LEVEL_MINI:
+		right = x + 15;
+		bottom = y + 15;
 		break;
 	}
 

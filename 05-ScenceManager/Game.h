@@ -14,6 +14,9 @@
 using namespace std;
 
 #define KEYBOARD_BUFFER_SIZE 1024
+#define SCENCE_START			0
+#define SCENCE_WORD_MAP_1		1
+#define SCENCE_WORD_MAP_1_1		4
 //#define SCREEN_WIDTH 1000.0f
 class CGame
 {

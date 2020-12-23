@@ -136,14 +136,13 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void FireBullet::Render()
 {
 	int ani = 0;
-	int alpha = 255;
 	if (Explode)
 	{
 		ani = FIRE_BULLET_ANI_EXPLODE;
 		this->x = XExplode;
 		this->y = YExplode;
 	}
-	animation_set->at(ani)->Render(x, y, alpha);
+	animation_set->at(ani)->Render(x, y);
 	//RenderBoundingBox();
 }
 void FireBullet::GetBoundingBox(float& left, float& top, float& right, float& bottom)

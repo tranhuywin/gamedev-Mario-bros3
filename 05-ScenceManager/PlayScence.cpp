@@ -196,11 +196,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			//	obj = new MarioChooseMap();
 			//}
 			//else 
-			{
-				obj = new CMario(x, y);
-				player = (CMario*)obj;
-			}
-			
+			obj = new CMario(x, y);
+			player = (CMario*)obj;
+			if (CGame::GetInstance()->Getcurrent_scene() == 0)
+				player->SetLevel(MARIO_LEVEL_MINI);
 			DebugOut(L"[INFO] Player object created!\n");
 			break;
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
@@ -236,14 +235,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			else {
 				obj = new Items(IdItem, SpriteEffectStart);
 			}
-		}
-		break;
+		}break;
 		case OBJECT_TYPE_GOOMBA:
 		{
 			int TypeGoomba = atoi(tokens[4].c_str());
 			obj = new CGoomba(TypeGoomba);
-		}
-		break;
+		}break;
 		case OBJECT_TYPE_FIRE_PIRANHA_PLANT:
 		{
 			// TODO: Get Possition from file
@@ -255,16 +252,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 			objects.push_back(objBullet);
 			obj = new VenusFireTrap(player, objBullet, TypeVenusFireTrap);
-		}
-		break;
+		}break;
 		case OBJECT_TYPE_PORTAL:
 		{
 			float r = atof(tokens[4].c_str());
 			float b = atof(tokens[5].c_str());
 			int scene_id = atoi(tokens[6].c_str());
 			obj = new CPortal(x, y, r, b, scene_id);
-		}
-		break;
+		}break;
 		default:
 			DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
 			return;
@@ -351,29 +346,53 @@ void CPlayScene::Load()
 
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
+bool CheckObjInScreen(LPGAMEOBJECT Obj) {
+	float XLeftScreen = CGame::GetInstance()->GetCamPosX() - 48;
+	float XRightScreen = CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth() + 48;
+	float YTopScreen = CGame::GetInstance()->GetCamPosY() - 48;
+	float YBotScreen = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() + 48;
 
+	if (Obj->x < XLeftScreen || Obj->x > XRightScreen)
+		return false;
+	if (Obj->y < YTopScreen || Obj->y > YBotScreen)
+		return false;
+	return true;
+}
 void CPlayScene::Update(DWORD dt)
 {
 	vector<LPGAMEOBJECT> coObjects;
 	vector<LPGAMEOBJECT> coObjectsItem;
+
 	//Push nhung Obj trong man hinh vao coObjects de xet va cham 
 	for (size_t i = 1; i < objects.size(); i++)
 	{
-		coObjects.push_back(objects[i]);
+		LPGAMEOBJECT e = objects[i];
+		if (dynamic_cast<Ground*>(e) || dynamic_cast<Line*>(e) || dynamic_cast<Tube*>(e) || dynamic_cast<Effect*>(e))
+			coObjects.push_back(objects[i]);
+		else if (CheckObjInScreen(objects[i]))
+			coObjects.push_back(objects[i]);
 	}
+
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		coObjectsItem.push_back(objects[i]);
+		//if (CheckObjInScreen(objects[i]))
+			coObjectsItem.push_back(objects[i]);
 	}
 	for (size_t i = 0; i < objectsItem.size(); i++)
 	{
-		objectsItem[i]->Update(dt, &coObjectsItem);
+		//if (CheckObjInScreen(objects[i]))
+			objectsItem[i]->Update(dt, &coObjectsItem);
 	}
 	// Update Obj is Active in screen
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		objects[i]->Update(dt, &coObjects);
-
+		LPGAMEOBJECT e = objects[i];
+		if (dynamic_cast<Brick*>(e) || dynamic_cast<CMario*>(e))
+		{
+			objects[i]->Update(dt, &coObjects);
+		}
+		else if (CheckObjInScreen(objects[i]))
+			objects[i]->Update(dt, &coObjects);
 	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
@@ -389,19 +408,27 @@ void CPlayScene::Update(DWORD dt)
 	// Update Status bar
 	float XStatusBar = CGame::GetInstance()->GetCamPosX() + 5;
 	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - 30;
-	//float YStatusBar = player->y - CGame::GetInstance()->GetScreenHeight() / 2;
 	statusBar->Update(dt, XStatusBar, YStatusBar);
 }
 
 void CPlayScene::Render()
 {
 	tileMap->Draw();
-	//CSprites::GetInstance()->Get(80003)->Draw(-50.0f, 0);
-	//CSprites::GetInstance()->Get(80003)->Draw(224.0f, 0);
+	if (CGame::GetInstance()->Getcurrent_scene() == 0)
+	{
+		CSprites::GetInstance()->Get(80003)->Draw(-50.0f, 0);
+		CSprites::GetInstance()->Get(80003)->Draw(224.0f, 0);
+	}
 	for (int i = 1; i < objects.size(); i++)
 	{
-
-		objects[i]->Render();
+		LPGAMEOBJECT e = objects[i];
+		if (dynamic_cast<Brick*>(e)) {
+			objects[i]->Render();
+		}
+		else if (CheckObjInScreen(objects[i]))
+		{
+			objects[i]->Render();
+		}
 	}
 	for (size_t i = 0; i < objectsItem.size(); i++)
 	{
@@ -485,7 +512,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetState(MARIO_STATE_JUMP);
 		break;
 	case DIK_Q:
-		mario->SetState(MARIO_STATE_KILL);
+		{
+			if(mario->GetLevel() != MARIO_LEVEL_MINI)
+				mario->SetState(MARIO_STATE_KILL);
+			else {
+				mario->SetState(MARIO_MINI_STATE_TELEPORT);
+			}
+		}
 		break;
 	case DIK_1:
 		mario->SetLevel(MARIO_LEVEL_SMALL);
@@ -505,9 +538,6 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_0:
 		mario->SetPosition(2263, 77);
 		break;
-	//case DIK_DOWN:
-	//	mario->SetState(MARIO_STATE_BEND_OVER);
-	//	break;
 
 	}
 }
@@ -538,11 +568,31 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
 	if (game->IsKeyDown(DIK_DOWN))
-		mario->SetState(MARIO_STATE_BEND_OVER);
+	{
+		if (mario->GetLevel() != MARIO_LEVEL_MINI)
+			mario->SetState(MARIO_STATE_BEND_OVER);
+		else
+			mario->SetState(MARIO_MINI_STATE_DOWN);
+	}
 	else if (game->IsKeyDown(DIK_RIGHT))
-		mario->SetState(MARIO_STATE_WALKING_RIGHT);
+	{
+		if (mario->GetLevel() != MARIO_LEVEL_MINI)
+			mario->SetState(MARIO_STATE_WALKING_RIGHT);
+		else
+			mario->SetState(MARIO_MINI_STATE_RIGHT);
+	}
 	else if (game->IsKeyDown(DIK_LEFT))
-		mario->SetState(MARIO_STATE_WALKING_LEFT);
+	{
+		if (mario->GetLevel() != MARIO_LEVEL_MINI)
+			mario->SetState(MARIO_STATE_WALKING_LEFT);
+		else
+			mario->SetState(MARIO_MINI_STATE_LEFT);
+	}
+	else if (game->IsKeyDown(DIK_UP))
+	{
+		if (mario->GetLevel() == MARIO_LEVEL_MINI)
+			mario->SetState(MARIO_MINI_STATE_UP);
+	}
 	else
 		mario->SetState(MARIO_STATE_IDLE);
 }

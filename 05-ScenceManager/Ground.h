@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
-#define GROUND_BBOX_HEIGHT 32
+#define GROUND_BBOX_HEIGHT 16
 #define GROUND_BBOX_WIDTH_1 624
 #define GROUND_BBOX_WIDTH_2 464
 #define GROUND_BBOX_WIDTH_3 352
