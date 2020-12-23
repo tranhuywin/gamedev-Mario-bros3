@@ -450,9 +450,13 @@ void CPlayScene::Unload()
 		delete objectsItem[i];
 	objectsItem.clear();
 	player = NULL;
+	
+	delete tileMap;
 	tileMap = NULL;
+	delete statusBar;
 	statusBar = NULL;
-	ItemSwitch = NULL;
+	//delete ItemSwitch;
+	//ItemSwitch = NULL;
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
 

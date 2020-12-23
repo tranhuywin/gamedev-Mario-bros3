@@ -8,6 +8,7 @@
 #include "Ground.h"
 #include "Tube.h"
 #include "QuestionBrick.h"
+#include "Brick.h"
 
 CKoopas::CKoopas(int TypeKoopas)
 {
@@ -32,7 +33,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	if(!IsCatching)
 		vy += KOOPAS_GRAVITY/2 * dt;
 	CGameObject::Update(dt);
-	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED || TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_GREEN) {
 		if (state == KOOPAS_STATE_PREPARE_WAKE_UP)
 		{
 			if (ShakingLeft)
@@ -41,14 +42,14 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				x += 3.0f;
 			ShakingLeft = !ShakingLeft;
 		}
-		if (GetTickCount() - Sleep_start > 5000 && state == KOOPAS_STATE_SHELL)
+		if (GetTickCount() - Sleep_start > KOOPAS_TIME_SLEEP && state == KOOPAS_STATE_SHELL)
 		{
 			Sleep_start = 0;
 			Sleep = 0;
 			state = KOOPAS_STATE_PREPARE_WAKE_UP;
 			StartPrepareWakeUp();
 		}
-		if (GetTickCount() - PrepareWakeUp_start > 2000 && state == KOOPAS_STATE_PREPARE_WAKE_UP)
+		if (GetTickCount() - PrepareWakeUp_start > KOOPAS_TIME_WAKE_UP && state == KOOPAS_STATE_PREPARE_WAKE_UP)
 		{
 			PrepareWakeUp_start = 0;
 			PrepareWakeUp = 0;
@@ -56,9 +57,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			state = KOOPAS_STATE_WALKING;
 			vx = KOOPAS_WALKING_SPEED;
 		}
-	}
-	else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
-
 	}
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -76,13 +74,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
-
+		float vyLine = vy;
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
 		/*if (nx != 0)
 			vx = 0;*/
-		float vyLine = vy;
 		if (ny != 0)
 			vy = 0;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
@@ -111,9 +108,36 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 				}
 				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
-					vy = -0.01f * dt;
+					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 				}
-
+			}else if (dynamic_cast<Brick*>(e->obj))
+			{
+				Brick* brick = dynamic_cast<Brick*>(e->obj);
+				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+					float XLeftBrick = brick->x;
+					if (vx < 0 && x < XLeftBrick - KOOPAS_BBOX_WIDTH / 2 && state == KOOPAS_STATE_WALKING) {
+						x = XLeftBrick; vx = -vx;
+					}
+					float XRightBrick = brick->x + BRICK_BBOX_WIDTH;
+					if (vx > 0 && x > XRightBrick - KOOPAS_BBOX_WIDTH / 3 && state == KOOPAS_STATE_WALKING) {
+						x = XRightBrick - KOOPAS_BBOX_WIDTH; vx = -vx;
+					}
+					if (e->ny > 0)
+					{
+						if (e->ny > 0)		// o duoi len
+						{
+							vy = vyLine;
+							y += dy;
+						}
+					}
+				}
+				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
+					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
+				}
+			}
+			else if (dynamic_cast<Ground*>(e->obj)) {
+				if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
+					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 			}
 			if (!dynamic_cast<CMario*>(e->obj)) {
 				if (e->nx != 0)
@@ -213,7 +237,8 @@ void CKoopas::Render()
 				ani = KOOPA_PARATROOPA_GREEN_ANI_WING_LEFT;
 		}
 	}
-	animation_set->at(ani)->Render(x, y);
+	if (state != KOOPAS_STATE_DIE)
+		animation_set->at(ani)->Render(x, y);
 	//RenderBoundingBox();
 }
 
@@ -231,12 +256,12 @@ void CKoopas::SetState(int state)
 		vx = KOOPAS_ROTATORY_SPEED;
 		break;
 	case KOOPAS_STATE_WALKING:
-		vx = -KOOPAS_WALKING_SPEED - 0.01f;
+		vx = -KOOPAS_WALKING_SPEED / 3;
 		if (this->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
-			vx = -0.01f;
+			vx = -KOOPAS_PARATROOPA_WALKING_SPEED;
 		break;
 	case KOOPAS_STATE_DIE:
-		vy = 0.1f;
+		vy = KOOPAS_DIE;
 		break;
 	}
 }

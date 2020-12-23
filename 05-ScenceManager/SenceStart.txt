@@ -663,9 +663,10 @@ bend over left Big
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
 # MARIO
-0	16.0	33.0	1
+0	16.0	32.2	1
 #Ground
 5	0	-16	1	224
+5	0	32	1	16
 5	0	0	1	48
 5	0	16	1	48
 5	0	48	1	48

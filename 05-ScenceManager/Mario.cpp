@@ -16,6 +16,7 @@
 #include "VenusFireTrap.h"
 #include "Items.h"
 
+
 CMario::CMario(float x, float y) : CGameObject()
 {
 	ani = -1;
@@ -167,32 +168,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	}
 
-	vector<LPGAMEOBJECT> coEventsResultColl;
-	coEventsResultColl.clear();
-	if (state != MARIO_STATE_DIE)
-		CalCollisions(coObjects, coEventsResultColl);
-	else if (level == MARIO_LEVEL_SMALL)
-			CGame::GetInstance()->SwitchScene(0);				// scence Start
-	
-	if (coEventsResultColl.size() != 0)
-	{
-		for (UINT i = 0; i < coEventsResultColl.size(); i++)
-		{
-			LPGAMEOBJECT e = coEventsResultColl[i];
-			if (dynamic_cast<CPortal*>(e) && StartTeleport) // if e->obj is Goomba 
-			{
-				CPortal* p = dynamic_cast<CPortal*>(e);
-				//DebugOut(L"Watinngggg......\n");
-				if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START)
-				{
-					CGame::GetInstance()->SwitchScene(p->GetSceneId());
-				}
-				//else(CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1)
-				return;			// khong return thi coObjects duoi se co 1 vai Obj = NULL
-			}
-		}
-	}
-
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -241,12 +216,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
 			
-			if (dynamic_cast<CGoomba *>(e->obj)) // if e->obj is Goomba 
+			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba *goomba = dynamic_cast<CGoomba *>(e->obj);
 				// jump on top >> kill Goomba and deflect a bit 
 				if (e->ny < 0)
 				{
+					if (goomba->GetState() != GOOMBA_STATE_DIE)
+						vy = -MARIO_JUMP_DEFLECT_SPEED;
 					if (goomba->TypeGoomba == GOOMBA_NORMAL)
 						goomba->SetState(GOOMBA_STATE_DIE);
 					else if (goomba->TypeGoomba == PARA_GOOMBA)
@@ -261,7 +238,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							goomba->LevelParaGoomba--;
 						}
 					}
-					vy = -MARIO_JUMP_DEFLECT_SPEED;
+
 				}
 				else if (e->nx != 0 && Iskilling)
 				{
@@ -273,7 +250,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					{
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
-							if (level > MARIO_LEVEL_SMALL)
+							if (level > MARIO_LEVEL_BIG)
+							{
+								SetLevel(MARIO_LEVEL_BIG);
+								this->x -= MARIO_RACCOON_BBOX_TAIL;
+								this->y -= 1;		// khong bi rot xuong Coobj
+								StartUntouchable();
+							}
+							else if (level > MARIO_LEVEL_SMALL)
 							{
 								level = MARIO_LEVEL_SMALL;
 								StartUntouchable();
@@ -281,6 +265,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							else
 								SetState(MARIO_STATE_DIE);	
 						}
+						else {
+							vy = vyPre;
+							y += dy;
+						}
+					}
+					else {
+						vx = vxPre;
+						x += dx; 
 					}
 				}
 			}
@@ -343,11 +335,34 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 					else
 					{
-						if (level == MARIO_LEVEL_BIG)
-							level = MARIO_LEVEL_SMALL;
-						if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_RACCOON)
-							level = MARIO_LEVEL_BIG;
-						StartUntouchable();
+						if (untouchable == 0)
+						{
+							if (Shell->GetState() != KOOPAS_STATE_DIE)
+							{
+								if (level > MARIO_LEVEL_BIG)
+								{
+									SetLevel(MARIO_LEVEL_BIG);
+									this->x -= MARIO_RACCOON_BBOX_TAIL;
+									this->y -= 1;		// khong bi rot xuong Coobj
+									StartUntouchable();
+								}
+								else if (level > MARIO_LEVEL_SMALL)
+								{
+									level = MARIO_LEVEL_SMALL;
+									StartUntouchable();
+								}
+								else
+									SetState(MARIO_STATE_DIE);
+							}
+							else {
+								vy = vyPre;
+								y += dy;
+							}
+						}
+						else {
+							vx = vxPre;
+							x += dx; 
+						}
 					}
 				}
 				else if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
@@ -376,10 +391,23 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj))
 			{
-				BulletPiranhaPlant* Bullet = dynamic_cast<BulletPiranhaPlant*>(e->obj);
+				vx = vxPre;
+				vy = vyPre;
+				x += dx; y += dy;
+			}
+			else if (dynamic_cast<VenusFireTrap*>(e->obj))
+			{
 				if (untouchable == 0)
 				{
-					if (level > MARIO_LEVEL_SMALL)
+
+					if (level > MARIO_LEVEL_BIG)
+					{
+						SetLevel(MARIO_LEVEL_BIG);
+						this->x -= MARIO_RACCOON_BBOX_TAIL;
+						this->y -= 1;		// khong bi rot xuong Coobj
+							StartUntouchable();
+					}
+					else if (level > MARIO_LEVEL_SMALL)
 					{
 						level = MARIO_LEVEL_SMALL;
 						StartUntouchable();
@@ -387,19 +415,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					else
 						SetState(MARIO_STATE_DIE);
 				}
-			}
-			else if (dynamic_cast<VenusFireTrap*>(e->obj))
-			{
-			VenusFireTrap* Plant = dynamic_cast<VenusFireTrap*>(e->obj);
-				if (untouchable == 0)
-				{
-					if (level > MARIO_LEVEL_SMALL)
-					{
-						level = MARIO_LEVEL_SMALL;
-						StartUntouchable();
-					}
-					else
-						SetState(MARIO_STATE_DIE);
+				else {
+					vx = vxPre;
+					x += dx;
 				}
 			}
 			else if (dynamic_cast<Items*>(e->obj)) 
@@ -413,7 +431,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
-				CPortal* p = dynamic_cast<CPortal*>(e->obj);
 				vx = vxPre;
 				vy = vyPre;
 				x += dx; y += dy;
@@ -423,7 +440,58 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
-	
+	vector<LPGAMEOBJECT> coEventsResultColl;
+	coEventsResultColl.clear();
+	if (state != MARIO_STATE_DIE)
+		CalCollisions(coObjects, coEventsResultColl);
+	if (state == MARIO_STATE_DIE && level == MARIO_LEVEL_SMALL && !CheckMarioInScreen())
+	{
+		CGame::GetInstance()->SwitchScene(SCENCE_START);				// scence Start
+		return;
+	}
+
+	if (coEventsResultColl.size() != 0)
+	{
+		for (UINT i = 0; i < coEventsResultColl.size(); i++)
+		{
+			LPGAMEOBJECT e = coEventsResultColl[i];
+			if (dynamic_cast<CPortal*>(e))
+			{
+				CPortal* p = dynamic_cast<CPortal*>(e);
+				if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START && StartTeleport)
+				{
+					CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					StartTeleport = false;
+					return;			// khong return thi coObjects duoi se co 1 vai Obj = NULL
+				}
+				if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
+				{
+					CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					return;
+				}
+			}
+			else if (dynamic_cast<BulletPiranhaPlant*>(e)) {
+				if (untouchable == 0)
+				{
+					if (level > MARIO_LEVEL_BIG)
+					{
+						SetLevel(MARIO_LEVEL_BIG);
+						this->x -= MARIO_RACCOON_BBOX_TAIL;
+						this->y -= 1;		// khong bi rot xuong Coobj
+						StartUntouchable();
+					}
+					else if (level > MARIO_LEVEL_SMALL)
+					{
+						level = MARIO_LEVEL_SMALL;
+						StartUntouchable();
+					}
+					else
+						SetState(MARIO_STATE_DIE);
+				}
+			}
+		}
+	}
+
 }
 
 void CMario::Render()
@@ -694,7 +762,21 @@ void CMario::Render()
 	}
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
-	RenderBoundingBox();
+	//RenderBoundingBox();
+}
+
+bool CMario::CheckMarioInScreen()
+{
+	float XLeftScreen = CGame::GetInstance()->GetCamPosX() - 48;
+	float XRightScreen = CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth() + 48;
+	float YTopScreen = CGame::GetInstance()->GetCamPosY() - 48;
+	float YBotScreen = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() + 48;
+
+	if (this->x < XLeftScreen || this->x > XRightScreen)
+		return false;
+	if (this->y < YTopScreen || this->y > YBotScreen)
+		return false;
+	return true;
 }
 
 void CMario::SetState(int state)
@@ -764,11 +846,11 @@ void CMario::SetState(int state)
 		if (!HaveInertia)
 			XHolding = x;
 		HaveInertia = true;
-		if (vx < 0.1 && vx != 0)
+		if (vx < MARIO_VY_ASCENDING_SLIP_MAX && vx != 0)
 		{
 			vx += MARIO_VY_ASCENDING_SLIP;
-			if (vx > 0.1)
-				vx = 0.1;
+			if (vx > MARIO_VY_ASCENDING_SLIP_MAX)
+				vx = MARIO_VY_ASCENDING_SLIP_MAX;
 		}
 		if (vx == 0 && !IsRunning)
 			vx = MARIO_WALKING_SPEED;
@@ -780,11 +862,11 @@ void CMario::SetState(int state)
 		if (!HaveInertia)
 			XHolding = x;
 		HaveInertia = true;
-		if (vx > -0.1 && vx != 0)
+		if (vx > -MARIO_VY_ASCENDING_SLIP_MAX && vx != 0)
 		{
 			vx -= MARIO_VY_ASCENDING_SLIP;
-			if (vx < -0.1)
-				vx = -0.1;
+			if (vx < -MARIO_VY_ASCENDING_SLIP_MAX)
+				vx = -MARIO_VY_ASCENDING_SLIP_MAX;
 		}
 		if(vx == 0 && !IsRunning)
 			vx = -MARIO_WALKING_SPEED;
@@ -847,7 +929,6 @@ void CMario::SetState(int state)
 			if(!StartTeleport)
 				start_y = this->y;
 			StartTeleport = true;
-			//this->y += 0.0001f;
 		}
 	case MARIO_STATE_IDLE: 
 		IsLimitRunning = false;
@@ -904,6 +985,11 @@ void CMario::SetState(int state)
 	}
 }
 
+void CMario::SetLevel(int l)
+{
+	level = l;
+}
+
 void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
 	left = x;
@@ -957,4 +1043,5 @@ void CMario::Reset()
 	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
 }
+
 

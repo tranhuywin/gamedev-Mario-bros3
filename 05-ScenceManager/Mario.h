@@ -25,6 +25,7 @@
 #define MARIO_Y_BEND_OVER			3.0f
 #define MARIO_KILL_LEFT_TAIL		3.0f
 #define MARIO_VY_ASCENDING_SLIP		0.004f
+#define MARIO_VY_ASCENDING_SLIP_MAX	0.1f
 #define MARIO_VY_ASCENDING_RUN		0.0014f
 
 
@@ -133,7 +134,7 @@
 #define MARIO_SMALL_BBOX_HEIGHT			15
 
 #define MARIO_RACCOON_BBOX_WIDTH		20
-#define MARIO_RACCOON_BBOX_HEIGHT		28
+#define MARIO_RACCOON_BBOX_HEIGHT		27
 #define MARIO_RACCOON_KILL_BBOX_WIDTH	23
 #define	MARIO_RACCOON_BBOX_TAIL			8
 #define MARIO_RACCOON_BBOX_BEND_OVER_WIDTH		22
@@ -193,8 +194,9 @@ public:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 
+	bool CheckMarioInScreen();
 	void SetState(int state);
-	void SetLevel(int l) { level = l; }
+	void SetLevel(int l);
 	int GetLevel() { return level; }
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 	void StartKill() { Kill = 1; Kill_start = GetTickCount(); }

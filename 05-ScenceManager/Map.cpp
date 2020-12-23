@@ -72,7 +72,8 @@ void TileMap::Draw()
 		{
 			float x = TileSetWidth * (currentColumn - FirstCol) + CGame::GetInstance()->GetCamPosX() -(int)(CGame::GetInstance()->GetCamPosX()) % TileSetWidth;
 			float y = TileSetHeight * (currentRow - FirstRow) + CGame::GetInstance()->GetCamPosY() - (int)(CGame::GetInstance()->GetCamPosY()) % TileSetHeight;
-			CSprites::GetInstance()->Get(tilemap[currentRow][currentColumn] + id)->Draw(x, y);
+			if (x >= 0 && y >= 0)
+				CSprites::GetInstance()->Get(tilemap[currentRow][currentColumn] + id)->Draw(x, y);
 		}
 	}
 }

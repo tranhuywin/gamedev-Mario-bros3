@@ -2,6 +2,7 @@
 [TEXTURES]
 0	textures\SpriteMario.png	68	145	190
 1	textures\SpriteMarioRight.png	68	145	190
+3	textures\StartScreen.png	0	0	255
 20	textures\misc.png	176	224	248
 10	textures\enemies.png	3	26	110
 11	textures\enemiesRight.png	3	26	110
@@ -322,6 +323,8 @@
 70020	156	144	172	160	40
 70021	178	144	194	160	40
 70022	200	153	216	160	40
+#Mushroom
+70025	286	121	302	137	40
 #========STATUS BAR=============
 80000	3	3	155	31	30
 # Card Bar
@@ -554,7 +557,7 @@ bend over left Big
 # walk
 701	30001	100	30002	100
 # die
-702	30003	1000
+702	30003	200
 ############    Tube ###########
 703	70006	100
 704	70007	100
@@ -566,7 +569,7 @@ bend over left Big
 #walking nor
 707	30016	100	30017	100
 #die
-708	30020	1000
+708	30020	200
 ############ FIRE BULLET   #################
 800	50001	100	50002	100	50003	100	50004	100
 801	50005	100	50006	100	50007	100	50008	100
@@ -581,6 +584,8 @@ bend over left Big
 813	70022	100
 #money
 814	70014	100
+#mushroom
+815	70025	100
 ########################    KOOPA Troopas	########################  
 #########   red
 #walk right 
@@ -654,7 +659,7 @@ bend over left Big
 # PARA GOOMBA
 11	705	706	707	708
 #Items
-12	810	811	812	813	814
+12	810	811	812	813	814	815
 [EFFECT]
 80100
 [OBJECTS]
@@ -663,22 +668,25 @@ bend over left Big
 #tube portal
 7	2256	112	10	192	1
 # MARIO
-#0	1940.0	350.0	1
-0	50.0	350.0	1
+0	1940.0	350.0	1
+#0	50.0	350.0	1
 #0	1390.0	380.0	1
 #0	1510.0	100.0	1
 #0	678.0	361.0	1
+#0	700	360	1
 # GOOMBA
 2	176	400	3	1
+2	562	400	3	1
 2	832	384	3	1
 2	900	384	3	1
-2	880	382	3	2
+2	1010	360	3	2
 #KOOPA Troopas
 3	560	355	7	0
 3	1430	290	7	2
 3	1385	290	7	2
 3	1340	290	7	2
-3	1410	388	7	1
+3	1472	388	7	1
+3	2100	350	7	0
 #KOOPA_PARATROOPA
 #Ground
 5	0	416	1	624
@@ -691,7 +699,7 @@ bend over left Big
 11	176	352	12	1
 11	192	352	12	0
 11	224	304	12	1
-11	240	304	12	1
+11	242	304	12	5
 #
 1	1440	128	12	3
 #
@@ -863,5 +871,3 @@ bend over left Big
 80000	80001	80010	80020
 [TITLEMAP]
 200000	textures\tile_map.png	textures\tile_map.txt	16	6	16	16
-#[MINI_MAP]
-#300000	textures\mini_map_1.png	textures\nimi_map_1.txt	16	1	16	16

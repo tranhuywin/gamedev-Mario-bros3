@@ -39,7 +39,12 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	vy += GOOMBA_GRAVITY * dt;
+	if (state != GOOMBA_STATE_DIE)
+		vy += GOOMBA_GRAVITY * dt;
+	else
+	{
+		vx = 0; vy = 0;
+	}
 	CGameObject::Update(dt);
 	if(state == GOOMBA_STATE_DIE)
 		//if(ani == GOOMBA_ANI_DIE || ani == PARAGOOMBA_DIE_ANI)
@@ -64,14 +69,12 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			JumpCount = 0;
 		}
 	}
-	if (vx < 0 && x < 16) {
-		x = 16; vx = -vx;
-	}
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
-	if (!Died)	//neu khac chet == song
+	//if (!Died)	//neu khac chet == song
+	if(state != GOOMBA_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
 
 	if (coEvents.size() == 0)
@@ -126,7 +129,8 @@ void CGoomba::Render()
 				ani = PARAGOOMBA_DIE_ANI;
 		}
 	}
-	animation_set->at(ani)->Render(x, YRender);
+	if (!Died)
+		animation_set->at(ani)->Render(x, YRender);
 	//RenderBoundingBox();
 }
 
@@ -138,6 +142,7 @@ void CGoomba::SetState(int state)
 		case GOOMBA_STATE_DIE:
 			StartDie();
 			vx = 0;
+			y += GOOMBA_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE;
 			break;
 		case GOOMBA_STATE_WALKING: 
 			vx = -GOOMBA_WALKING_SPEED;

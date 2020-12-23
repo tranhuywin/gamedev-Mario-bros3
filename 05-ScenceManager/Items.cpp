@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "QuestionBrick.h"
 #include "Brick.h"
+#include "Ground.h"
 void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	if (IdItem == ITEM_SWITCH)
@@ -35,7 +36,13 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 		}
 		else if (IdItem == ITEM_MONEY_ROTATOR) {
 			right = x + ITEM_BBOX_MONEY_IDLE - ITEM_BBOX_L;
-			bottom = y + ITEM_BBOX_MONEY_IDLE + ITEM_BBOX_B;
+			bottom = y + ITEM_BBOX_MONEY_IDLE;
+		}
+		else if (IdItem == ITEM_MUSHROOM_GREEN) {
+			left = x;
+			top = y;
+			right = x + 14;
+			bottom = y + 16;
 		}
 	}
 }
@@ -82,6 +89,10 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				Active = false;
 			}
 		}
+		else if (IdItem == ITEM_MUSHROOM_GREEN) {
+			this->vx = -ITEM_MUSHROOM_SPEEED_VX * dt;
+			vy += ITEM_GRAVITY/4 * dt;
+		}
 		else if (IdItem == ITEM_SWITCH)
 		{
 			if (Y_Start - y > ITEM_SWITCH_YSTART_DISTANCE_Y)
@@ -109,6 +120,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if(!CollTail)
 		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE)
 			Active = true;
+
 		if (sizeCo != 0)
 		{
 			for (UINT i = 0; i < sizeCo; i++)
@@ -166,6 +178,12 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						CGame::GetInstance()->SetMoney(CurentMoney + 1);
 						x = -100; y = -100.0f; vy = 0; vx = 0;
 					}
+					else if (IdItem == ITEM_MUSHROOM_GREEN && vx != 0) {
+						int CurentLife = CGame::GetInstance()->GetLife();
+						CGame::GetInstance()->SetLife(CurentLife + 1);
+						this->Active = false;
+						x = -100; y = -100.0f; vy = 0; vx = 0;
+					}
 				}
 				else if (dynamic_cast<QuestionBrick*>(e))
 				{
@@ -182,6 +200,18 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							vy = -ITEM_SWITCH_VY * dt;
 						Active = true;
 					}
+					if (IdItem == ITEM_MUSHROOM_GREEN && Active && vx != 0 && vy > 0)
+					{
+						vy = 0;
+						this->y -= 0.4f;
+					}
+					else if(IdItem == ITEM_MUSHROOM_GREEN && Active) {
+						vx = 0;
+					}
+				}
+				else if (dynamic_cast<Ground*>(e)) {
+					vy = 0;
+					this->y -= 0.4f;
 				}
 				else if (dynamic_cast<Brick*>(e)) {
 					Active = false;
@@ -194,7 +224,6 @@ void Items::Render()
 {
 	if (effect != NULL)
 		effect->Render();
-	//RenderBoundingBox();
 	int ani = -1;
 	if (this->Active)
 		if (IdItem == ITEM_TREE_LEAF)
@@ -203,6 +232,8 @@ void Items::Render()
 			ani = ITEM_ANI_MONEY;
 		else if (IdItem == ITEM_MONEY_IDLE)
 			ani = ITEM_ANI_MONEY_IDLE;
+		else if (IdItem == ITEM_MUSHROOM_GREEN)
+			ani = ITEM_ANI_MUSHROOM_GREEN;
 		else if (IdItem == ITEM_SWITCH)
 		{
 			if (state != ITEM_SWITCH_STATE_OFF)
@@ -213,6 +244,7 @@ void Items::Render()
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
+	RenderBoundingBox();
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)
