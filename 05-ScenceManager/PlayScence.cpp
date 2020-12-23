@@ -540,7 +540,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetLevel(MARIO_LEVEL_FIRE);
 		break;
 	case DIK_0:
-		mario->SetPosition(2263, 77);
+		mario->SetPosition(2268, 70);
 		break;
 
 	}

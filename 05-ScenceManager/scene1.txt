@@ -666,7 +666,7 @@ bend over left Big
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
 #tube portal
-7	2256	112	10	192	1
+7	2256	112	10	64	1
 # MARIO
 #0	1940.0	350.0	1
 # start
@@ -863,6 +863,7 @@ bend over left Big
 #3
 7	1856	368	10	48	0
 #4
+7	2256	112	10	192	-1
 #5
 7	2256	383	10	32	-1
 #6
@@ -871,8 +872,8 @@ bend over left Big
 4	-100	0	4
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	2256	111	0	2287	125	4
-50	2256	145	0	2287	150	4
+50	2256	109	0	2287	180	4
+#50	2256	145	0	2287	180	4
 [STATUS_BAR]
 80000	80001	80010	80020
 [TITLEMAP]

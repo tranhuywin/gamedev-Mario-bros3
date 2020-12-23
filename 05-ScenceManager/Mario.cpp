@@ -15,6 +15,7 @@
 #include "BulletPiranhaPlant.h"
 #include "VenusFireTrap.h"
 #include "Items.h"
+#include "Tube.h"
 
 
 CMario::CMario(float x, float y) : CGameObject()
@@ -171,7 +172,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
-	if (state != MARIO_STATE_DIE)
+	if (state != MARIO_STATE_DIE && !StartTeleport)
 		CalcPotentialCollisions(coObjects, coEvents);
 	if (coEvents.size()==0)
 	{
@@ -449,7 +450,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		CGame::GetInstance()->SwitchScene(SCENCE_START);				// scence Start
 		return;
 	}
-
 	if (coEventsResultColl.size() != 0)
 	{
 		for (UINT i = 0; i < coEventsResultColl.size(); i++)
@@ -466,7 +466,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 				{
-					CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					IsWaitingTeleport = true;
+					if (StartTeleport) {
+						this->vy = MARIO_START_TELEPORT_VY * dt;
+					}
+					if (this->y > p->y) {
+						CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					}
 					return;
 				}
 			}
@@ -491,7 +497,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 	}
-
 }
 
 void CMario::Render()
@@ -805,6 +810,7 @@ void CMario::SetState(int state)
 			break;
 		case MARIO_MINI_STATE_TELEPORT:
 			StartTeleport = true;
+			//this->y += 1.0f;
 			break;
 		}
 	}
@@ -926,9 +932,11 @@ void CMario::SetState(int state)
 			IsBendingOver = true;
 		}
 		else {
-			if(!StartTeleport)
-				start_y = this->y;
-			StartTeleport = true;
+			//this->vy = -0.1f;
+			//if(!StartTeleport)
+			//	start_y = this->y;
+			if(IsWaitingTeleport)
+				StartTeleport = true;
 		}
 	case MARIO_STATE_IDLE: 
 		IsLimitRunning = false;
