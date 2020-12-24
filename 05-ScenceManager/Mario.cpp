@@ -17,6 +17,7 @@
 #include "Items.h"
 #include "Tube.h"
 
+//CMario* CMario::__instance = NULL;
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -267,8 +268,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 								SetState(MARIO_STATE_DIE);	
 						}
 						else {
-							vy = vyPre;
-							y += dy;
+							//vy = vyPre;
+							//y += dy;
 						}
 					}
 					else {

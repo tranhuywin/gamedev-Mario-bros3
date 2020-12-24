@@ -160,7 +160,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CMario* mario = dynamic_cast<CMario*>(e);
 				if (IdItem == ITEM_TREE_LEAF)
 				{
-					
 					if (mario->GetLevel() == MARIO_LEVEL_RACCOON && vy > 0)
 					{
 						AniEffect = SpriteEffectStart + EFFECT_1000;
@@ -185,7 +184,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						if (mario->Iskilling)
 						{
 							CollTail = true;
-							//Active = false;
 						}
 						else if(Active)
 						{
@@ -267,7 +265,7 @@ void Items::Render()
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)

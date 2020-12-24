@@ -51,7 +51,7 @@ void QuestionBrick::SetState(int state)
 		case BRICK_STATE_QUESTION_OFF:
 			vy = 0;
 			y = YCollition;
-			break;
+ 			break;
 		case BRICK_STATE_QUESTION_ON_UP:
 			vy = -BRICK_DEFLECT_SPEED * dt;
 			break;

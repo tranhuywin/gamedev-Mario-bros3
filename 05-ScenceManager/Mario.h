@@ -181,6 +181,9 @@ class CMario : public CGameObject
 	FireBullet* firebullet_2 = new FireBullet();
 	CKoopas* Shell;
 	Tail* TailofRaccoon = new Tail();
+private:
+	//static CMario* __instance;
+	
 public: 
 	bool OnPlatform;
 	bool IsFlying;
@@ -190,10 +193,9 @@ public:
 	bool IsRunning;
 	bool IsWaitingTeleport;
 	bool StartTeleport;
-	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
-
+	CMario(float x = 0.0f, float y = 0.0f);
 	bool CheckMarioInScreen();
 	void SetState(int state);
 	void SetLevel(int l);
@@ -205,4 +207,5 @@ public:
 	void StartFireAttack() { FireAttack = 1; FireAttack_start = GetTickCount(); }
 	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
+	//static CMario* GetInstance();
 };

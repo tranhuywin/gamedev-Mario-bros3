@@ -73,9 +73,12 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
-	//if (!Died)	//neu khac chet == song
-	if(state != GOOMBA_STATE_DIE)
+	if (!Died)	//neu khac chet == song
+	//if(state != GOOMBA_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
+	else {
+		x = 0; y = 0; vx = 0; vy = 0;
+	}
 
 	if (coEvents.size() == 0)
 	{
@@ -131,7 +134,7 @@ void CGoomba::Render()
 	}
 	if (!Died)
 		animation_set->at(ani)->Render(x, YRender);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 void CGoomba::SetState(int state)

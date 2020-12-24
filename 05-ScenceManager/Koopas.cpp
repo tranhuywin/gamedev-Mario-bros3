@@ -9,6 +9,7 @@
 #include "Tube.h"
 #include "QuestionBrick.h"
 #include "Brick.h"
+#include "Goomba.h"
 
 CKoopas::CKoopas(int TypeKoopas)
 {
@@ -78,8 +79,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-		/*if (nx != 0)
-			vx = 0;*/
+	if (nx != 0)
+			vx = -vx;
 		if (ny != 0)
 			vy = 0;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
@@ -110,7 +111,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
 					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 				}
-			}else if (dynamic_cast<Brick*>(e->obj))
+			}
+			else if (dynamic_cast<Brick*>(e->obj))
 			{
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
@@ -134,22 +136,28 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
 					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 				}
+
+				if (state == KOOPAS_STATE_ROTATORY) {
+					brick->IsBreaked = true;
+					vx = -vx;
+				}
 			}
 			else if (dynamic_cast<Ground*>(e->obj)) {
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
 					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 			}
-			if (!dynamic_cast<CMario*>(e->obj)) {
-				if (e->nx != 0)
+			else if (dynamic_cast<QuestionBrick*>(e->obj) && state == KOOPAS_STATE_ROTATORY)
+			{
+				QuestionBrick* questionBrick = dynamic_cast<QuestionBrick*>(e->obj);
+				if (questionBrick->GetState() == BRICK_STATE_QUESTION_ON)
 				{
-					vx = -vx;
+					questionBrick->SetState(BRICK_STATE_QUESTION_ON_UP);
+					questionBrick->YCollition = questionBrick->y;
 				}
-				if (dynamic_cast<QuestionBrick*>(e->obj))
-				{
-					QuestionBrick* questionBrick = dynamic_cast<QuestionBrick*>(e->obj);
-					if (questionBrick->GetState() == BRICK_STATE_QUESTION_ON)
-						questionBrick->SetState(BRICK_STATE_QUESTION_OFF);
-				}
+			}
+			else if (dynamic_cast<CGoomba*>(e->obj) && state == KOOPAS_STATE_ROTATORY) {
+				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+				goomba->SetState(GOOMBA_STATE_DIE);
 			}
 		}
 	}

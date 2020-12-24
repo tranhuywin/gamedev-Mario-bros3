@@ -197,6 +197,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			//}
 			//else 
 			obj = new CMario(x, y);
+			//obj = CMario::GetInstance();
 			player = (CMario*)obj;
 			if (CGame::GetInstance()->Getcurrent_scene() == 0)
 				player->SetLevel(MARIO_LEVEL_MINI);
