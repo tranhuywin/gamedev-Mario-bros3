@@ -2,8 +2,8 @@
 start	1
 #scene list
 [SCENES]
-0	SenceStart.txt
-1	scene1.txt
-2	scene2.txt
-3	scene-test.txt
-4	sence1_mini.txt
+0	SenceStart.txt	0
+1	scene1.txt	0
+2	scene2.txt	0
+3	scene-test.txt	0
+4	sence1_mini.txt	0

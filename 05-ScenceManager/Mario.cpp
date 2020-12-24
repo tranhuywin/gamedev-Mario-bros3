@@ -472,6 +472,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						this->vy = MARIO_START_TELEPORT_VY * dt;
 					}
 					if (this->y > p->y) {
+						this->x = 2336;
+						this->y = 330;
 						CGame::GetInstance()->SwitchScene(p->GetSceneId());
 					}
 					return;

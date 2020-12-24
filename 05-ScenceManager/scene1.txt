@@ -323,8 +323,10 @@
 70020	156	144	172	160	40
 70021	178	144	194	160	40
 70022	200	153	216	160	40
-#Mushroom
+#Mushroom green
 70025	286	121	302	137	40
+#mushroom red
+70026	156	121	172	137	40
 #========STATUS BAR=============
 80000	3	3	155	31	30
 # Card Bar
@@ -584,8 +586,10 @@ bend over left Big
 813	70022	100
 #money
 814	70014	100
-#mushroom
+#mushroom green
 815	70025	100
+#mushroom red
+816	70026	100
 ########################    KOOPA Troopas	########################  
 #########   red
 #walk right 
@@ -659,7 +663,7 @@ bend over left Big
 # PARA GOOMBA
 11	705	706	707	708
 #Items
-12	810	811	812	813	814	815
+12	810	811	812	813	814	815	816
 [EFFECT]
 80100
 [OBJECTS]
@@ -668,6 +672,7 @@ bend over left Big
 #tube portal
 7	2256	112	10	64	1
 # MARIO
+#Brick
 #0	1940.0	350.0	1
 # start
 0	50.0	350.0	1
@@ -702,7 +707,7 @@ bend over left Big
 11	176	352	12	1
 11	192	352	12	0
 11	224	304	12	1
-11	242	304	12	5
+11	242	304	12	6
 #
 1	1440	128	12	3
 #

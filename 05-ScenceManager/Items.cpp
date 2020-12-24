@@ -38,7 +38,7 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 			right = x + ITEM_BBOX_MONEY_IDLE - ITEM_BBOX_L;
 			bottom = y + ITEM_BBOX_MONEY_IDLE;
 		}
-		else if (IdItem == ITEM_MUSHROOM_GREEN) {
+		else if (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) {
 			left = x;
 			top = y;
 			right = x + ITEM_BBOX_MUSHROOM;
@@ -89,10 +89,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				Active = false;
 			}
 		}
-		else if (IdItem == ITEM_MUSHROOM_GREEN) {
-			//this->vx = -ITEM_MUSHROOM_SPEEED_VX * dt;
-			//vy += ITEM_GRAVITY/5 * dt;
-		}
 		else if (IdItem == ITEM_SWITCH)
 		{
 			if (Y_Start - y > ITEM_SWITCH_YSTART_DISTANCE_Y)
@@ -116,7 +112,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResultPro;
 	coEvents.clear();
-	if(Active && IdItem == ITEM_MUSHROOM_GREEN)
+	if(Active && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 		CalcPotentialCollisions(coObjects, coEvents);
 	if (coEvents.size() == 0)
 	{
@@ -126,6 +122,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else {
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0, rdy = 0;
+		float vxPre = vx;
 		FilterCollision(coEvents, coEventsResultPro, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.3f;
 		y += min_ty * dy + ny * 0.3f;
@@ -134,6 +131,14 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vx = 0;
 		if (ny != 0)
 			vy = 0;
+		for (UINT i = 0; i < coEventsResultPro.size(); i++)
+		{
+			LPCOLLISIONEVENT e = coEventsResultPro[i];
+			if (dynamic_cast<CMario*>(e->obj)) {
+				vx = vxPre;
+				x += dx;
+			}
+		}
 	}
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
@@ -143,9 +148,9 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CalCollisions(coObjects, coEventsResult);
 	int sizeCo = coEventsResult.size();
 	if(!CollTail)
-	if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE)
-		Active = true;
-	if (sizeCo == 0 && IdItem == ITEM_MUSHROOM_GREEN)
+		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE)
+			Active = true;
+	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{
 		vx = -ITEM_MUSHROOM_VX * dt;
 		vy += ITEM_GRAVITY / 6 * dt;
@@ -183,7 +188,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					{
 						if (mario->Iskilling)
 						{
-							CollTail = true;
+							//CollTail = true;
+							//DebugOut(L"Kill\n");
 						}
 						else if(Active)
 						{
@@ -204,11 +210,24 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					CGame::GetInstance()->SetMoney(CurentMoney + 1);
 					x = -100; y = -100.0f; vy = 0; vx = 0;
 				}
-				else if (IdItem == ITEM_MUSHROOM_GREEN && vx != 0) {
-					AniEffect = SpriteEffectStart + EFFECT_1_UP;
-					effect = new Effect(this->x, this->y, AniEffect);
-					int CurentLife = CGame::GetInstance()->GetLife();
-					CGame::GetInstance()->SetLife(CurentLife + 1);
+				else if ((IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) && vx != 0) {
+					if (IdItem == ITEM_MUSHROOM_GREEN) {
+						AniEffect = SpriteEffectStart + EFFECT_1_UP;
+						effect = new Effect(this->x, this->y, AniEffect);
+						int CurentLife = CGame::GetInstance()->GetLife();
+						CGame::GetInstance()->SetLife(CurentLife + 1);
+					}
+					else {
+						AniEffect = SpriteEffectStart + EFFECT_1000;
+						effect = new Effect(this->x, this->y, AniEffect);
+						int CurrentScore = CGame::GetInstance()->GetScore();
+						CGame::GetInstance()->SetScore(CurrentScore + 1000);
+						if (mario->GetLevel() == MARIO_LEVEL_SMALL) {
+							mario->y -= MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT;
+							mario->SetLevel(MARIO_LEVEL_BIG);
+						}
+
+					}
 					this->Active = false;
 					x = -100; y = -100.0f; vy = 0; vx = 0;
 				}
@@ -226,7 +245,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					if (IdItem == ITEM_SWITCH)
 						vy = -ITEM_SWITCH_VY * dt;
-					if (IdItem == ITEM_MUSHROOM_GREEN && Active)
+					if ((IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) && Active)
 					{
 						vx = 0; vy = -ITEM_MUSHROOM_VY_UP * dt;
 					}
@@ -255,6 +274,8 @@ void Items::Render()
 			ani = ITEM_ANI_MONEY_IDLE;
 		else if (IdItem == ITEM_MUSHROOM_GREEN)
 			ani = ITEM_ANI_MUSHROOM_GREEN;
+		else if (IdItem == ITEM_MUSHROOM_RED)
+			ani = ITEM_ANI_MUSHROOM_RED;
 		else if (IdItem == ITEM_SWITCH)
 		{
 			if (state != ITEM_SWITCH_STATE_OFF)

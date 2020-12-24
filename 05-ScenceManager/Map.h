@@ -1,3 +1,4 @@
+#pragma once
 #include"Sprites.h"
 #include"Textures.h"
 #include"Utils.h"
@@ -7,7 +8,9 @@
 #include <sstream>
 #include"Game.h"
 
+
 #define ArrTileMap	500
+
 class TileMap
 {
 	LPCWSTR filePath_data;

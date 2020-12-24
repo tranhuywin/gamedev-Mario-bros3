@@ -101,7 +101,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			vy = 0;
 			if (TypeGoomba == PARA_GOOMBA)
 				if (LevelParaGoomba == PARAGOOMBA_WINGED_LEVEL) {
-					vy = -PARAGOOMBA_JUMP_DEFLECT_SPEED;
+					vy = -PARAGOOMBA_JUMP_DEFLECT_SPEED * dt;
 					JumpCount++;
 				}
 		}
@@ -134,7 +134,7 @@ void CGoomba::Render()
 	}
 	if (!Died)
 		animation_set->at(ani)->Render(x, YRender);
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void CGoomba::SetState(int state)

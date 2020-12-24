@@ -37,6 +37,8 @@ class CGame
 
 	LPKEYEVENTHANDLER keyHandler;
 
+	LPSCENE scenes_1 = NULL;
+
 	float cam_x = 0.0f;
 	float cam_y = 0.0f;
 
@@ -73,7 +75,7 @@ public:
 	void Load(LPCWSTR gameFile);
 	LPSCENE GetCurrentScene() { return scenes[current_scene]; }
 	void SwitchScene(int scene_id);
-
+	//void SaveCurrentScene(){return }
 	int GetScreenWidth() { return screen_width; }
 	int GetScreenHeight() { return screen_height; }
 	

@@ -9,6 +9,7 @@
 #define ITEM_MONEY_IDLE			3
 #define ITEM_MONEY_ROTATOR		4
 #define ITEM_MUSHROOM_GREEN		5
+#define ITEM_MUSHROOM_RED		6
 
 #define ITEM_BBOX_L				4
 #define ITEM_BBOX_T				4
@@ -28,7 +29,7 @@
 #define ITEM_TREE_LEAF_X_DISTANCE_X_START		20.0f
 #define ITEM_SWITCH_VY							0.001f
 #define ITEM_MUSHROOM_VY_UP						0.001f
-#define ITEM_MUSHROOM_VX						0.001f
+#define ITEM_MUSHROOM_VX						0.0025f
 #define ITEM_SWITCH_YSTART_DISTANCE_Y			14.0f
 #define ITEM_STATE_LISTEN			100
 #define ITEM_STATE_ATIVE			200
@@ -40,6 +41,7 @@
 #define ITEM_ANI_SWITCH_OFF			3
 #define ITEM_ANI_MONEY_IDLE			4
 #define ITEM_ANI_MUSHROOM_GREEN		5
+#define ITEM_ANI_MUSHROOM_RED		6
 class Items : public CGameObject
 {
 public:

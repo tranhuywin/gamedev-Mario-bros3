@@ -108,6 +108,9 @@
     <ClCompile Include="StatusBar.cpp">
       <Filter>Source Files\Map</Filter>
     </ClCompile>
+    <ClCompile Include="SenceWorldMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="StatusBar.h">
       <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="SenceWorldMap.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

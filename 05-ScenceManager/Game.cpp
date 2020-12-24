@@ -5,7 +5,7 @@
 #include "Utils.h"
 
 #include "PlayScence.h"
-
+#include "SenceWorldMap.h"
 CGame * CGame::__instance = NULL;
 
 /*
@@ -342,7 +342,14 @@ void CGame::_ParseSection_SCENES(string line)
 	int id = atoi(tokens[0].c_str());
 	LPCWSTR path = ToLPCWSTR(tokens[1]);
 
+	int IDScene = atoi(tokens[2].c_str());
+
 	LPSCENE scene = new CPlayScene(id, path);
+	if (IDScene == 1)
+		scene = new SenceWorldMap(id, path);
+	else
+		scene = new CPlayScene(id, path);
+	//LPSCENE scene = new CPlayScene(id, path);
 	scenes[id] = scene;
 }
 
@@ -389,6 +396,31 @@ void CGame::SwitchScene(int scene_id)
 {
 	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
 
+	/*if (current_scene == 4 && scene_id == 1 && scenes_1!= NULL)
+	{
+		scenes_1->Unload();
+		CTextures::GetInstance()->Clear();
+		CSprites::GetInstance()->Clear();
+		CAnimations::GetInstance()->Clear();
+		CGame::GetInstance()->SetKeyHandler(scenes_1->GetKeyEventHandler());
+		scenes_1->Load();
+	}
+	else {
+		scenes[current_scene]->Unload();
+
+		CTextures::GetInstance()->Clear();
+		CSprites::GetInstance()->Clear();
+		CAnimations::GetInstance()->Clear();
+
+		current_scene = scene_id;
+		LPSCENE s = scenes[scene_id];
+		CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
+		s->Load();
+		if (scene_id == 1 && scenes_1 == NULL) {
+			scenes_1 = (CPlayScene*)s;
+		}
+	}*/
+
 	scenes[current_scene]->Unload();
 
 	CTextures::GetInstance()->Clear();
@@ -398,5 +430,5 @@ void CGame::SwitchScene(int scene_id)
 	current_scene = scene_id;
 	LPSCENE s = scenes[scene_id];
 	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
-	s->Load();	
+	s->Load();
 }
