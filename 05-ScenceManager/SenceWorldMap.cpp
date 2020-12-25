@@ -218,9 +218,9 @@ void SenceWorldMap::Load()
 		if (line == "[ANIMATION_SETS]") {
 			section = SCENE_SECTION_ANIMATION_SETS; continue;
 		}
-		if (line == "[OBJECTS]") {
-			section = SCENE_SECTION_OBJECTS; continue;
-		}
+		//if (line == "[OBJECTS]") {
+		//	section = SCENE_SECTION_OBJECTS; continue;
+		//}
 		if (line == "[TITLEMAP]") {
 			section = SCENE_SECTION_TITLE_MAP; continue;
 		}
@@ -241,7 +241,7 @@ void SenceWorldMap::Load()
 		case SCENE_SECTION_SPRITES: _ParseSection_SPRITES(line); break;
 		case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
 		case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
-		case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
+		//	case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
 		case SCENE_SECTION_TITLE_MAP: _ParseSection_TITLE_MAP(line); break;
 		//case SCENE_SECTION_EFFECT: _ParseSection_EFFECT(line); break;
 		case SCENE_SECTION_STATUS_BAR: _ParseSection_STATUS_BAR(line); break;

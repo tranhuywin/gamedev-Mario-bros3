@@ -15,6 +15,7 @@
 #include "VenusFireTrap.h"
 #include "Items.h";
 #include "BulletPiranhaPlant.h"
+#include "Tree.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
@@ -49,6 +50,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_WOODEN_BRICK		9
 #define OBJECT_TYPE_FIRE_PIRANHA_PLANT	10
 #define OBJECT_TYPE_ITEM				11
+#define OBJECT_TYPE_TREE				12
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -200,8 +202,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		} break;
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
+		//case OBJECT_TYPE_TREE: obj = new Tree(); break;
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_TREE:
+		{
+			int IdObj = atoi(tokens[4].c_str());
+			obj = new Tree(IdObj);
+		} break;
 		case OBJECT_TYPE_TUBE: 
 		{
 			float Height = atoi(tokens[4].c_str());

@@ -130,6 +130,7 @@
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="SenceWorldMap.cpp" />
     <ClCompile Include="StatusBar.cpp" />
+    <ClCompile Include="Tree.cpp" />
     <ClCompile Include="VenusFireTrap.cpp" />
     <ClCompile Include="Items.cpp" />
     <ClCompile Include="QuestionBrick.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="SenceWorldMap.h" />
     <ClInclude Include="StatusBar.h" />
+    <ClInclude Include="Tree.h" />
     <ClInclude Include="VenusFireTrap.h" />
     <ClInclude Include="Items.h" />
     <ClInclude Include="QuestionBrick.h" />
