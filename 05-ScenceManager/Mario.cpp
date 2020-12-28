@@ -16,6 +16,7 @@
 #include "VenusFireTrap.h"
 #include "Items.h"
 #include "Tube.h"
+#include "Brick.h"
 
 //CMario* CMario::__instance = NULL;
 
@@ -23,7 +24,17 @@ CMario::CMario(float x, float y) : CGameObject()
 {
 	ani = -1;
 	LastAni = -1;
-	level = MARIO_LEVEL_BIG;
+	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1)
+		level = MARIO_LEVEL_RACCOON;
+	else
+	{
+		level = MARIO_LEVEL_SMALL;
+		if (CGame::GetInstance()->GetReturnWorld()) {
+			this->x = X_RETURN_WORLD_1;
+			this->y = Y_RETURN_WORLD_1;
+			level = MARIO_LEVEL_RACCOON;
+		}
+	}
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 	start_x = x; 
@@ -34,6 +45,12 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	DebugOut(L"Vy%f\n", vy);
+	if (CGame::GetInstance()->GetReturnWorld() && CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1) {
+		this->x = X_RETURN_WORLD_1;
+		this->y = Y_RETURN_WORLD_1;
+		CGame::GetInstance()->SetReturnWorld(false);
+	}
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
 	{
@@ -382,6 +399,24 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 
 			}
+			else if (dynamic_cast<Brick*>(e->obj)) {
+				Brick* brick = dynamic_cast<Brick*>(e->obj);
+				if (e->ny > 0)
+				{
+					brick->BBox = false;
+					if (brick->StoreItemQBrick)
+					{
+						brick->SwitchOff = true;
+						if (brick->QBick != NULL && brick->QBick->GetState() == BRICK_STATE_QUESTION_ON)
+						{
+							brick->QBick->SetState(BRICK_STATE_QUESTION_ON_UP);
+							brick->QBick->YCollition = brick->QBick->y;
+						}
+					}
+					else
+						brick->IsBreaked = true;
+				}
+			}
 			else if (dynamic_cast<QuestionBrick*>(e->obj))
 			{
 				QuestionBrick* brick = dynamic_cast<QuestionBrick*>(e->obj);
@@ -425,9 +460,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<Items*>(e->obj)) 
 			{
 				Items* item = dynamic_cast<Items*>(e->obj);
-				// jump on top >> kill Goomba and deflect a bit 
-				if (e->ny < 0)
+				if (e->ny < 0 && item->GetState() != ITEM_SWITCH_STATE_OFF)
 				{
+					item->Active = true;
 					item->SetState(ITEM_SWITCH_STATE_OFF);
 				}
 			}
@@ -467,17 +502,30 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 				{
-					IsWaitingTeleport = true;
-					if (StartTeleport) {
-						this->vy = MARIO_START_TELEPORT_VY * dt;
+					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) {
+						CGame::GetInstance()->SetReturnWorld(true);
 					}
-					if (this->y > p->y) {
-						this->x = 2336;
-						this->y = 330;
+					IsWaitingTeleport = true;
+					if (StartTeleport ) {
+						if(CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1)
+							this->vy = MARIO_START_TELEPORT_VY * dt;
+						else if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) {
+							this->vy = -MARIO_START_TELEPORT_VY * dt;
+						}
+					}
+					if (this->y > p->y && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1)) {
+							CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					}
+					else if (this->y < p->y && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) ) {
 						CGame::GetInstance()->SwitchScene(p->GetSceneId());
 					}
+					TeleUp = false;
 					return;
 				}
+			}
+			else if (dynamic_cast<Tube*>(e)) {
+				vy = -MARIO_START_TELEPORT_VY * dt;
+				TeleUp = true;
 			}
 			else if (dynamic_cast<BulletPiranhaPlant*>(e)) {
 				if (untouchable == 0)
@@ -498,7 +546,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						SetState(MARIO_STATE_DIE);
 				}
 			}
+			/*else {
+				IsWaitingTeleport = false;
+				StartTeleport = false;
+			}*/
 		}
+	}
+	else {
+		TeleUp = false;
 	}
 }
 
@@ -620,6 +675,8 @@ void CMario::Render()
 					ani = MARIO_ANI_RACCOON_BEND_OVER_RIGHT;
 				if (StartTeleport)
 					ani = MARIO_ANI_RACCOON_TELEPORT;
+				if(TeleUp)
+					ani = MARIO_ANI_RACCOON_TELEPORT;
 			}
 			else 
 			{
@@ -638,6 +695,8 @@ void CMario::Render()
 				if (IsBendingOver)
 					ani = MARIO_ANI_RACCOON_BEND_OVER_LEFT;
 				if (StartTeleport)
+					ani = MARIO_ANI_RACCOON_TELEPORT;
+				if(TeleUp)
 					ani = MARIO_ANI_RACCOON_TELEPORT;
 			}
 		}
@@ -926,6 +985,10 @@ void CMario::SetState(int state)
 		}
 		IsBendingOver = false;	
 		break;
+	case MARIO_STATE_UP:
+		if (IsWaitingTeleport)
+			StartTeleport = true;
+		break;
 	case MARIO_STATE_BEND_OVER:
 		if (!IsWaitingTeleport) {
 			if (!IsBendingOver)
@@ -935,9 +998,6 @@ void CMario::SetState(int state)
 			IsBendingOver = true;
 		}
 		else {
-			//this->vy = -0.1f;
-			//if(!StartTeleport)
-			//	start_y = this->y;
 			if(IsWaitingTeleport)
 				StartTeleport = true;
 		}

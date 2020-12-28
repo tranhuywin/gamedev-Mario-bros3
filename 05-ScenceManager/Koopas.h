@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
-
+#include "Effect.h"
 #define KOOPAS_WALKING_SPEED				0.04f
 #define KOOPAS_PARATROOPA_WALKING_SPEED		0.01f
 #define KOOPAS_ROTATORY_SPEED	0.2f
@@ -55,6 +55,7 @@ class CKoopas : public CGameObject
 public:
 	bool TailAttack, IsCatching;
 	int TypeKoopas;
+	Effect* effect = NULL;
 	CKoopas(int TypeKoopas);
 	virtual void SetState(int state);
 	void BeCatch(LPGAMEOBJECT mario, float YShell);

@@ -128,7 +128,6 @@
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="BulletPiranhaPlant.cpp" />
     <ClCompile Include="Effect.cpp" />
-    <ClCompile Include="SenceWorldMap.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="Tree.cpp" />
     <ClCompile Include="VenusFireTrap.cpp" />
@@ -159,7 +158,6 @@
     <ClInclude Include="Brick.h" />
     <ClInclude Include="BulletPiranhaPlant.h" />
     <ClInclude Include="Effect.h" />
-    <ClInclude Include="SenceWorldMap.h" />
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="Tree.h" />
     <ClInclude Include="VenusFireTrap.h" />

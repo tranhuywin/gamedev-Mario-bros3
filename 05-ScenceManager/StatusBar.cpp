@@ -62,10 +62,37 @@ void StatusBar::DrawPMeter()
 			CSprites::GetInstance()->Get(SpritePowerState + 7)->Draw(PosXPMeter, PosYPMeter);
 	}
 }
+void StatusBar::DrawCard()
+{
+	if (CGame::GetInstance()->GetCard_1() != CARD_NONE) {
+		if(CGame::GetInstance()->GetCard_1() == CARD_MUSHROOM)
+			CSprites::GetInstance()->Get(SpriteCard)->Draw(posX + X_CARD + X_CARD_1, posY);
+		else if(CGame::GetInstance()->GetCard_1() == CARD_FLOWER)
+			CSprites::GetInstance()->Get(SpriteCard + 1)->Draw(posX + X_CARD + X_CARD_1, posY);
+		else if(CGame::GetInstance()->GetCard_1() == CARD_STAR)
+			CSprites::GetInstance()->Get(SpriteCard + 2)->Draw(posX + X_CARD + X_CARD_1, posY);
+	}
+	if (CGame::GetInstance()->GetCard_2() != CARD_NONE) {
+		if (CGame::GetInstance()->GetCard_2() == CARD_MUSHROOM)
+			CSprites::GetInstance()->Get(SpriteCard)->Draw(posX + X_CARD + X_CARD_2, posY);
+		else if (CGame::GetInstance()->GetCard_2() == CARD_FLOWER)
+			CSprites::GetInstance()->Get(SpriteCard + 1)->Draw(posX + X_CARD + X_CARD_2, posY);
+		else if (CGame::GetInstance()->GetCard_2() == CARD_STAR)
+			CSprites::GetInstance()->Get(SpriteCard + 2)->Draw(posX + X_CARD + X_CARD_2, posY);
+	}
+	if (CGame::GetInstance()->GetCard_2() != CARD_NONE) {
+		if (CGame::GetInstance()->GetCard_3() == CARD_MUSHROOM)
+			CSprites::GetInstance()->Get(SpriteCard)->Draw(posX + X_CARD + X_CARD_3, posY);
+		else if (CGame::GetInstance()->GetCard_3() == CARD_FLOWER)
+			CSprites::GetInstance()->Get(SpriteCard + 1)->Draw(posX + X_CARD + X_CARD_3, posY);
+		else if (CGame::GetInstance()->GetCard_3() == CARD_STAR)
+			CSprites::GetInstance()->Get(SpriteCard + 2)->Draw(posX + X_CARD + X_CARD_3, posY);
+	}
+}
 void StatusBar::Render()
 {
 	//BackGound
-	CSprites::GetInstance()->Get(SpriteStatusBar + 2)->Draw(posX - 5, posY - 3);
+	CSprites::GetInstance()->Get(SpriteStatusBar + 2)->Draw(posX - 5, posY- 2);
 	// status
 	CSprites::GetInstance()->Get(SpriteStatusBar)->Draw(posX, posY);
 	//card
@@ -77,9 +104,10 @@ void StatusBar::Render()
 	DrawNumber(posX + X_MONEY, posY + Y_MONEY, to_string(TotalMoney), 2);
 	DrawNumber(posX + X_TIME, posY + Y_TIME, to_string(Time), 3);
 	DrawPMeter();
+	DrawCard();
 }
 
-StatusBar::StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int SpriteNumber0, int SpritePowerState)
+StatusBar::StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int SpriteNumber0, int SpritePowerState, int SpriteCard)
 {
 	Mario = mario;
 	Time = CGame::GetInstance()->GetTime();
@@ -87,6 +115,7 @@ StatusBar::StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int 
 	this->SpriteCardBar = SpriteCardBar;
 	this->SpriteNumber0 = SpriteNumber0;
 	this->SpritePowerState = SpritePowerState;
+	this->SpriteCard = SpriteCard;
 }
 
 void StatusBar::PlusScore(int Score)

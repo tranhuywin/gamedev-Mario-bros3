@@ -3,46 +3,51 @@
 #include "QuestionBrick.h"
 #include "Brick.h"
 #include "Ground.h"
+#include "BulletPiranhaPlant.h"
 void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	if (IdItem == ITEM_SWITCH)
-	{
-		left = x;
-		top = y;
-	}
-	else {
-		left = x + ITEM_BBOX_L;
-		top = y + ITEM_BBOX_T;
-	}
-	if (!Active)
-	{
-		right = x + ITEM_BBOX_R;
-		bottom = y + ITEM_BBOX_B;
-		if (IdItem == ITEM_MONEY_IDLE)
-		{
-			left = x - TAIL_BBOX_WIDTH;
-			bottom = y + ITEM_BBOX_MONEY_IDLE;
-		}
-	}
-	else {
-		right = x + ITEM_BBOX_R_ACTIVE;
-		bottom = y + ITEM_BBOX_B_ACTIVE;
+	if (BBox) {
 		if (IdItem == ITEM_SWITCH)
 		{
-			right = x + ITEM_BBOX_SWITCH;
-			bottom = y + ITEM_BBOX_SWITCH;
-			if (state == ITEM_SWITCH_STATE_OFF)
-				bottom = y + ITEM_BBOX_SWITCH_B;
-		}
-		else if (IdItem == ITEM_MONEY_ROTATOR) {
-			right = x + ITEM_BBOX_MONEY_IDLE - ITEM_BBOX_L;
-			bottom = y + ITEM_BBOX_MONEY_IDLE;
-		}
-		else if (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) {
 			left = x;
-			top = y;
-			right = x + ITEM_BBOX_MUSHROOM;
-			bottom = y + ITEM_BBOX_MUSHROOM;
+			top = y + 1;
+		}
+		else {
+			left = x + ITEM_BBOX_L;
+			top = y + ITEM_BBOX_T;
+		}
+		if (!Active)
+		{
+			right = x + ITEM_BBOX_R;
+			bottom = y + ITEM_BBOX_B;
+			if (IdItem == ITEM_MONEY_IDLE)
+			{
+				left = x - TAIL_BBOX_WIDTH;
+				bottom = y + ITEM_BBOX_MONEY_IDLE;
+			}
+		}
+		else {
+			left = x + ITEM_BBOX_L;
+			top = y + ITEM_BBOX_T;
+			right = x + ITEM_BBOX_R_ACTIVE;
+			bottom = y + ITEM_BBOX_B_ACTIVE;
+			if (IdItem == ITEM_SWITCH)
+			{
+				right = x + ITEM_BBOX_SWITCH;
+				bottom = y + ITEM_BBOX_SWITCH;
+				if (state == ITEM_SWITCH_STATE_OFF)
+					bottom = y + ITEM_BBOX_SWITCH_B;
+			}
+			else if (IdItem == ITEM_MONEY_ROTATOR || IdItem == ITEM_CARD) {
+				right = x + ITEM_BBOX_MONEY_IDLE - ITEM_BBOX_L;
+				bottom = y + ITEM_BBOX_MONEY_IDLE;
+			}
+			else if (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) {
+				left = x;
+				top = y;
+				right = x + ITEM_BBOX_MUSHROOM;
+				bottom = y + ITEM_BBOX_MUSHROOM;
+			}
 		}
 	}
 }
@@ -57,9 +62,13 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (effect != NULL)
 		effect->Update(dt);
-	if (IdItem == ITEM_MONEY_IDLE && !OfBrick)
-		Active = true;
-	CGameObject::Update(dt);
+	/*if (IdItem == ITEM_MONEY_IDLE && !OfBrick)
+		Active = true;*/
+	/*if (BrickBreak != NULL)
+		if (IdItem == ITEM_MONEY_IDLE && BrickBreak->IsBreaked)
+			Active = false;*/
+	
+		CGameObject::Update(dt);
 	//x += dx;
 	//y += dy;
 	if (CollTail)
@@ -122,7 +131,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else {
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0, rdy = 0;
-		float vxPre = vx;
+		float vxPre = vx, vyPre = vy;
 		FilterCollision(coEvents, coEventsResultPro, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.3f;
 		y += min_ty * dy + ny * 0.3f;
@@ -138,6 +147,11 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				vx = vxPre;
 				x += dx;
 			}
+			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj)) {
+				vx = vxPre;
+				vy = vyPre;
+				x += dx; y += dy;
+			}
 		}
 	}
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
@@ -148,7 +162,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CalCollisions(coObjects, coEventsResult);
 	int sizeCo = coEventsResult.size();
 	if(!CollTail)
-		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE)
+		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && !BrickBreak->IsBreaked)
 			Active = true;
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{
@@ -178,7 +192,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 					if(mario->GetLevel() == MARIO_LEVEL_RACCOON && sizeCo == 1)
 					{
-						x = -100; y = -100; vy = 0; vx = 0;
+						//x = -100; y = -100; vy = 0; vx = 0;
+						BBox = false;
 						Active = false;
 					}
 					if (mario->GetLevel() == MARIO_LEVEL_BIG)
@@ -190,6 +205,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						{
 							//CollTail = true;
 							//DebugOut(L"Kill\n");
+							MarioGetMoney = true;
 						}
 						else if(Active)
 						{
@@ -198,9 +214,9 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							int CurentMoney = CGame::GetInstance()->GetMoney();
 							CGame::GetInstance()->SetMoney(CurentMoney + 1);
 							x = -100; y = -100; vy = 0; vx = 0;
+							BBox = false;
 							Active = false;
 						}
-						MarioGetMoney = true;
 					}
 				else if (IdItem == ITEM_MONEY_ROTATOR) {
 					Active = false;
@@ -208,7 +224,24 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					CGame::GetInstance()->SetScore(CurentScore + 100);
 					int CurentMoney = CGame::GetInstance()->GetMoney();
 					CGame::GetInstance()->SetMoney(CurentMoney + 1);
-					x = -100; y = -100.0f; vy = 0; vx = 0;
+					//x = -100; y = -100.0f; vy = 0; vx = 0;
+					BBox = false;
+				}
+				else if (IdItem == ITEM_CARD) {
+					int Frame = animation_set->at(ITEM_ANI_CARD)->GetcurrentFrame();
+					
+					if (CGame::GetInstance()->GetCard_1() == -1) {
+						CGame::GetInstance()->SetCard_1(Frame + 1);
+					}
+					else if (CGame::GetInstance()->GetCard_2() == -1) {
+						CGame::GetInstance()->SetCard_2(Frame + 1);
+					}
+					else if (CGame::GetInstance()->GetCard_3() == -1) {
+						CGame::GetInstance()->SetCard_3(Frame + 1);
+					}
+					Active = false;
+					//x = -100; y = -100; vy = 0; vx = 0;
+					BBox = false;
 				}
 				else if ((IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) && vx != 0) {
 					if (IdItem == ITEM_MUSHROOM_GREEN) {
@@ -229,11 +262,25 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 					}
 					this->Active = false;
-					x = -100; y = -100.0f; vy = 0; vx = 0;
+					//x = -100; y = -100.0f; vy = 0; vx = 0;
+					BBox = false;
+				}
+			}
+			else if (dynamic_cast<CKoopas*>(e)) {
+				CKoopas* koopas = dynamic_cast<CKoopas*>(e);
+				if (koopas->GetState() == KOOPAS_STATE_ROTATORY) {
+					if (IdItem == ITEM_MONEY_IDLE)
+					{
+						MarioGetMoney = true;			//lam tam, chua toi uu
+						x = -100; y = -100; vy = 0; vx = 0;
+						BBox = false;
+						Active = false;
+					}
 				}
 			}
 			else if (dynamic_cast<QuestionBrick*>(e))
 			{
+				//brick->StoreItemQBrick = true;
 				QuestionBrick* QBrick = dynamic_cast<QuestionBrick*>(e);
 				if (QBrick->GetState() == BRICK_STATE_QUESTION_ON_UP)
 				{
@@ -252,11 +299,20 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					Active = true;
 				}
 			}
-
 			else if (dynamic_cast<Brick*>(e)) {
 				Active = false;
 				OfBrick = true;
+				Brick* brick = dynamic_cast<Brick*>(e);
+				BrickBreak = brick;
+				/*if (brick->IsBreaked && IdItem == ITEM_ANI_MONEY_IDLE) {
+					Active = false;
+				}*/
+				//brick->StoreItemQBrick = true;
 			}
+			/*else if (OfBrick) {
+				MarioGetMoney = true;
+				Active = false;
+			}*/
 		}
 	}
 }
@@ -276,6 +332,8 @@ void Items::Render()
 			ani = ITEM_ANI_MUSHROOM_GREEN;
 		else if (IdItem == ITEM_MUSHROOM_RED)
 			ani = ITEM_ANI_MUSHROOM_RED;
+		else if (IdItem == ITEM_CARD)
+			ani = ITEM_ANI_CARD;
 		else if (IdItem == ITEM_SWITCH)
 		{
 			if (state != ITEM_SWITCH_STATE_OFF)
@@ -283,6 +341,7 @@ void Items::Render()
 			else {
 					ani = ITEM_ANI_SWITCH_OFF;
 			}
+			//RenderBoundingBox();
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
@@ -293,6 +352,8 @@ Items::Items(int IdItem, int SpriteEffectStart)
 {
 	this->IdItem = IdItem;
 	if (IdItem == ITEM_MONEY_ROTATOR)
+		Active = true;
+	else if(IdItem == ITEM_CARD)
 		Active = true;
 	this->SpriteEffectStart = SpriteEffectStart;
 }

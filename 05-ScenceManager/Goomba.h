@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObject.h"
-
+#include "Effect.h"
 #define GOOMBA_WALKING_SPEED 0.05f
 #define GOOMBA_GRAVITY		0.001
 #define PARAGOOMBA_JUMP_DEFLECT_HEIGHT_SPEED		0.25f
@@ -12,6 +12,8 @@
 #define PARAGOOMBA_WINGED_BBOX_WIDTH		20
 #define PARAGOOMBA_WINGED_BBOX_HEIGHT		18
 #define PARAGOOMBA_WINGED_BIG_BBOX_HEIGHT	24
+
+#define GOOMBA_SCORE						100
 
 #define GOOMBA_STATE_WALKING					100
 #define GOOMBA_STATE_DIE						200
@@ -36,12 +38,14 @@ class CGoomba : public CGameObject
 	DWORD Die_start;
 	bool Died;
 	int Die , JumpCount;
+	
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
 	void StartDie() { Die = 1; Die_start = GetTickCount(); }
 
 public: 	
+	Effect* effect = NULL;
 	int TypeGoomba, LevelParaGoomba = 1;
 	CGoomba(int TypeGoomba);
 	virtual void SetState(int state);

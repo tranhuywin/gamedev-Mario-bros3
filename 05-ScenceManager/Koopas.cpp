@@ -20,17 +20,19 @@ CKoopas::CKoopas(int TypeKoopas)
 void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
 	left = x;
-	top = y;
+	top = y + 1;
 	right = x + KOOPAS_BBOX_WIDTH;
 
 	if (state == KOOPAS_STATE_WALKING)
-		bottom = y + KOOPAS_BBOX_HEIGHT;
+		bottom = y + KOOPAS_BBOX_HEIGHT - 1;
 	else
-		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL;
+		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL - 1;
 }
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
+	if (effect != NULL)
+		effect->Update(dt);
 	if(!IsCatching)
 		vy += KOOPAS_GRAVITY/2 * dt;
 	CGameObject::Update(dt);
@@ -72,10 +74,11 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	else
 	{
-		float min_tx, min_ty, nx = 0, ny;
+		float min_tx, min_ty, nx = 0, ny = 0;
 		float rdx = 0;
 		float rdy = 0;
 		float vyLine = vy;
+		float vyPre = vy, vxPre = vx;
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
@@ -137,9 +140,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 				}
 
-				if (state == KOOPAS_STATE_ROTATORY) {
+				if (state == KOOPAS_STATE_ROTATORY  && nx != 0) {
 					brick->IsBreaked = true;
 					vx = -vx;
+					
 				}
 			}
 			else if (dynamic_cast<Ground*>(e->obj)) {
@@ -158,6 +162,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			else if (dynamic_cast<CGoomba*>(e->obj) && state == KOOPAS_STATE_ROTATORY) {
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				goomba->SetState(GOOMBA_STATE_DIE);
+				vx = vxPre;
+				x += dx;
 			}
 		}
 	}
@@ -166,6 +172,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 void CKoopas::Render()
 {
+	if (effect != NULL)
+		effect->Render();
 	int ani = KOOPAS_ANI_WALKING_LEFT_RED;
 	if(this->TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED)
 	{
@@ -259,6 +267,11 @@ void CKoopas::SetState(int state)
 		vx = 0;
 		vy = 0;
 		StartSleep();
+		if (effect == NULL) {
+			effect = new Effect(this->x, this->y, 80100);
+			int CurrentScore = CGame::GetInstance()->GetScore();
+			CGame::GetInstance()->SetScore(CurrentScore + 100);
+		}
 		break;
 	case KOOPAS_STATE_ROTATORY:
 		vx = KOOPAS_ROTATORY_SPEED;

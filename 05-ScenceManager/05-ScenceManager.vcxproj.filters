@@ -108,11 +108,8 @@
     <ClCompile Include="StatusBar.cpp">
       <Filter>Source Files\Map</Filter>
     </ClCompile>
-    <ClCompile Include="SenceWorldMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Tree.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,11 +194,8 @@
     <ClInclude Include="StatusBar.h">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
-    <ClInclude Include="SenceWorldMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Tree.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

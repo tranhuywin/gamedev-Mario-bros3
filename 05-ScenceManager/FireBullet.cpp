@@ -19,6 +19,10 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x = -OUTSIDE_MAP; y = OUTSIDE_MAP;
 		vx = 0; vy = 0;
+		BBox = false;
+	}
+	else {
+		BBox = true;
 	}
 	if (x < CGame::GetInstance()->GetCamPosX())
 		IsBeingFired = false;
@@ -147,10 +151,12 @@ void FireBullet::Render()
 }
 void FireBullet::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	left = x;
-	top = y;
-	right = x + FIRE_BULLET_BBOX_WIDTH;
-	bottom = y + FIRE_BULLET_BBOX_WIDTH;
+	if (BBox) {
+		left = x;
+		top = y;
+		right = x + FIRE_BULLET_BBOX_WIDTH;
+		bottom = y + FIRE_BULLET_BBOX_WIDTH;
+	}
 }
 void FireBullet::attack(float x, float y, bool isRight)
 {

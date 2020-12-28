@@ -51,6 +51,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_FIRE_PIRANHA_PLANT	10
 #define OBJECT_TYPE_ITEM				11
 #define OBJECT_TYPE_TREE				12
+#define OBJECT_TYPE_CARD				13
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -159,11 +160,12 @@ void CPlayScene::_ParseSection_STATUS_BAR(string line) {
 	vector<string> tokens = split(line);
 	if (tokens.size() < 4) return; // skip invalid lines
 
-	int SpriteStatusBar = atoi(tokens[0].c_str());	// 80000	80001	80010	80020
+	int SpriteStatusBar = atoi(tokens[0].c_str());	// 80000	80001	80010	80020	80030
 	int SpriteCardBar = atoi(tokens[1].c_str());
 	int SpriteNumber0 = atoi(tokens[2].c_str());
 	int SpritePowerState = atoi(tokens[3].c_str());
-	statusBar = new StatusBar(player, SpriteStatusBar, SpriteCardBar, SpriteNumber0, SpritePowerState);
+	int SpriteCard = atoi(tokens[4].c_str());
+	statusBar = new StatusBar(player, SpriteStatusBar, SpriteCardBar, SpriteNumber0, SpritePowerState, SpriteCard);
 }
 /*
 	Parse a line in section [OBJECTS] 
@@ -196,13 +198,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			obj = new CMario(x, y);
 			player = (CMario*)obj;
 
-			if (CGame::GetInstance()->Getcurrent_scene() == 0)
+			if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START)
 				player->SetLevel(MARIO_LEVEL_MINI);
 			DebugOut(L"[INFO] Player object created!\n");
 		} break;
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
-		//case OBJECT_TYPE_TREE: obj = new Tree(); break;
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
 		case OBJECT_TYPE_TREE:
@@ -247,7 +248,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		}break;
 		case OBJECT_TYPE_FIRE_PIRANHA_PLANT:
 		{
-			// TODO: Get Possition from file
 			int aniPlant = atoi(tokens[4].c_str());
 			int TypeVenusFireTrap = atoi(tokens[5].c_str());
 			BulletPiranhaPlant* objBullet = new BulletPiranhaPlant();
@@ -373,32 +373,35 @@ void CPlayScene::Update(DWORD dt)
 		LPGAMEOBJECT e = objects[i];
 		if (dynamic_cast<Ground*>(e) || dynamic_cast<Line*>(e) || dynamic_cast<Tube*>(e) || dynamic_cast<Effect*>(e))
 			coObjects.push_back(objects[i]);
+		else if (dynamic_cast<CMario*>(e)) {
+		}
 		else if (CheckObjInScreen(objects[i]))
 			coObjects.push_back(objects[i]);
 	}
 
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		//if (CheckObjInScreen(objects[i]))
 			coObjectsItem.push_back(objects[i]);
 	}
 	for (size_t i = 0; i < objectsItem.size(); i++)
 	{
-		//if (CheckObjInScreen(objects[i]))
 			objectsItem[i]->Update(dt, &coObjectsItem);
 	}
 	// Update Obj is Active in screen
 	for (size_t i = 0; i < objects.size(); i++)
 	{
 		LPGAMEOBJECT e = objects[i];
-		if (dynamic_cast<Brick*>(e) || dynamic_cast<CMario*>(e))
+		if ( dynamic_cast<CMario*>(e))
+		{
+			player->Update(dt, &coObjects);
+		}
+		else if (dynamic_cast<Brick*>(e) || dynamic_cast<QuestionBrick*>(e) || dynamic_cast<Tube*>(e))
 		{
 			objects[i]->Update(dt, &coObjects);
 		}
 		else if (CheckObjInScreen(objects[i]))
 			objects[i]->Update(dt, &coObjects);
 	}
-	//player->Update(dt, &coObjects);
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
@@ -421,7 +424,7 @@ void CPlayScene::Render()
 	tileMap->Draw();
 	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START)
 	{
-		CSprites::GetInstance()->Get(80003)->Draw(-50.0f, 0);
+		CSprites::GetInstance()->Get(80003)->Draw(-50.0f, 0);		// TODO: Add sprite
 		CSprites::GetInstance()->Get(80003)->Draw(224.0f, 0);
 	}
 	for (int i = 1; i < objects.size(); i++)
@@ -439,10 +442,14 @@ void CPlayScene::Render()
 	{
 		objectsItem[i]->Render();
 	}
-	objects[0]->Render();
-	//player->Render();
-	//CMario::GetInstance()->Render();
-	//CMario::Render();
+	player->Render();
+			
+	if (dynamic_cast<Tube*>(objects[0])) {
+		objects[0]->Render();	// cong che portal
+	}
+	if (dynamic_cast<Tube*>(objects[1])) {
+		objects[1]->Render();	// cong che portal
+	}
 	statusBar->Render();
 }
 
@@ -470,74 +477,6 @@ void CPlayScene::Unload()
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
 
-void CPlayScene::LoadWorld()
-{
-	DebugOut(L"[INFO] Start loading scene resources from : %s \n", sceneFilePath);
-
-	ifstream f;
-	f.open(sceneFilePath);
-
-	// current resource section flag
-	int section = SCENE_SECTION_UNKNOWN;
-
-	char str[MAX_SCENE_LINE];
-	while (f.getline(str, MAX_SCENE_LINE))
-	{
-		string line(str);
-
-		if (line[0] == '#') continue;	// skip comment lines	
-
-		if (line == "[TEXTURES]") { section = SCENE_SECTION_TEXTURES; continue; }
-		if (line == "[SPRITES]") {
-			section = SCENE_SECTION_SPRITES; continue;
-		}
-		if (line == "[ANIMATIONS]") {
-			section = SCENE_SECTION_ANIMATIONS; continue;
-		}
-		if (line == "[ANIMATION_SETS]") {
-			section = SCENE_SECTION_ANIMATION_SETS; continue;
-		}
-		/*if (line == "[OBJECTS]") {
-			section = SCENE_SECTION_OBJECTS; continue;
-		}*/
-		if (line == "[TITLEMAP]") {
-			section = SCENE_SECTION_TITLE_MAP; continue;
-		}
-		if (line == "[EFFECT]") {
-			section = SCENE_SECTION_EFFECT; continue;
-		}
-		/*if (line == "[STATUS_BAR]") {
-			section = SCENE_SECTION_STATUS_BAR; continue;
-		}*/
-		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }
-
-		//
-		// data section
-		//
-		switch (section)
-		{
-		case SCENE_SECTION_TEXTURES: _ParseSection_TEXTURES(line); break;
-		case SCENE_SECTION_SPRITES: _ParseSection_SPRITES(line); break;
-		case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
-		case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
-		case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
-		case SCENE_SECTION_TITLE_MAP: _ParseSection_TITLE_MAP(line); break;
-		case SCENE_SECTION_EFFECT: _ParseSection_EFFECT(line); break;
-		case SCENE_SECTION_STATUS_BAR: _ParseSection_STATUS_BAR(line); break;
-		}
-	}
-
-	f.close();
-
-	CTextures::GetInstance()->Add(ID_TEX_BBOX, L"textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
-
-	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
-}
-
-void CPlayScene::UnLoadWorld()
-{
-}
-
 void CPlayScene::UpdateCammera()
 {
 	CGame* game = CGame::GetInstance();
@@ -556,9 +495,9 @@ void CPlayScene::UpdateCammera()
 		cy -= game->GetScreenHeight() / 2;
 	else
 	{
-		if(CurSecene == 1)
+		if(CurSecene == SCENCE_WORD_MAP_1)
 			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
-		else if(CurSecene == 4)
+		else if(CurSecene == SCENCE_WORD_MAP_1_1)
 			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 2;
 		if(player->y < 192)
 			cy -= game->GetScreenHeight();
@@ -567,11 +506,11 @@ void CPlayScene::UpdateCammera()
 		cx = SCREEN_BORDER;
 	if (cy < SCREEN_BORDER)
 		cy = SCREEN_BORDER;
-	if (CurSecene == 0)
+	if (CurSecene == SCENCE_START)
 	{
 		cx = -50.0f;
 	}
-	else if (CurSecene == 4)
+	else if (CurSecene == SCENCE_WORD_MAP_1_1)
 	{
 		cx = 95.0f;
 		cy = 8.0f;
@@ -588,13 +527,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 
 	switch (KeyCode)
 	{
-	case DIK_A: 
-		mario->Reset();
-		break;
-	case DIK_SPACE:
+	//case DIK_A: 
+	//	mario->Reset();
+	//	break;
+	case DIK_S:
 		mario->SetState(MARIO_STATE_JUMP);
 		break;
-	case DIK_Q:
+	case DIK_A:
 		{
 			if(mario->GetLevel() != MARIO_LEVEL_MINI)
 				mario->SetState(MARIO_STATE_KILL);
@@ -632,12 +571,12 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	switch (KeyCode)
 	{
-	case DIK_SPACE:
+	case DIK_S:
 		mario->SetState(MARIO_STATE_DROP);
 		break;
 	case DIK_DOWN:
 		mario->SetState(MARIO_STATE_STAND);
-	case DIK_Q:
+	case DIK_A:
 		mario->SetState(MARIO_STATE_SKILL_OFF);
 		break;
 	}
@@ -675,6 +614,9 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	{
 		if (mario->GetLevel() == MARIO_LEVEL_MINI)
 			mario->SetState(MARIO_MINI_STATE_UP);
+		else {
+			mario->SetState(MARIO_STATE_UP);
+		}
 	}
 	else
 		mario->SetState(MARIO_STATE_IDLE);

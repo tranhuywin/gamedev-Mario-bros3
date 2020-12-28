@@ -2,7 +2,7 @@
 #pragma once
 #include "GameObject.h"
 #define OUTSIDE_MAP						500.0f
-#define TAIL_BBOX_WIDTH					20.0f
+#define TAIL_BBOX_WIDTH					19.0f
 #define RACCOON_BBOX_HIGHT				25.0f
 class Tail : public CGameObject
 {

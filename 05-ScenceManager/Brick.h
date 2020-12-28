@@ -1,10 +1,11 @@
 #pragma once
 #include "GameObject.h"
-#include "Items.h"
+#include "QuestionBrick.h"
+//#include "Items.h"
 #define BRICK_BBOX_WIDTH		16.0f
-#define BRICK_VX_BREAK			0.001f
-#define BRICK_VY_BREAK			0.00018f
-#define BRICK_VY_START_BREAK	0.03f
+#define BRICK_VX_BREAK			0.0002f
+#define BRICK_VY_BREAK			0.0005f
+#define BRICK_VY_START_BREAK	0.01f
 class Brick : public CGameObject
 {
 	virtual void Render();
@@ -15,7 +16,8 @@ class Brick : public CGameObject
 	float xBreak, yBreak;
 	LPGAMEOBJECT items;
 public:
-	bool IsBreaked, SwitchOff;
+	bool IsBreaked, SwitchOff, StoreItemQBrick;
+	QuestionBrick* QBick = NULL;
 	Brick(LPGAMEOBJECT item);
 };
 

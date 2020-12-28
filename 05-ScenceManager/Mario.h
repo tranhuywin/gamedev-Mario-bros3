@@ -8,9 +8,11 @@
 #define MARIO_WALKING_SPEED				0.1f 
 #define MARIO_MAX_SPEED_RUNNING			0.2f 
 //0.1f
+#define X_RETURN_WORLD_1			2336
+#define Y_RETURN_WORLD_1			375
 #define MARIO_JUMP_SPEED_Y			0.01f
 #define MARIO_JUMP_DEFLECT_SPEED	0.2f
-#define MARIO_GRAVITY				0.0015f
+#define MARIO_GRAVITY				0.002f
 #define MARIO_GRAVITY_TELEPORT		0.000015f
 #define MARIO_FALL_SLOWLY_SPEED		0.0025f
 #define MARIO_DIE_DEFLECT_SPEED		0.5f
@@ -43,6 +45,7 @@
 #define MARIO_STATE_STAND				1000
 #define MARIO_STATE_SKILL_ON			1100
 #define MARIO_STATE_SKILL_OFF			1200
+#define MARIO_STATE_UP					1300
 //start scence
 #define MARIO_MINI_SPEED				0.1f
 #define MARIO_MINI_STATE_UP				1300
@@ -171,7 +174,7 @@ class CMario : public CGameObject
 	bool IsJumping;
 	bool IsSlowDropping;
 	bool AllowJump;
-	
+	bool TeleUp;
 	bool IsBendingOver;
 	bool IsCatching;
 	bool PrepareCatch;

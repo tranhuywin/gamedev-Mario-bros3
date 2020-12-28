@@ -39,8 +39,8 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-	void LoadWorld();
-	void UnLoadWorld();
+	//virtual void LoadWorld();
+	//void UnLoadWorld();
 	void UpdateCammera();
 	CMario * GetPlayer() { return player; } 
 	//friend class CPlayScenceKeyHandler;

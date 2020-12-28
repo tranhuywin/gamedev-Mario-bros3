@@ -59,7 +59,7 @@ public:
 	int ny;
 
 	int state;
-	//bool Active;
+	bool BBox = true;
 	DWORD dt; 
 
 	LPANIMATION_SET animation_set;

@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Mario.h"
 #include "Effect.h"
+#include "Brick.h"
 
 #define ITEM_TREE_LEAF			0
 #define ITEM_MONEY				1
@@ -10,14 +11,15 @@
 #define ITEM_MONEY_ROTATOR		4
 #define ITEM_MUSHROOM_GREEN		5
 #define ITEM_MUSHROOM_RED		6
+#define ITEM_CARD				7
 
 #define ITEM_BBOX_L				4
 #define ITEM_BBOX_T				4
 #define ITEM_BBOX_R_ACTIVE		7
 #define ITEM_BBOX_B_ACTIVE		7
 #define ITEM_BBOX_R				14
-#define ITEM_BBOX_B				17
-#define ITEM_BBOX_SWITCH		16
+#define ITEM_BBOX_B				14
+#define ITEM_BBOX_SWITCH		14
 #define ITEM_BBOX_SWITCH_B		7
 #define ITEM_BBOX_MONEY_IDLE	16
 #define ITEM_BBOX_MUSHROOM		15
@@ -42,12 +44,16 @@
 #define ITEM_ANI_MONEY_IDLE			4
 #define ITEM_ANI_MUSHROOM_GREEN		5
 #define ITEM_ANI_MUSHROOM_RED		6
+#define ITEM_ANI_CARD				7
 class Items : public CGameObject
 {
+	
 public:
 	Effect* effect = NULL;
+	Brick* BrickBreak = NULL;
 	int IdItem;
-	int AniEffect, SpriteEffectStart;
+	int AniEffect;
+	int SpriteEffectStart;
 	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail, OfBrick;
 	bool DrawEffect;
 	float X_Start, Y_Start;

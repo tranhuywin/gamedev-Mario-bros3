@@ -1,5 +1,6 @@
 #include "Goomba.h"
 #include "Utils.h"
+#include "Items.h"
 CGoomba::CGoomba(int TypeGoomba)
 {
 	this->TypeGoomba = TypeGoomba;
@@ -39,6 +40,10 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
+	if (effect != NULL) {
+		effect->Update(dt);
+	}
+
 	if (state != GOOMBA_STATE_DIE)
 		vy += GOOMBA_GRAVITY * dt;
 	else
@@ -112,6 +117,9 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 void CGoomba::Render()
 {
 	int YRender = y;
+	if (effect != NULL) {
+		effect->Render();
+	}
 	if (TypeGoomba == GOOMBA_NORMAL)
 	{
 		ani = GOOMBA_ANI_WALKING;
@@ -146,6 +154,12 @@ void CGoomba::SetState(int state)
 			StartDie();
 			vx = 0;
 			y += GOOMBA_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE;
+			if (effect == NULL)
+			{
+				effect = new Effect(this->x, this->y - GOOMBA_BBOX_HEIGHT, 80100);
+				int CurrentScore = CGame::GetInstance()->GetScore();
+				CGame::GetInstance()->SetScore(CurrentScore + 100);
+			}
 			break;
 		case GOOMBA_STATE_WALKING: 
 			vx = -GOOMBA_WALKING_SPEED;
