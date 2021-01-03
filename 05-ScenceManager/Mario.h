@@ -211,5 +211,4 @@ public:
 	void StartFireAttack() { FireAttack = 1; FireAttack_start = GetTickCount(); }
 	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
-	//static CMario* GetInstance() { if (__instance == NULL) __instance = new CMario(0.0f, 0.0f);return __instance;};
 };

@@ -166,7 +166,15 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			Active = true;
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{
-		vx = -ITEM_MUSHROOM_VX * dt;
+		/*int rd = rand() % (1 + 1);
+		if(rd == 1)
+			vx = -ITEM_MUSHROOM_VX * dt;
+		else
+			vx = ITEM_MUSHROOM_VX * dt;*/
+		if(nx == 1)
+			vx = ITEM_MUSHROOM_VX * dt;
+		else
+			vx = -ITEM_MUSHROOM_VX * dt;
 		vy += ITEM_GRAVITY / 6 * dt;
 	}
 	if (sizeCo != 0)
@@ -304,15 +312,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				OfBrick = true;
 				Brick* brick = dynamic_cast<Brick*>(e);
 				BrickBreak = brick;
-				/*if (brick->IsBreaked && IdItem == ITEM_ANI_MONEY_IDLE) {
-					Active = false;
-				}*/
-				//brick->StoreItemQBrick = true;
 			}
-			/*else if (OfBrick) {
-				MarioGetMoney = true;
-				Active = false;
-			}*/
+
 		}
 	}
 }
@@ -355,6 +356,15 @@ Items::Items(int IdItem, int SpriteEffectStart)
 		Active = true;
 	else if(IdItem == ITEM_CARD)
 		Active = true;
+	else if (IdItem == ITEM_MUSHROOM_GREEN)
+	{
+		srand(time(NULL));
+		int rd = rand() % (2);
+		if (rd == 1)
+			nx = 1;
+		else
+			nx = -1;
+	}
 	this->SpriteEffectStart = SpriteEffectStart;
 }
 

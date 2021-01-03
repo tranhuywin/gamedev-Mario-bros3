@@ -17,6 +17,7 @@
 #include "Items.h"
 #include "Tube.h"
 #include "Brick.h"
+#include "FlyingWood.h"
 
 //CMario* CMario::__instance = NULL;
 
@@ -45,13 +46,12 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	DebugOut(L"Vy%f\n", vy);
 	if (CGame::GetInstance()->GetReturnWorld() && CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1) {
 		this->x = X_RETURN_WORLD_1;
 		this->y = Y_RETURN_WORLD_1;
 		CGame::GetInstance()->SetReturnWorld(false);
 	}
-	CGameObject::Update(dt);
+	//
 	if (level != MARIO_LEVEL_MINI)
 	{
 	if (ani != -1)
@@ -86,7 +86,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (!IsLimitFlying)
 		{
 			vy = -MARIO_FLY_SPEED_Y * dt;
-			//vy = -0.008 * dt;
 		}
 		else if (nx == 1)
 		{
@@ -121,6 +120,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				vy += MARIO_GRAVITY_TELEPORT * dt;
 			}
+
 			IsSlowDropping = false;
 		}
 	}
@@ -147,8 +147,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			Shell->vx = KOOPAS_ROTATORY_SPEED * nx;
 			Shell->IsCatching = false;
 		}
-	
-	
+	//if (vy < 0.17f)
+	//	DebugOut(L"state%d\n", GetState());
+	CGameObject::Update(dt);
 	// turn off collision when die 
 	
 	// reset untouchable timer if untouchable time has passed
@@ -465,6 +466,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					item->Active = true;
 					item->SetState(ITEM_SWITCH_STATE_OFF);
 				}
+			}
+			else if (dynamic_cast<FlyingWood*>(e->obj)) {
+				FlyingWood* flyingWood = dynamic_cast<FlyingWood*>(e->obj);
+				flyingWood->IsCollMario = true;
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
@@ -1045,7 +1050,6 @@ void CMario::SetState(int state)
 			break;
 		}
 
-	
 	case MARIO_STATE_DIE:
 		vy = -MARIO_DIE_DEFLECT_SPEED;
 		int Life = CGame::GetInstance()->GetLife();

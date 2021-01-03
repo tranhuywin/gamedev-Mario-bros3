@@ -16,6 +16,7 @@
 #include "Items.h";
 #include "BulletPiranhaPlant.h"
 #include "Tree.h"
+#include "FlyingWood.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
@@ -52,6 +53,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_ITEM				11
 #define OBJECT_TYPE_TREE				12
 #define OBJECT_TYPE_CARD				13
+#define OBJECT_TYPE_FLYING_WOOD			14
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -206,6 +208,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); break;
 		case OBJECT_TYPE_TREE:
 		{
 			int IdObj = atoi(tokens[4].c_str());
@@ -497,8 +500,8 @@ void CPlayScene::UpdateCammera()
 	{
 		if(CurSecene == SCENCE_WORD_MAP_1)
 			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
-		else if(CurSecene == SCENCE_WORD_MAP_1_1)
-			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 2;
+		/*else if(CurSecene == SCENCE_WORD_MAP_1_1)
+			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 2;*/
 		if(player->y < 192)
 			cy -= game->GetScreenHeight();
 	}
@@ -515,7 +518,9 @@ void CPlayScene::UpdateCammera()
 		cx = 95.0f;
 		cy = 8.0f;
 	}
-	//player->GetPosition(cx, cy);
+	//else if (CurSecene == SCENCE_WORD_MAP_4) {
+	//	player->GetPosition(cx, cy);
+	//}
 	CGame::GetInstance()->SetCamPos(cx, cy);
 }
 
