@@ -500,8 +500,6 @@ void CPlayScene::UpdateCammera()
 	{
 		if(CurSecene == SCENCE_WORD_MAP_1)
 			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
-		/*else if(CurSecene == SCENCE_WORD_MAP_1_1)
-			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 2;*/
 		if(player->y < 192)
 			cy -= game->GetScreenHeight();
 	}
@@ -518,9 +516,9 @@ void CPlayScene::UpdateCammera()
 		cx = 95.0f;
 		cy = 8.0f;
 	}
-	//else if (CurSecene == SCENCE_WORD_MAP_4) {
-	//	player->GetPosition(cx, cy);
-	//}
+	else if (CurSecene == SCENCE_WORD_MAP_4) {
+		cy += game->GetScreenHeight() / 4;
+	}
 	CGame::GetInstance()->SetCamPos(cx, cy);
 }
 

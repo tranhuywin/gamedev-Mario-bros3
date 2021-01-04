@@ -25,6 +25,12 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 				left = x - TAIL_BBOX_WIDTH;
 				bottom = y + ITEM_BBOX_MONEY_IDLE;
 			}
+			else if (IdItem == ITEM_MULTIPLE_MONEY) {
+				left = x;
+				top = y + 1;
+				right = x + 16;
+				bottom = y + 17.0f;
+			}
 		}
 		else {
 			left = x + ITEM_BBOX_L;
@@ -62,13 +68,12 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (effect != NULL)
 		effect->Update(dt);
-	/*if (IdItem == ITEM_MONEY_IDLE && !OfBrick)
+	/*if (IdItem == ITEM_MONEY_IDLE && !OfBrick)			//640	48
 		Active = true;*/
 	/*if (BrickBreak != NULL)
 		if (IdItem == ITEM_MONEY_IDLE && BrickBreak->IsBreaked)
 			Active = false;*/
 	
-		CGameObject::Update(dt);
 	//x += dx;
 	//y += dy;
 	if (CollTail)
@@ -84,7 +89,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else
 				vx += ITEM_TREE_LEAF_VX * dt;
 		}
-		else if (IdItem == ITEM_MONEY) {
+		else if (IdItem == ITEM_MONEY || IdItem == ITEM_MULTIPLE_MONEY) {
 			vy += ITEM_GRAVITY * dt;
 			if (y - Y_Start > 0 && vy != 0)
 			{
@@ -94,7 +99,14 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CGame::GetInstance()->SetMoney(CurentMoney + 1);
 				AniEffect = SpriteEffectStart + EFFECT_100;
 				effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
-				x = -100; y = -100.0f; vy = 0; vx = 0;
+				vx = 0; vy = 0;
+				CountColl--;
+				if (CountColl <= 0)
+					BBox = false;
+				if (IdItem == ITEM_MULTIPLE_MONEY) {
+					this->x = X_Start;
+					this->y = Y_Start;
+				}
 				Active = false;
 			}
 		}
@@ -117,7 +129,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else {
 		vy = 0; vx = 0;
 	}
-
+	CGameObject::Update(dt);
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResultPro;
 	coEvents.clear();
@@ -166,11 +178,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			Active = true;
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{
-		/*int rd = rand() % (1 + 1);
-		if(rd == 1)
-			vx = -ITEM_MUSHROOM_VX * dt;
-		else
-			vx = ITEM_MUSHROOM_VX * dt;*/
 		if(nx == 1)
 			vx = ITEM_MUSHROOM_VX * dt;
 		else
@@ -226,14 +233,17 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							Active = false;
 						}
 					}
-				else if (IdItem == ITEM_MONEY_ROTATOR) {
+				else if (IdItem == ITEM_MONEY_ROTATOR ) {
 					Active = false;
 					int CurentScore = CGame::GetInstance()->GetScore();
 					CGame::GetInstance()->SetScore(CurentScore + 100);
 					int CurentMoney = CGame::GetInstance()->GetMoney();
 					CGame::GetInstance()->SetMoney(CurentMoney + 1);
-					//x = -100; y = -100.0f; vy = 0; vx = 0;
 					BBox = false;
+				}
+				else if (IdItem == ITEM_MULTIPLE_MONEY) {
+					vy = -ITEM_DEFLECT_SPEED * dt;
+					Active = true;
 				}
 				else if (IdItem == ITEM_CARD) {
 					int Frame = animation_set->at(ITEM_ANI_CARD)->GetcurrentFrame();
@@ -292,7 +302,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				QuestionBrick* QBrick = dynamic_cast<QuestionBrick*>(e);
 				if (QBrick->GetState() == BRICK_STATE_QUESTION_ON_UP)
 				{
-					if (IdItem == ITEM_TREE_LEAF || IdItem == ITEM_MONEY)
+					if (IdItem == ITEM_TREE_LEAF || IdItem == ITEM_MONEY || IdItem == ITEM_MULTIPLE_MONEY)
 						vy = -ITEM_DEFLECT_SPEED * dt;
 					Active = true;
 				}
@@ -304,14 +314,16 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					{
 						vx = 0; vy = -ITEM_MUSHROOM_VY_UP * dt;
 					}
-					Active = true;
+					if(IdItem != ITEM_MULTIPLE_MONEY)
+						Active = true;
 				}
 			}
 			else if (dynamic_cast<Brick*>(e)) {
-				Active = false;
-				OfBrick = true;
+				// multiple coin
+				//Active = false;
+				//OfBrick = true;
 				Brick* brick = dynamic_cast<Brick*>(e);
-				BrickBreak = brick;
+				brick->IdItemOfBrick = IdItem;		
 			}
 
 		}
@@ -325,7 +337,7 @@ void Items::Render()
 	if (this->Active)
 		if (IdItem == ITEM_TREE_LEAF)
 			ani = ITEM_ANI_TREE_LEAF;
-		else if (IdItem == ITEM_MONEY || IdItem == ITEM_MONEY_ROTATOR)
+		else if (IdItem == ITEM_MONEY || IdItem == ITEM_MONEY_ROTATOR || IdItem == ITEM_MULTIPLE_MONEY)
 			ani = ITEM_ANI_MONEY;
 		else if (IdItem == ITEM_MONEY_IDLE)
 			ani = ITEM_ANI_MONEY_IDLE;
@@ -346,7 +358,7 @@ void Items::Render()
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)

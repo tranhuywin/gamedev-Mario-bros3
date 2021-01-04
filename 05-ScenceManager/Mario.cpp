@@ -404,14 +404,21 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (e->ny > 0)
 				{
-					brick->BBox = false;
+					
 					if (brick->StoreItemQBrick)
 					{
-						brick->SwitchOff = true;
-						if (brick->QBick != NULL && brick->QBick->GetState() == BRICK_STATE_QUESTION_ON)
-						{
-							brick->QBick->SetState(BRICK_STATE_QUESTION_ON_UP);
-							brick->QBick->YCollition = brick->QBick->y;
+						
+						if (brick->CountCollBrickMulMoney >0 && brick->IdItemOfBrick == ITEM_MULTIPLE_MONEY) {
+							brick->CountCollBrickMulMoney--;
+						}
+						else {
+							brick->BBox = false;
+							brick->SwitchOff = true;
+							if (brick->QBick != NULL && brick->QBick->GetState() == BRICK_STATE_QUESTION_ON)
+							{
+								brick->QBick->SetState(BRICK_STATE_QUESTION_ON_UP);
+								brick->QBick->YCollition = brick->QBick->y;
+							}
 						}
 					}
 					else

@@ -12,6 +12,7 @@
 #define ITEM_MUSHROOM_GREEN		5
 #define ITEM_MUSHROOM_RED		6
 #define ITEM_CARD				7
+#define ITEM_MULTIPLE_MONEY		8
 
 #define ITEM_BBOX_L				4
 #define ITEM_BBOX_T				4
@@ -52,6 +53,7 @@ public:
 	Effect* effect = NULL;
 	Brick* BrickBreak = NULL;
 	int IdItem;
+	int CountColl = 10;
 	int AniEffect;
 	int SpriteEffectStart;
 	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail, OfBrick;

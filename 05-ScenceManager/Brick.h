@@ -16,6 +16,8 @@ class Brick : public CGameObject
 	float xBreak, yBreak;
 	LPGAMEOBJECT items;
 public:
+	int IdItemOfBrick = -1;
+	int CountCollBrickMulMoney = 10;
 	bool IsBreaked, SwitchOff, StoreItemQBrick;
 	QuestionBrick* QBick = NULL;
 	Brick(LPGAMEOBJECT item);
