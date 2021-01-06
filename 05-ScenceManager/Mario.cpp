@@ -53,11 +53,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		CGame::GetInstance()->SetReturnWorld(false);
 	}
 	//
-	if (vy < -0.20)
-	{
-		DebugOut(L"vy%f\n", vy);
-		DebugOut(L"state%d\n", state);
-	}
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
 	{
@@ -485,7 +480,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<FlyingWood*>(e->obj)) {
 				FlyingWood* flyingWood = dynamic_cast<FlyingWood*>(e->obj);
-				flyingWood->IsCollMario = true;
+				if(e->ny < 0)
+					flyingWood->IsCollMario = true;
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{

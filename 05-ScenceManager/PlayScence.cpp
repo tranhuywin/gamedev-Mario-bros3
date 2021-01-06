@@ -60,8 +60,14 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define MAX_SCENE_LINE 1024
 
 #define CAMERA_ON_PLATFORM 64.0f
+#define CAMERA_MOVE_VX		0.04f
+#define CAMERA_X_START_MAP	50.0f
+#define CAMERA_X_WORLD_1_1	95.0f
+#define CAMERA_Y_WORLD_1_1	8.0f
 
 #define SCREEN_BORDER		0.0f
+#define STATUS_BAR_MARGIN_LEFT	5.0f
+#define STATUS_BAR_MARGIN_TOP	30.0f
 #define SCREEN_BORDER_RIGHT 16.0f
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
@@ -406,7 +412,6 @@ void CPlayScene::Update(DWORD dt)
 			objects[i]->Update(dt, &coObjects);
 	}
 
-	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
 
 	if (player->x < 0)
@@ -414,11 +419,21 @@ void CPlayScene::Update(DWORD dt)
 	if (player->x > tileMap->GetWidthMap() - MARIO_BIG_BBOX_WIDTH * 2)
 		player->SetPosition(tileMap->GetWidthMap()- MARIO_BIG_BBOX_WIDTH * 2, player->y);
 
-	// Update camera to follow mario
-	UpdateCammera();
+	// Update camera 
+	UpdateCammera(dt);
+	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)
+	{
+		if (player->x < CamX)
+		{
+			player->SetPosition(CamX, player->y);
+			player->SetState(MARIO_STATE_WALKING_RIGHT);
+		}
+		if(player->x > CamX + CGame::GetInstance()->GetScreenWidth())
+			player->SetPosition(CamX + CGame::GetInstance()->GetScreenWidth(), player->y);
+	}
 	// Update Status bar
-	float XStatusBar = CGame::GetInstance()->GetCamPosX() + 5;
-	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - 30;
+	float XStatusBar = CGame::GetInstance()->GetCamPosX() + STATUS_BAR_MARGIN_LEFT;
+	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - STATUS_BAR_MARGIN_TOP;
 	statusBar->Update(dt, XStatusBar, YStatusBar);
 }
 
@@ -480,49 +495,62 @@ void CPlayScene::Unload()
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
 
-void CPlayScene::UpdateCammera()
+void CPlayScene::UpdateCammera(DWORD dt)
 {
 	CGame* game = CGame::GetInstance();
-	float cx, cy;
+	//float CamX, CamY;
 	int CurSecene = game->Getcurrent_scene();
+	bool CammeraMove = false;
+	if (CurSecene == SCENCE_WORD_MAP_4)
+		CammeraMove = true;
 
-	player->GetPosition(cx, cy);
-	cx -= game->GetScreenWidth() / 2;
-	if (cx > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
-		cx = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
-	if (player->IsFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))
+	
+	if (!CammeraMove)
 	{
-		cy -= game->GetScreenHeight() / 2;
+		player->GetPosition(CamX, CamY);
+		CamX -= game->GetScreenWidth() / 2;
+		if (CamX > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
+			CamX = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
+		if (player->IsFlying && CamY < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))
+		{
+			CamY -= game->GetScreenHeight() / 2;
+		}
+		else if (player->IsLimitFlying && CamY < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
+			CamY -= game->GetScreenHeight() / 2;
+		else
+		{
+			if (CurSecene == SCENCE_WORD_MAP_1)
+				CamY = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
+			if (player->y < 192)
+				CamY -= game->GetScreenHeight();
+		}
+		if (CamX < SCREEN_BORDER)
+			CamX = SCREEN_BORDER;
+		if (CamY < SCREEN_BORDER)
+			CamY = SCREEN_BORDER;
+		if (CurSecene == SCENCE_START)
+		{
+			CamX = -CAMERA_X_START_MAP;
+		}
+		else if (CurSecene == SCENCE_WORD_MAP_1_1)
+		{
+			CamX = CAMERA_X_WORLD_1_1;
+			CamY = CAMERA_Y_WORLD_1_1;
+		}
+		else if (CurSecene == SCENCE_WORD_MAP_4) {
+			CamY += game->GetScreenHeight() / 4;
+		}
+		else if (CurSecene == SCENCE_WORD_MAP_4_1) {
+			CamY += game->GetScreenHeight() / 6;
+		}
 	}
-	else if (player->IsLimitFlying && cy < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
-		cy -= game->GetScreenHeight() / 2;
 	else
 	{
-		if(CurSecene == SCENCE_WORD_MAP_1)
-			cy = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
-		if(player->y < 192)
-			cy -= game->GetScreenHeight();
+		CamX += CAMERA_MOVE_VX * dt;
+		if (CamX > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
+			CamX = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
 	}
-	if (cx < SCREEN_BORDER)
-		cx = SCREEN_BORDER;
-	if (cy < SCREEN_BORDER)
-		cy = SCREEN_BORDER;
-	if (CurSecene == SCENCE_START)
-	{
-		cx = -50.0f;
-	}
-	else if (CurSecene == SCENCE_WORD_MAP_1_1)
-	{
-		cx = 95.0f;
-		cy = 8.0f;
-	}
-	else if (CurSecene == SCENCE_WORD_MAP_4) {
-		cy += game->GetScreenHeight() / 4;
-	}
-	else if (CurSecene == SCENCE_WORD_MAP_4_1) {
-		cy += game->GetScreenHeight() / 6;
-	}
-	CGame::GetInstance()->SetCamPos(cx, cy);
+	CGame::GetInstance()->SetCamPos(CamX, CamY);
 }
 
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
@@ -565,6 +593,8 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_0:
 		mario->SetPosition(2268, 70);
+	case DIK_9:
+		mario->SetPosition(1970, 74);
 		break;
 
 	}

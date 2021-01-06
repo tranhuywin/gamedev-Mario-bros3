@@ -18,7 +18,7 @@ protected:
 	int SpriteEffectStart;
 	TileMap *tileMap;
 	CMario* player;
-	
+	float CamX = 0, CamY = 0;
 	//MarioChooseMap* playerChoose;
 	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
@@ -41,7 +41,7 @@ public:
 	virtual void Unload();
 	//virtual void LoadWorld();
 	//void UnLoadWorld();
-	void UpdateCammera();
+	void UpdateCammera(DWORD dt);
 	CMario * GetPlayer() { return player; } 
 	//friend class CPlayScenceKeyHandler;
 };
