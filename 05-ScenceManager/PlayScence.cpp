@@ -519,6 +519,9 @@ void CPlayScene::UpdateCammera()
 	else if (CurSecene == SCENCE_WORD_MAP_4) {
 		cy += game->GetScreenHeight() / 4;
 	}
+	else if (CurSecene == SCENCE_WORD_MAP_4_1) {
+		cy += game->GetScreenHeight() / 6;
+	}
 	CGame::GetInstance()->SetCamPos(cx, cy);
 }
 
@@ -553,7 +556,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetLevel(MARIO_LEVEL_BIG);
 		break;
 	case DIK_3:
-		mario->SetPosition(mario->x, mario->y - MARIO_BIG_BBOX_HEIGHT/3);
+		mario->SetPosition(mario->x, mario->y - MARIO_BIG_BBOX_HEIGHT/2);
 		mario->SetLevel(MARIO_LEVEL_RACCOON);
 		break;
 	case DIK_4:

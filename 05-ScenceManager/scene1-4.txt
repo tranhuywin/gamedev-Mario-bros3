@@ -689,18 +689,24 @@ bend over left Big
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
+#tube
+7	1936	96	10	64	1
 # MARIO
 # start
 #0	90.0	80.0	1
 #Item
 #0	653	94	1
 #coin
-0	980	123	1
+#0	980	123	1
+#portal
+0	1970	74	1
 #
 #0	1185.0	90.0	1
 #Ground
 5	0	112	1	156
 5	1920	160	1	128
+5	1970	128	1	44
+5	1970	144	1	44
 #Item
 #11	640	48	12	5
 11	1008	112	12	8
@@ -790,6 +796,8 @@ bend over left Big
 1	1776	128	2
 1	1792	128	2
 1	1808	128	2
+#tube
+7	1936	96	10	64	-1
 # ---- fire bullet	----
 4	-100	0	4
 ###### flying wood  ######
@@ -799,8 +807,8 @@ bend over left Big
 14	624	160	14
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	2256	109	0	2287	180	4
-50	2800	350	0	2810	418	0
+50	1940	94	0	1960	140	4
+#50	2800	350	0	2810	418	0
 #50	2256	145	0	2287	180	4
 [STATUS_BAR]
 80000	80001	80010	80020	80030

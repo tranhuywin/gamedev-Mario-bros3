@@ -19,14 +19,15 @@
 #include "Brick.h"
 #include "FlyingWood.h"
 
-//CMario* CMario::__instance = NULL;
-
 CMario::CMario(float x, float y) : CGameObject()
 {
 	ani = -1;
 	LastAni = -1;
 	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1)
 		level = MARIO_LEVEL_RACCOON;
+	else if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
+		level = MARIO_LEVEL_RACCOON;
+	}
 	else
 	{
 		level = MARIO_LEVEL_SMALL;
@@ -46,12 +47,18 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (CGame::GetInstance()->GetReturnWorld() && CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1) {
+	if (CGame::GetInstance()->GetReturnWorld() && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)) {
 		this->x = X_RETURN_WORLD_1;
 		this->y = Y_RETURN_WORLD_1;
 		CGame::GetInstance()->SetReturnWorld(false);
 	}
 	//
+	if (vy < -0.20)
+	{
+		DebugOut(L"vy%f\n", vy);
+		DebugOut(L"state%d\n", state);
+	}
+	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
 	{
 	if (ani != -1)
@@ -114,7 +121,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 		else
 		{
-			if (!StartTeleport)
+			if (!StartTeleport && state != MARIO_STATE_JUMP)
 				vy += MARIO_GRAVITY * dt;
 			else
 			{
@@ -125,7 +132,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 	}
 	if (YHolding - y > MARIO_DISTANCE_JUMP)
+	{
 		AllowJump = false;
+		IsDropping = true;
+	}
+
+	if (IsDropping && vy >= MARIO_DROP_VY_MAX)
+		vy = MARIO_DROP_VY_MAX;
 	if (IsCatching && Shell->GetState() != KOOPAS_STATE_WALKING)
 	{
 		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT / 4);
@@ -147,15 +160,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			Shell->vx = KOOPAS_ROTATORY_SPEED * nx;
 			Shell->IsCatching = false;
 		}
-	//if (vy < 0.17f)
-	//	DebugOut(L"state%d\n", GetState());
-	CGameObject::Update(dt);
-	// turn off collision when die 
-	
-	// reset untouchable timer if untouchable time has passed
 	if (KickShell && GetTickCount() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
 		KickShell = false;
-	//DebugOut(L"animation_set->at(ani)%d\n", animation_set->at(MARIO_ANI_RACCOON_KILL_RIGHT)->GetcurrentFrame());
 	if (Kill && GetTickCount() - Kill_start > animation_set->at(ani)->GettotalFrameTime())
 	{
 		Kill_start = 0;
@@ -222,8 +228,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		// check mario on a platform, because Mario is pushed, so need to check IsJunping
 		if (ny == -1) 
 		{
-			if(!AllowJump)
+			if (!AllowJump)
+			{
 				OnPlatform = true;
+				IsDropping = false;
+			}
 			IsLimitFlying = false;
 		}
 		else
@@ -514,18 +523,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 				{
-					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) {
+					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
 						CGame::GetInstance()->SetReturnWorld(true);
 					}
 					IsWaitingTeleport = true;
 					if (StartTeleport ) {
-						if(CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1)
+						if(CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)
 							this->vy = MARIO_START_TELEPORT_VY * dt;
-						else if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) {
+						else if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
 							this->vy = -MARIO_START_TELEPORT_VY * dt;
 						}
 					}
-					if (this->y > p->y && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1)) {
+					if (this->y > p->y && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)) {
 							CGame::GetInstance()->SwitchScene(p->GetSceneId());
 					}
 					else if (this->y < p->y && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) ) {

@@ -11,6 +11,7 @@
 #define X_RETURN_WORLD_1			2336
 #define Y_RETURN_WORLD_1			375
 #define MARIO_JUMP_SPEED_Y			0.01f
+#define MARIO_DROP_VY_MAX			0.25f
 #define MARIO_JUMP_DEFLECT_SPEED	0.2f
 #define MARIO_GRAVITY				0.002f
 #define MARIO_GRAVITY_TELEPORT		0.000015f
@@ -18,7 +19,7 @@
 #define MARIO_DIE_DEFLECT_SPEED		0.5f
 #define MARIO_INERTIA_DECREASE		0.002f
 #define MARIO_DISTANCE_INERTIA		30.0f
-#define MARIO_DISTANCE_JUMP			70.0f
+#define MARIO_DISTANCE_JUMP			60.0f
 #define MARIO_DISTANCE_SLOW_DROP	20.0f
 #define MARIO_FLY_SPEED_Y			0.008f
 #define	MARIO_OVER_LINE				3.0f
@@ -193,7 +194,7 @@ public:
 	bool IsLimitRunning;
 	bool IsLimitFlying;
 	bool Iskilling;
-	bool IsRunning;
+	bool IsRunning, IsDropping;
 	bool IsWaitingTeleport;
 	bool StartTeleport;
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);

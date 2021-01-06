@@ -1,8 +1,9 @@
 [SETTINGS]
-start	3
+start	1
 #scene list
 [SCENES]
 0	SenceStart.txt
 1	scene1-1.txt
 2	sence1_1_hiden.txt
 3	scene1-4.txt
+4	scene1-4End.txt

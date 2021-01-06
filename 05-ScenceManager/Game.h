@@ -19,6 +19,7 @@ using namespace std;
 #define SCENCE_WORD_MAP_1		1
 #define SCENCE_WORD_MAP_1_1		2
 #define SCENCE_WORD_MAP_4		3
+#define SCENCE_WORD_MAP_4_1		4
 //#define SCREEN_WIDTH 1000.0f
 class CGame
 {
