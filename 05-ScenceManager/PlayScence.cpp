@@ -67,7 +67,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 
 #define SCREEN_BORDER		0.0f
 #define STATUS_BAR_MARGIN_LEFT	5.0f
-#define STATUS_BAR_MARGIN_TOP	30.0f
+#define STATUS_BAR_MARGIN_TOP	35.0f
 #define SCREEN_BORDER_RIGHT 16.0f
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
@@ -520,7 +520,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 		else
 		{
 			if (CurSecene == SCENCE_WORD_MAP_1)
-				CamY = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 4;
+				CamY = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 10;
 			if (player->y < 192)
 				CamY -= game->GetScreenHeight();
 		}

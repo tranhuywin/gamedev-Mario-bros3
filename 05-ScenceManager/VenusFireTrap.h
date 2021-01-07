@@ -9,7 +9,7 @@
 #define VENUS_FIRE_TRAP_DISTANCE_ATTACK_MARIO	80
 
 #define VENUS_FIRE_TRAP_SPEED_VY		0.001f
-#define VENUS_FIRE_TRAP_TIME_ATTACK	3000
+//#define VENUS_FIRE_TRAP_TIME_ATTACK	3000
 #define VENUS_FIRE_TRAP_ANI_RIGHT_UP			0
 #define VENUS_FIRE_TRAP_ANI_RIGHT_DOWN			1
 #define VENUS_FIRE_TRAP_ANI_LEFT_UP				2
@@ -42,7 +42,7 @@ class VenusFireTrap : public CGameObject
 	BulletPiranhaPlant* Bullet;
 	DWORD Attack_start, WaitAttack_start;
 	CMario* mario;
-
+	int TimeAttack = 1900, TimeWaitAttack = 0;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();

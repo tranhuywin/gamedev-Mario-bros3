@@ -27,11 +27,12 @@ void VenusFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CheckPositionMarioToAttack();
 
 	Bullet->Update(dt, coObjects);
-	int TimeAttack = 1950, TimeWaitAttack = 0;
+	
 	if (TypeVenusFireTrap != TYPE_VENUS_FIRE_TRAP_GREEN_BITE)
 	{
 		TimeAttack = VENUS_FIRE_TRAP_TIME_ATTACK;
 		TimeWaitAttack = VENUS_FIRE_TRAP_TIME_WAIT_ATTACK;
+		//TimeWaitAttack = 3000;
 	}
 	if (GetTickCount() - Attack_start > TimeAttack)
 	{

@@ -482,6 +482,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				FlyingWood* flyingWood = dynamic_cast<FlyingWood*>(e->obj);
 				if(e->ny < 0)
 					flyingWood->IsCollMario = true;
+				if(e->nx < 0)
+					this->x += min_tx * dx + nx * 0.3f;
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
