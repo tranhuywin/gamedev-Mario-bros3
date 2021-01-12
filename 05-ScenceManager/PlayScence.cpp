@@ -593,6 +593,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_0:
 		mario->SetPosition(2268, 70);
+		break;
 	case DIK_9:
 		mario->SetPosition(1970, 74);
 		break;

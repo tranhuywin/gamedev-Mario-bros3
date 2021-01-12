@@ -26,8 +26,8 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 				bottom = y + ITEM_BBOX_MONEY_IDLE;
 			}
 			else if (IdItem == ITEM_MULTIPLE_MONEY) {
-				left = x;
-				top = y + 1;
+				//left = x;
+				//top = y;
 				right = x + 16;
 				bottom = y + 17.0f;
 			}

@@ -482,8 +482,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				FlyingWood* flyingWood = dynamic_cast<FlyingWood*>(e->obj);
 				if(e->ny < 0)
 					flyingWood->IsCollMario = true;
-				if(e->nx < 0)
-					this->x += min_tx * dx + nx * 0.3f;
+				//if (e->nx < 0)
+				//{
+				//	//this->x = flyingWood->x - MARIO_BIG_BBOX_WIDTH;
+				//	vx = flyingWood->vx;
+				//	
+				//}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
@@ -545,6 +549,31 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<Tube*>(e)) {
 				vy = -MARIO_START_TELEPORT_VY * dt;
 				TeleUp = true;
+			}
+			else if (dynamic_cast<FlyingWood*>(e)) {
+				FlyingWood* flyingWood = dynamic_cast<FlyingWood*>(e);
+
+				if (this->nx > 0 && this->x < flyingWood->x)
+				{
+					if (level == MARIO_LEVEL_BIG || level == MARIO_LEVEL_FIRE) {
+						this->x = flyingWood->x - MARIO_BIG_BBOX_WIDTH;
+						if (vx != 0)
+							this->vx = flyingWood->vx;
+					}
+					else if (level == MARIO_LEVEL_RACCOON) {
+						this->x = flyingWood->x - MARIO_RACCOON_BBOX_WIDTH + MARIO_RACCOON_BBOX_TAIL;//cong them bb duoi
+						if (vx != 0)
+							this->vx = flyingWood->vx;
+					}
+					else if (level == MARIO_LEVEL_SMALL){
+						this->x = flyingWood->x - MARIO_SMALL_BBOX_WIDTH;
+
+						if (vx != 0)
+							this->vx = flyingWood->vx;
+					}
+
+
+				}
 			}
 			else if (dynamic_cast<BulletPiranhaPlant*>(e)) {
 				if (untouchable == 0)
