@@ -206,11 +206,11 @@ public:
 	void SetState(int state);
 	void SetLevel(int l);
 	int GetLevel() { return level; }
-	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
-	void StartKill() { Kill = 1; Kill_start = GetTickCount(); }
-	void Startfly() { Fly = 1; Fly_start = GetTickCount(); }
-	void StartSlip() { Slip = 1; Slip_start = GetTickCount(); }
-	void StartFireAttack() { FireAttack = 1; FireAttack_start = GetTickCount(); }
+	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
+	void StartKill() { Kill = 1; Kill_start = GetTickCount64(); }
+	void Startfly() { Fly = 1; Fly_start = GetTickCount64(); }
+	void StartSlip() { Slip = 1; Slip_start = GetTickCount64(); }
+	void StartFireAttack() { FireAttack = 1; FireAttack_start = GetTickCount64(); }
 	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 };

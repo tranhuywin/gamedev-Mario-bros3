@@ -117,6 +117,12 @@
     <ClCompile Include="FlyingWood.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Brothers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoomerangOfBrother.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -207,6 +213,12 @@
       <Filter>Header Files\Map</Filter>
     </ClInclude>
     <ClInclude Include="FlyingWood.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Brothers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoomerangOfBrother.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

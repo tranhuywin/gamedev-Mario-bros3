@@ -18,7 +18,7 @@ protected:
 	int SpriteEffectStart;
 	TileMap *tileMap;
 	CMario* player;
-	float CamX = 0, CamY = 0;
+	
 	//MarioChooseMap* playerChoose;
 	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
@@ -33,7 +33,7 @@ protected:
 	void _ParseSection_EFFECT(string line);
 	void _ParseSection_STATUS_BAR(string line);
 public: 
-	
+	float CamX = 0, CamY = 0;
 	CPlayScene(int id, LPCWSTR filePath);
 	virtual void Load();
 	virtual void Update(DWORD dt);

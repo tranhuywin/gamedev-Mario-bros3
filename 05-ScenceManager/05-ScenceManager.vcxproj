@@ -125,7 +125,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animations.cpp" />
+    <ClCompile Include="BoomerangOfBrother.cpp" />
     <ClCompile Include="Brick.cpp" />
+    <ClCompile Include="Brothers.cpp" />
     <ClCompile Include="BulletPiranhaPlant.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="FlyingWood.cpp" />
@@ -157,7 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animations.h" />
+    <ClInclude Include="BoomerangOfBrother.h" />
     <ClInclude Include="Brick.h" />
+    <ClInclude Include="Brothers.h" />
     <ClInclude Include="BulletPiranhaPlant.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="FlyingWood.h" />

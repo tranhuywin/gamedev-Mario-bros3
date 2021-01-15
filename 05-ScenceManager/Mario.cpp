@@ -155,9 +155,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			Shell->vx = KOOPAS_ROTATORY_SPEED * nx;
 			Shell->IsCatching = false;
 		}
-	if (KickShell && GetTickCount() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
+	if (KickShell && GetTickCount64() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
 		KickShell = false;
-	if (Kill && GetTickCount() - Kill_start > animation_set->at(ani)->GettotalFrameTime())
+	if (Kill && GetTickCount64() - Kill_start > animation_set->at(ani)->GettotalFrameTime())
 	{
 		Kill_start = 0;
 		Kill = 0;
@@ -166,23 +166,23 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		animation_set->at(MARIO_ANI_RACCOON_KILL_RIGHT)->ResetcurrentFrame();		// loi currentFrame co luc k phai la -1
 		animation_set->at(MARIO_ANI_RACCOON_KILL_LEFT)->ResetcurrentFrame();
 	}
-	if (FireAttack && GetTickCount() - FireAttack_start > animation_set->at(ani)->GettotalFrameTime())
+	if (FireAttack && GetTickCount64() - FireAttack_start > animation_set->at(ani)->GettotalFrameTime())
 	{
 		FireAttack_start = 0;
 		FireAttack = 0;
 	}
-	if (GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
+	if (GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
 	{
 		untouchable_start = 0;
 		untouchable = 0;
 	}
-	if (GetTickCount() - Fly_start > MARIO_FLY_TIME)	// con thoi gian thi dc bay, nhan 1 cai tinh thoi gian lai
+	if (GetTickCount64() - Fly_start > MARIO_FLY_TIME)	// con thoi gian thi dc bay, nhan 1 cai tinh thoi gian lai
 	{
 		Fly_start = 0;
 		Fly = 0;
 		IsFlying = false;
 	}
-	if (GetTickCount() - Slip_start > MARIO_SLIP_TIME)
+	if (GetTickCount64() - Slip_start > MARIO_SLIP_TIME)
 	{
 		Slip_start = 0;
 		Slip = 0;
@@ -553,7 +553,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<FlyingWood*>(e)) {
 				FlyingWood* flyingWood = dynamic_cast<FlyingWood*>(e);
 
-				if (this->nx > 0 && this->x < flyingWood->x)
+				if (this->nx > 0 && this->x < flyingWood->x - MARIO_SMALL_BBOX_WIDTH)
 				{
 					if (level == MARIO_LEVEL_BIG || level == MARIO_LEVEL_FIRE) {
 						this->x = flyingWood->x - MARIO_BIG_BBOX_WIDTH;

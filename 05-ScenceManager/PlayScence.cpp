@@ -17,6 +17,8 @@
 #include "BulletPiranhaPlant.h"
 #include "Tree.h"
 #include "FlyingWood.h"
+#include "Brothers.h"
+
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
@@ -54,6 +56,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_TREE				12
 #define OBJECT_TYPE_CARD				13
 #define OBJECT_TYPE_FLYING_WOOD			14
+#define OBJECT_TYPE_BROTHER				15
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -64,6 +67,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define CAMERA_X_START_MAP	50.0f
 #define CAMERA_X_WORLD_1_1	95.0f
 #define CAMERA_Y_WORLD_1_1	8.0f
+#define CAMERA_Y_WORLD_4_1  6.0f
 
 #define SCREEN_BORDER		0.0f
 #define STATUS_BAR_MARGIN_LEFT	5.0f
@@ -215,6 +219,16 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
 		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); break;
+		case OBJECT_TYPE_BROTHER: 
+		{
+			int IDType = atoi(tokens[4].c_str());
+			int AniWeapon = atoi(tokens[5].c_str());
+			BoomerangOfBrother* Boomerang1 = new BoomerangOfBrother(AniWeapon);
+			objects.push_back(Boomerang1);
+			BoomerangOfBrother* Boomerang2 = new BoomerangOfBrother(AniWeapon);
+			objects.push_back(Boomerang2);
+			obj = new Brothers(IDType, Boomerang1, Boomerang2);
+		}break;
 		case OBJECT_TYPE_TREE:
 		{
 			int IdObj = atoi(tokens[4].c_str());
@@ -521,7 +535,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 		{
 			if (CurSecene == SCENCE_WORD_MAP_1)
 				CamY = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 10;
-			if (player->y < 192)
+			if (player->y < 192 && CurSecene == SCENCE_WORD_MAP_1)
 				CamY -= game->GetScreenHeight();
 		}
 		if (CamX < SCREEN_BORDER)
@@ -541,7 +555,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 			CamY += game->GetScreenHeight() / 4;
 		}
 		else if (CurSecene == SCENCE_WORD_MAP_4_1) {
-			CamY += game->GetScreenHeight() / 6;
+			CamY = CAMERA_Y_WORLD_4_1;
 		}
 	}
 	else
@@ -596,6 +610,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_9:
 		mario->SetPosition(1970, 74);
+		((CPlayScene*)scence)->CamX = 1800;
 		break;
 
 	}
