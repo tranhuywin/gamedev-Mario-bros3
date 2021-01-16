@@ -174,7 +174,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CalCollisions(coObjects, coEventsResult);
 	int sizeCo = coEventsResult.size();
 	if(!CollTail)
-		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && !BrickBreak->IsBreaked)
+		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE /*&& !BrickBreak->IsBreaked Note: oke*/)
 			Active = true;
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{

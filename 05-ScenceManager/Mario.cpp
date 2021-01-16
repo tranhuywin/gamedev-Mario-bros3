@@ -18,6 +18,7 @@
 #include "Tube.h"
 #include "Brick.h"
 #include "FlyingWood.h"
+#include "BoomerangOfBrother.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -594,6 +595,25 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						SetState(MARIO_STATE_DIE);
 				}
 			}
+			else if (dynamic_cast<BoomerangOfBrother*>(e)) {
+				if (untouchable == 0)
+				{
+					if (level > MARIO_LEVEL_BIG)
+					{
+						SetLevel(MARIO_LEVEL_BIG);
+						this->x -= MARIO_RACCOON_BBOX_TAIL;
+						this->y -= 1;		// khong bi rot xuong Coobj
+						StartUntouchable();
+					}
+					else if (level > MARIO_LEVEL_SMALL)
+					{
+						level = MARIO_LEVEL_SMALL;
+						StartUntouchable();
+					}
+					else
+						SetState(MARIO_STATE_DIE);
+				}
+			}
 			/*else {
 				IsWaitingTeleport = false;
 				StartTeleport = false;
@@ -613,9 +633,19 @@ void CMario::Render()
 		firebullet_2->Render();
 		TailofRaccoon->Render();
 	}
-	int alpha = 255;
-	if (untouchable) alpha = 128;
 
+	if (untouchable) {
+		CountMiliSeconds++;
+		if(CountMiliSeconds >= 0)
+			alpha = 30;
+		if (CountMiliSeconds >= 10)
+		{
+			alpha = 100;
+			if (CountMiliSeconds == 15)
+				CountMiliSeconds = 0;
+		}
+	}
+	else alpha = 255;
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
 	else

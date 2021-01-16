@@ -6,9 +6,9 @@
 #define KOOPAS_PARATROOPA_WALKING_SPEED		0.01f
 #define KOOPAS_ROTATORY_SPEED	0.2f
 #define KOOPAS_DIE_DEFLECT_SPEED 0.02f
-#define KOOPAS_GRAVITY			0.001f
+#define KOOPAS_GRAVITY			0.0019f
 #define KOOPAS_DIE				0.1f
-#define KOOPAS_BBOX_WIDTH 16
+#define KOOPAS_BBOX_WIDTH 15
 #define KOOPAS_BBOX_HEIGHT  26
 #define KOOPAS_BBOX_HEIGHT_SHELL 16
 
@@ -59,6 +59,6 @@ public:
 	CKoopas(int TypeKoopas);
 	virtual void SetState(int state);
 	void BeCatch(LPGAMEOBJECT mario, float YShell);
-	void StartSleep() { Sleep = 1; Sleep_start = GetTickCount(); }
-	void StartPrepareWakeUp() { PrepareWakeUp = 1; PrepareWakeUp_start = GetTickCount(); }
+	void StartSleep() { Sleep = 1; Sleep_start = GetTickCount64(); }
+	void StartPrepareWakeUp() { PrepareWakeUp = 1; PrepareWakeUp_start = GetTickCount64(); }
 };

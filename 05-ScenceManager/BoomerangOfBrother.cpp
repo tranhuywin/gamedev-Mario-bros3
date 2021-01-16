@@ -2,6 +2,10 @@
 
 void BoomerangOfBrother::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
+	left = x;
+	top = y;
+	right = x + 14;
+	bottom = y + 14;
 }
 
 void BoomerangOfBrother::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)

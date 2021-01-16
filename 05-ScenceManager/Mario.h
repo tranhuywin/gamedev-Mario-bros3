@@ -159,6 +159,8 @@ class CMario : public CGameObject
 	int FireAttack;
 	int ani = -1;
 	int LastAni = -1;
+	int alpha = 255;
+	int CountMiliSeconds = 0;
 	DWORD untouchable_start;
 	DWORD Kill_start;
 	DWORD Fly_start;

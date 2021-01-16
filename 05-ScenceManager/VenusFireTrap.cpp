@@ -34,13 +34,13 @@ void VenusFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		TimeWaitAttack = VENUS_FIRE_TRAP_TIME_WAIT_ATTACK;
 		//TimeWaitAttack = 3000;
 	}
-	if (GetTickCount() - Attack_start > TimeAttack)
+	if (GetTickCount64() - Attack_start > TimeAttack)
 	{
 		Attack_start = 0;
 		Attack = 0;
 		IsAtack = false;
 	}
-	if (GetTickCount() - WaitAttack_start > TimeWaitAttack)
+	if (GetTickCount64() - WaitAttack_start > TimeWaitAttack)
 	{
 		WaitAttack_start = 0;
 		WaitAttack = 0;

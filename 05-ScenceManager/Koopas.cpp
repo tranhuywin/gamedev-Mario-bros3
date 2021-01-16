@@ -141,9 +141,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 
 				if (state == KOOPAS_STATE_ROTATORY  && nx != 0) {
-					brick->IsBreaked = true;
-					vx = -vx;
-					
+					brick->IsBreaked = true;					
 				}
 			}
 			else if (dynamic_cast<Ground*>(e->obj)) {

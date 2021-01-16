@@ -17,36 +17,36 @@ void Brothers::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Boomerang1->CatchBoomerang(this->x, this->y);
 	}
 	if(WaitAttackBoom2)
-		Boomerang2->Attack(this->x + 10.0f, this->y);
+		Boomerang2->Attack(this->x, this->y);
 	else {
 		Boomerang2->CatchBoomerang(this->x, this->y);
 	}
 	/*Boomerang1->Update(dt);
 	Boomerang2->Update(dt);*/
-	if (Boomerang1->CatchDone && Boomerang2->CatchDone) {
+	if (Boomerang1->CatchDone /*&& Boomerang2->CatchDone*/) {
 		StartWaitAttackBoom1();
+		//StartWaitAttackBoom2();
+	}
+	if (Boomerang2->CatchDone) {
 		StartWaitAttackBoom2();
 	}
-	/*if (Boomerang2->CatchDone) {
-		StartWaitAttackBoom2();
-	}*/
-	if (WaitAttackBoom1 && GetTickCount64() - WaitAttackBoom1_start > 1500)
+	if (WaitAttackBoom1 && GetTickCount64() - WaitAttackBoom1_start > BOOMERANG_1_TIME_WAIT_ATTACK)
 	{
 		WaitAttackBoom1 = 0;
 		WaitAttackBoom1_start = 0;
 	}
-	if (WaitAttackBoom2 && GetTickCount64() - WaitAttackBoom2_start > 1500)
+	if (WaitAttackBoom2 && GetTickCount64() - WaitAttackBoom2_start > BOOMERANG_2_TIME_WAIT_ATTACK)
 	{
 		WaitAttackBoom2 = 0;
 		WaitAttackBoom2_start = 0;
 	}
 	CGameObject::Update(dt);
 	
-	vy += 0.001f * dt;
-	if (x > 80)
-		vx = -0.001f *dt;
-	if(x < 15.0)
-		vx = 0.001f * dt;
+	vy += BROTHER_SPEED_VX * dt;
+	if (x > BROTHER_X_MAX)
+		vx = -BROTHER_SPEED_VX *dt;
+	if(x < BROTHER_X_MIN)
+		vx = BROTHER_SPEED_VX * dt;
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -99,7 +99,7 @@ void Brothers::SetState(int state)
 	{
 		case BROTHER_STATE_ATTACK:
 		{
-			this->vx = 0.015f;
+			this->vx = BROTHER_SPEED_VX_START;
 		}
 		break;
 	}
