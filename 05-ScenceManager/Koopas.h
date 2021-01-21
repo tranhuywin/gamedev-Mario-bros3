@@ -51,6 +51,7 @@ class CKoopas : public CGameObject
 	virtual void Render();
 	bool ShakingLeft;
 	int Sleep, PrepareWakeUp;
+	float XLeftBrick = 0, XRightBrick = 0;
 	DWORD Sleep_start, PrepareWakeUp_start;
 public:
 	bool TailAttack, IsCatching;

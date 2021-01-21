@@ -17,7 +17,7 @@ class Brick : public CGameObject
 	LPGAMEOBJECT items;
 public:
 	int IdItemOfBrick = -1;
-	int CountCollBrickMulMoney = 10;
+	int CountCollBrickMulMoney = 5;
 	bool IsBreaked, SwitchOff, StoreItemQBrick;
 	QuestionBrick* QBick = NULL;
 	Brick(LPGAMEOBJECT item);

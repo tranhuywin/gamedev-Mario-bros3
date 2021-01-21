@@ -800,6 +800,8 @@ bend over left Big
 1	1808	128	2
 #tube
 7	1936	96	10	64	-1
+##KOOPA Troopas
+3	1051	78	7	0
 # ---- fire bullet	----
 4	-100	0	4
 ###### flying wood  ######

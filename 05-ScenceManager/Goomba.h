@@ -42,7 +42,7 @@ class CGoomba : public CGameObject
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
-	void StartDie() { Die = 1; Die_start = GetTickCount(); }
+	void StartDie() { Die = 1; Die_start = GetTickCount64(); }
 
 public: 	
 	Effect* effect = NULL;

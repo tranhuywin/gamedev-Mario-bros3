@@ -68,11 +68,11 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (effect != NULL)
 		effect->Update(dt);
-	/*if (IdItem == ITEM_MONEY_IDLE && !OfBrick)			//640	48
+	/*if (IdItem == ITEM_MONEY_IDLE && !OfBrick)			
 		Active = true;*/
-	/*if (BrickBreak != NULL)
+	if (BrickBreak != NULL)
 		if (IdItem == ITEM_MONEY_IDLE && BrickBreak->IsBreaked)
-			Active = false;*/
+			Active = false;
 	
 	//x += dx;
 	//y += dy;
@@ -148,8 +148,11 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x += min_tx * dx + nx * 0.3f;
 		y += min_ty * dy + ny * 0.3f;
 
+
 		if (nx != 0)
 			vx = 0;
+		//if (nx != 0 && ny != 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
+		//	vx = -vx;
 		if (ny != 0)
 			vy = 0;
 		for (UINT i = 0; i < coEventsResultPro.size(); i++)
@@ -173,16 +176,23 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	CalCollisions(coObjects, coEventsResult);
 	int sizeCo = coEventsResult.size();
-	if(!CollTail)
-		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE /*&& !BrickBreak->IsBreaked Note: oke*/)
+	if (!CollTail)
+	{
+		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && !BrickBreak->IsBreaked)
 			Active = true;
+
+		//if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE /*&& !BrickBreak->IsBreaked*/)
+		//	Active = true;
+	}
+
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{
 		if(nx == 1)
 			vx = ITEM_MUSHROOM_VX * dt;
 		else
 			vx = -ITEM_MUSHROOM_VX * dt;
-		vy += ITEM_GRAVITY / 6 * dt;
+
+		vy = ITEM_MUSHROOM_GRANVITY * dt;
 	}
 	if (sizeCo != 0)
 	{
@@ -324,6 +334,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				//OfBrick = true;
 				Brick* brick = dynamic_cast<Brick*>(e);
 				brick->IdItemOfBrick = IdItem;		
+				BrickBreak = brick;
 			}
 
 		}

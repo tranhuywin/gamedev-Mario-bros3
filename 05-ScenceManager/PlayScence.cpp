@@ -64,7 +64,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 
 #define CAMERA_ON_PLATFORM 64.0f
 #define CAMERA_MOVE_VX		0.04f
-#define CAMERA_X_START_MAP	50.0f
+#define CAMERA_X_START_MAP	48.0f
+#define CAMERA_Y_START_MAP 32.0f
 #define CAMERA_X_WORLD_1_1	95.0f
 #define CAMERA_Y_WORLD_1_1	8.0f
 #define CAMERA_Y_WORLD_4_1  6.0f
@@ -161,6 +162,13 @@ void CPlayScene::_ParseSection_TITLE_MAP(string line)
 	int num_col_on_textture = atoi(tokens[4].c_str());
 	int tileset_width = atoi(tokens[5].c_str());
 	int tileset_height = atoi(tokens[6].c_str());
+
+	gridObjIdle = new CGrid();
+	gridObjIdle->Resize();
+
+	gridObjMove = new CGrid();
+	gridObjMove->Resize();
+
 	this->tileMap = new TileMap(ID, filePath_texture.c_str(), filePath_data.c_str(), num_row_on_texture, num_col_on_textture, tileset_width, tileset_height);
 }
 void CPlayScene::_ParseSection_EFFECT(string line) {
@@ -214,11 +222,11 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 				player->SetLevel(MARIO_LEVEL_MINI);
 			DebugOut(L"[INFO] Player object created!\n");
 		} break;
-		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
-		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
-		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
-		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
-		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); break;
+		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); listObjIdle.push_back(obj); break;
+		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); listObjMove.push_back(obj); break;
+		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); listObjIdle.push_back(obj); break;
+		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); listObjIdle.push_back(obj); break;
+		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); listObjMove.push_back(obj); break;
 		case OBJECT_TYPE_BROTHER: 
 		{
 			int IDType = atoi(tokens[4].c_str());
@@ -228,6 +236,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			BoomerangOfBrother* Boomerang2 = new BoomerangOfBrother(AniWeapon);
 			objects.push_back(Boomerang2);
 			obj = new Brothers(IDType, Boomerang1, Boomerang2);
+			listObjMove.push_back(obj);
 		}break;
 		case OBJECT_TYPE_TREE:
 		{
@@ -239,35 +248,46 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			float Height = atoi(tokens[4].c_str());
 			int IDAni = atoi(tokens[5].c_str());
 			obj = new Tube(Height, IDAni);
+			listObjIdle.push_back(obj);
 		} break;
 		case OBJECT_TYPE_LINE: 
 		{
 			float Width = atoi(tokens[4].c_str());
 			obj = new Line(Width);
+			listObjIdle.push_back(obj);
 		}break;
 		case OBJECT_TYPE_GROUND: 
 		{
 			float Width = atoi(tokens[4].c_str());
 			obj = new Ground(Width);
+			listObjIdle.push_back(obj);
 		}break;
 		case OBJECT_TYPE_KOOPAS: 
 		{
 			int TypeKoopas = atoi(tokens[4].c_str());
 			obj = new CKoopas(TypeKoopas);
+			listObjMove.push_back(obj);
 		}break;
 		case OBJECT_TYPE_ITEM:
 		{
 			int IdItem = atoi(tokens[4].c_str());
-			if(IdItem != ITEM_SWITCH)
+			if (IdItem != ITEM_SWITCH)
+			{
 				objItem = new Items(IdItem, SpriteEffectStart);
-			else {
-				obj = new Items(IdItem, SpriteEffectStart);
+				//listObjIdle.push_back(objItem);
 			}
+			else
+			{
+				obj = new Items(IdItem, SpriteEffectStart);
+				listObjIdle.push_back(obj);
+			}
+			
 		}break;
 		case OBJECT_TYPE_GOOMBA:
 		{
 			int TypeGoomba = atoi(tokens[4].c_str());
 			obj = new CGoomba(TypeGoomba);
+			listObjMove.push_back(obj);
 		}break;
 		case OBJECT_TYPE_FIRE_PIRANHA_PLANT:
 		{
@@ -279,6 +299,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 			objects.push_back(objBullet);
 			obj = new VenusFireTrap(player, objBullet, TypeVenusFireTrap);
+			listObjIdle.push_back(obj);
+			listObjMove.push_back(objBullet);		//chua xet bullet
 		}break;
 		case OBJECT_TYPE_PORTAL:
 		{
@@ -293,7 +315,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		}
 	if (obj != NULL)
 	{
-		// General object setup
 		obj->SetPosition(x, y);
 		//obj->SetXYStartLive(x, y);
 		LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
@@ -311,7 +332,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		objectsItem.push_back(objItem);
 	}
 		
-
 }
 
 void CPlayScene::Load()
@@ -390,6 +410,32 @@ void CPlayScene::Update(DWORD dt)
 	vector<LPGAMEOBJECT> coObjects;
 	vector<LPGAMEOBJECT> coObjectsItem;
 
+	//gridObjIdle->MakeObjOutOfCam(listMovingWood);
+	gridObjMove->MakeObjOutOfCam(listObjMove);
+
+	//insert obj
+	InsertObjToGrid();
+	
+	for (int i = 0; i < objects.size(); i++)
+	{
+		coObjects.push_back(objects[i]);
+	}
+
+	for (int i = 1; i < objects.size(); i++)
+	{
+		objects[i]->Update(dt, &coObjects);
+	}
+	//item
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		coObjectsItem.push_back(objects[i]);
+	}
+	coObjectsItem.push_back(player);
+	for (size_t i = 0; i < objectsItem.size(); i++)
+	{
+		objectsItem[i]->Update(dt, &coObjectsItem);
+	}
+	/*
 	//Push nhung Obj trong man hinh vao coObjects de xet va cham 
 	for (size_t i = 1; i < objects.size(); i++)
 	{
@@ -424,8 +470,9 @@ void CPlayScene::Update(DWORD dt)
 		}
 		else if (CheckObjInScreen(objects[i]))
 			objects[i]->Update(dt, &coObjects);
-	}
+	}*/
 
+	player->Update(dt, &coObjects);
 	if (player == NULL) return; 
 
 	if (player->x < 0)
@@ -449,31 +496,28 @@ void CPlayScene::Update(DWORD dt)
 	float XStatusBar = CGame::GetInstance()->GetCamPosX() + STATUS_BAR_MARGIN_LEFT;
 	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - STATUS_BAR_MARGIN_TOP;
 	statusBar->Update(dt, XStatusBar, YStatusBar);
+	//
+	gridObjMove->ResetGrid(listObjMove);
+	//gridObjIdle->ResetGrid(listMovingWood);
 }
 
 void CPlayScene::Render()
 {
 	tileMap->Draw();
-	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START)
-	{
-		CSprites::GetInstance()->Get(80003)->Draw(-50.0f, 0);		// TODO: Add sprite
-		CSprites::GetInstance()->Get(80003)->Draw(224.0f, 0);
-	}
-	for (int i = 1; i < objects.size(); i++)
-	{
-		LPGAMEOBJECT e = objects[i];
-		if (dynamic_cast<Brick*>(e)) {
-			objects[i]->Render();
-		}
-		else if (CheckObjInScreen(objects[i]))
-		{
-			objects[i]->Render();
-		}
-	}
+
 	for (size_t i = 0; i < objectsItem.size(); i++)
 	{
 		objectsItem[i]->Render();
 	}
+	for (int i = 1; i < objects.size(); i++)
+	{
+		objects[i]->Render();
+	}
+	/*for (int i = objects.size() - 1; i >= 0; i--)
+		objects[i]->Render();
+	for (int i = 0; i < listObjIdle.size(); i++)
+		listObjIdle[i]->Render();*/
+
 	player->Render();
 			
 	if (dynamic_cast<Tube*>(objects[0])) {
@@ -485,9 +529,30 @@ void CPlayScene::Render()
 	statusBar->Render();
 }
 
-/*
-	Unload current scene
-*/
+void CPlayScene::InsertObjToGrid()
+{
+	objects.clear();
+	listAllObjIdle.clear();
+	listAllObjMove.clear();
+	///gridObjIdle->GetGrid(listObjIdle);
+	for (UINT i = 0; i < listObjIdle.size(); i++)
+	{
+		objects.push_back(listObjIdle[i]);
+	}
+
+	gridObjIdle->GetGrid(listAllObjIdle);
+
+	for (UINT i = 0; i < listAllObjIdle.size(); i++)
+	{
+		objects.push_back(listAllObjIdle[i]);
+	}
+
+	gridObjMove->GetGrid(listAllObjMove);
+	for (UINT i = 0; i < listAllObjMove.size(); i++)
+	{
+		objects.push_back(listAllObjMove[i]);
+	}
+}
 void CPlayScene::Unload()
 {
 	for (int i = 0; i < objects.size(); i++)
@@ -496,7 +561,6 @@ void CPlayScene::Unload()
 	for (int i = 0; i < objectsItem.size(); i++)
 		delete objectsItem[i];
 	objectsItem.clear();
-	//if(CGame::GetInstance()->Getcurrent_scene() == 4)
 	
 	player = NULL;
 	
@@ -545,6 +609,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 		if (CurSecene == SCENCE_START)
 		{
 			CamX = -CAMERA_X_START_MAP;
+			CamY = -CAMERA_Y_START_MAP;
 		}
 		else if (CurSecene == SCENCE_WORD_MAP_1_1)
 		{
@@ -560,7 +625,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 	}
 	else
 	{
-		CamX += CAMERA_MOVE_VX * dt;
+		//CamX += CAMERA_MOVE_VX * dt;
 		if (CamX > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
 			CamX = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
 	}
@@ -612,7 +677,10 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetPosition(1970, 74);
 		((CPlayScene*)scence)->CamX = 1800;
 		break;
-
+	case DIK_8:
+		mario->SetPosition(988, 130);
+		((CPlayScene*)scence)->CamX = 810;
+		break;
 	}
 }
 

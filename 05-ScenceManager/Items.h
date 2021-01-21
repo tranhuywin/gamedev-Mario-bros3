@@ -33,6 +33,7 @@
 #define ITEM_SWITCH_VY							0.001f
 #define ITEM_MUSHROOM_VY_UP						0.001f
 #define ITEM_MUSHROOM_VX						0.0025f
+#define ITEM_MUSHROOM_GRANVITY					0.01f
 #define ITEM_SWITCH_YSTART_DISTANCE_Y			14.0f
 #define ITEM_STATE_LISTEN			100
 #define ITEM_STATE_ATIVE			200
@@ -53,7 +54,7 @@ public:
 	Effect* effect = NULL;
 	Brick* BrickBreak = NULL;
 	int IdItem;
-	int CountColl = 10;
+	int CountColl = 5;
 	int AniEffect;
 	int SpriteEffectStart;
 	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail, OfBrick;

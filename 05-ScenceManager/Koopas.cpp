@@ -45,14 +45,14 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				x += 3.0f;
 			ShakingLeft = !ShakingLeft;
 		}
-		if (GetTickCount() - Sleep_start > KOOPAS_TIME_SLEEP && state == KOOPAS_STATE_SHELL)
+		if (GetTickCount64() - Sleep_start > KOOPAS_TIME_SLEEP && state == KOOPAS_STATE_SHELL)
 		{
 			Sleep_start = 0;
 			Sleep = 0;
 			state = KOOPAS_STATE_PREPARE_WAKE_UP;
 			StartPrepareWakeUp();
 		}
-		if (GetTickCount() - PrepareWakeUp_start > KOOPAS_TIME_WAKE_UP && state == KOOPAS_STATE_PREPARE_WAKE_UP)
+		if (GetTickCount64() - PrepareWakeUp_start > KOOPAS_TIME_WAKE_UP && state == KOOPAS_STATE_PREPARE_WAKE_UP)
 		{
 			PrepareWakeUp_start = 0;
 			PrepareWakeUp = 0;
@@ -94,10 +94,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			{
 				Line* line = dynamic_cast<Line*>(e->obj);
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+
 					float XLeftLine = line->GetX_Left();
 					if (vx < 0 && x < XLeftLine && state == KOOPAS_STATE_WALKING) {
 						x = XLeftLine; vx = -vx;
 					}
+
 					float XRightLine = line->GetX_Right();
 					if (vx > 0 && x > XRightLine - KOOPAS_BBOX_WIDTH && state == KOOPAS_STATE_WALKING) {
 						x = XRightLine - KOOPAS_BBOX_WIDTH; vx = -vx;
@@ -119,21 +121,24 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			{
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
-					float XLeftBrick = brick->x;
+					if (brick->x < XLeftBrick)
+					//if(this->vx < 0 && brick->x < XLeftBrick)
+						XLeftBrick = brick->x;
 					if (vx < 0 && x < XLeftBrick - KOOPAS_BBOX_WIDTH / 2 && state == KOOPAS_STATE_WALKING) {
-						x = XLeftBrick; vx = -vx;
+						x = XLeftBrick;
+						vx = -vx;
 					}
-					float XRightBrick = brick->x + BRICK_BBOX_WIDTH;
+					if (XRightBrick < brick->x + BRICK_BBOX_WIDTH)
+					//if (this->vx > 0 && XRightBrick < brick->x + BRICK_BBOX_WIDTH)
+						XRightBrick = brick->x + BRICK_BBOX_WIDTH;
 					if (vx > 0 && x > XRightBrick - KOOPAS_BBOX_WIDTH / 3 && state == KOOPAS_STATE_WALKING) {
-						x = XRightBrick - KOOPAS_BBOX_WIDTH; vx = -vx;
+						x = XRightBrick - KOOPAS_BBOX_WIDTH; 
+						vx = -vx;
 					}
 					if (e->ny > 0)
 					{
-						if (e->ny > 0)		// o duoi len
-						{
-							vy = vyLine;
-							y += dy;
-						}
+						vy = vyLine;
+						y += dy;
 					}
 				}
 				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {

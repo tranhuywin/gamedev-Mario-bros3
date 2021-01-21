@@ -1,20 +1,27 @@
 ﻿#pragma once
-
-#include <vector>
 #include "GameObject.h"
-class Grid
+#include "Game.h"
+
+#define CELL_WIDTH 250
+#define CELL_HEIGHT 250
+
+#define MAP_WIDTH	2816
+#define MAP_HEIGHT  1000
+
+
+class CGrid
 {
-	vector<LPGAMEOBJECT> objects;
-	float XGrid, YGrid;
-	float Height, Width;
+	vector<vector<vector<LPGAMEOBJECT>>> listCells;
+
 public:
-	Grid(float xGrid, float yGrid, float Height, float Width);
-	~Grid();
-
-	void Add(LPGAMEOBJECT object);
-	LPGAMEOBJECT Move(LPGAMEOBJECT object); // x, y là toạ độ mới của unit, vì vậy lúc này x, y của unit lưu vị trí cũ
-	void Get(D3DXVECTOR3 camPosition, vector<LPGAMEOBJECT>*  listUnits); // lấy tất cả các Unit* nằm trong vùng viewport để Update và Render
-
-	void Out();
+	CGrid(int cellWidth = CELL_WIDTH, int cellHeight = CELL_HEIGHT);
+	~CGrid();
+	void Resize();
+	void ClearGrid(int numsRow, int numsCol);
+	void ResetGrid(vector<LPGAMEOBJECT> list);
+	void renderGrid();
+	//void PushGrid(vector<LPGAMEOBJECT> list);
+	void GetGrid(vector<LPGAMEOBJECT>& list);
+	//void PushGridStart(LPGAMEOBJECT obj, int row, int col);
+	void MakeObjOutOfCam(vector<LPGAMEOBJECT>& list);
 };
-

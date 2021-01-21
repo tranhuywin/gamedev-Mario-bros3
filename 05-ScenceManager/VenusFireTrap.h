@@ -49,8 +49,8 @@ class VenusFireTrap : public CGameObject
 	int ani;
 public:
 	VenusFireTrap(CMario *mario, BulletPiranhaPlant* bullet, int TypeVenusFireTrap);
-	void StartAttack() { Attack = 1; Attack_start = GetTickCount(); }
-	void StartWaitAttack() { WaitAttack = 1; WaitAttack_start = GetTickCount(); }
+	void StartAttack() { Attack = 1; Attack_start = GetTickCount64(); }
+	void StartWaitAttack() { WaitAttack = 1; WaitAttack_start = GetTickCount64(); }
 	void SetState(int state);
 	void CheckPositionMarioToAttack();
 };

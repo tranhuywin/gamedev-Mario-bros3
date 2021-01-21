@@ -23,6 +23,6 @@ public:
 	virtual void Render();
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	void attack(float x, float y, bool isRight);
-	void StartExplode() {	Explode = 1; Explode_start = GetTickCount();}
+	void StartExplode() {	Explode = 1; Explode_start = GetTickCount64();}
 };
 

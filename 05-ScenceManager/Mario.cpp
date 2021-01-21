@@ -24,6 +24,17 @@ CMario::CMario(float x, float y) : CGameObject()
 {
 	ani = -1;
 	LastAni = -1;
+	NoCardStartGame = CGame::GetInstance()->GetCard_1();
+	if (CGame::GetInstance()->GetCard_1() != -1) {
+		NoCardStartGame = 1;
+	}
+	else if (CGame::GetInstance()->GetCard_2() != -1)
+		NoCardStartGame = 2;
+	else if (CGame::GetInstance()->GetCard_3() != -1)
+		NoCardStartGame = 3;
+	else
+		NoCardStartGame = 0;
+
 	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1)
 		level = MARIO_LEVEL_RACCOON;
 	else if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
@@ -53,7 +64,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		this->y = Y_RETURN_WORLD_1;
 		CGame::GetInstance()->SetReturnWorld(false);
 	}
-	//
+	if (NoCardStartGame == 0 && CGame::GetInstance()->GetCard_1() != -1)
+		SetState(MARIO_STATE_WALKING_RIGHT);
+	if (NoCardStartGame == 1 && CGame::GetInstance()->GetCard_2() != -1)
+		SetState(MARIO_STATE_WALKING_RIGHT);
+	if (NoCardStartGame == 2 && CGame::GetInstance()->GetCard_3() != -1)
+		SetState(MARIO_STATE_WALKING_RIGHT);
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
 	{
@@ -323,7 +339,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						if (this->nx == -1)
 							Shell->vx = -KOOPAS_ROTATORY_SPEED;
 						KickShell = true;
-						Kick_start = GetTickCount();
+						Kick_start = GetTickCount64();
 					}
 					else if (e->nx != 0 && Iskilling)
 					{

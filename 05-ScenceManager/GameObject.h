@@ -60,6 +60,7 @@ public:
 
 	int state;
 	bool BBox = true;
+	bool checkOnCam;
 	DWORD dt; 
 
 	LPANIMATION_SET animation_set;

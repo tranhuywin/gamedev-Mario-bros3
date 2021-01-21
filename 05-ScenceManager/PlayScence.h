@@ -10,7 +10,7 @@
 #include "Items.h"
 #include "Map.h"
 #include "StatusBar.h"
-
+#include "Grid.h"
 
 class CPlayScene: public CScene
 {
@@ -18,7 +18,15 @@ protected:
 	int SpriteEffectStart;
 	TileMap *tileMap;
 	CMario* player;
-	
+	//Grid
+	CGrid* gridObjMove;
+	CGrid* gridObjIdle;
+	vector<LPGAMEOBJECT> listAllObjMove;
+	vector<LPGAMEOBJECT> listAllObjIdle;
+	vector<LPGAMEOBJECT> listObjIdle;	//list obj dung yen
+	vector<LPGAMEOBJECT> listObjMove;
+	//vector<LPGAMEOBJECT> listMovingWood;
+
 	//MarioChooseMap* playerChoose;
 	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
@@ -39,9 +47,8 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-	//virtual void LoadWorld();
-	//void UnLoadWorld();
 	void UpdateCammera(DWORD dt);
+	void InsertObjToGrid();
 	CMario * GetPlayer() { return player; } 
 	//friend class CPlayScenceKeyHandler;
 };
