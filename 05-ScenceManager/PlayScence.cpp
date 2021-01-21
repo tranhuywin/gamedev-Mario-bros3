@@ -299,8 +299,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 			objects.push_back(objBullet);
 			obj = new VenusFireTrap(player, objBullet, TypeVenusFireTrap);
-			listObjIdle.push_back(obj);
-			listObjMove.push_back(objBullet);		//chua xet bullet
+			listObjMove.push_back(obj);
+			listObjMove.push_back(objBullet);
 		}break;
 		case OBJECT_TYPE_PORTAL:
 		{
@@ -308,6 +308,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			float b = atof(tokens[5].c_str());
 			int scene_id = atoi(tokens[6].c_str());
 			obj = new CPortal(x, y, r, b, scene_id);
+			listObjMove.push_back(obj);
 		}break;
 		default:
 			DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
@@ -421,7 +422,7 @@ void CPlayScene::Update(DWORD dt)
 		coObjects.push_back(objects[i]);
 	}
 
-	for (int i = 1; i < objects.size(); i++)
+	for (int i = 0; i < objects.size(); i++)
 	{
 		objects[i]->Update(dt, &coObjects);
 	}
@@ -509,14 +510,12 @@ void CPlayScene::Render()
 	{
 		objectsItem[i]->Render();
 	}
-	for (int i = 1; i < objects.size(); i++)
+	for (int i = 0; i < objects.size(); i++)
 	{
 		objects[i]->Render();
 	}
-	/*for (int i = objects.size() - 1; i >= 0; i--)
-		objects[i]->Render();
 	for (int i = 0; i < listObjIdle.size(); i++)
-		listObjIdle[i]->Render();*/
+		listObjIdle[i]->Render();
 
 	player->Render();
 			
@@ -561,9 +560,15 @@ void CPlayScene::Unload()
 	for (int i = 0; i < objectsItem.size(); i++)
 		delete objectsItem[i];
 	objectsItem.clear();
+
+	listObjIdle.clear();
+	listObjMove.clear();
 	
 	player = NULL;
-	
+	/*delete gridObjMove;
+	gridObjMove = NULL;
+	delete gridObjIdle;
+	gridObjIdle = NULL;*/
 	delete tileMap;
 	tileMap = NULL;
 	delete statusBar;

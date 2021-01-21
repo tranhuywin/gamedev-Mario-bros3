@@ -60,6 +60,10 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 
 void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (!(CGame::GetInstance()->GetLevel() == MARIO_LEVEL_BIG) && IdItem == ITEM_ANI_TREE_LEAF)
+	{
+		IdItem = ITEM_ANI_MUSHROOM_RED;
+	}
 	if (!SetPosStart)
 	{
 		this->X_Start = this->x;
@@ -159,8 +163,16 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			LPCOLLISIONEVENT e = coEventsResultPro[i];
 			if (dynamic_cast<CMario*>(e->obj)) {
-				vx = vxPre;
-				x += dx;
+				if (nx != 0) {
+					vx = vxPre;
+					x += dx;
+				}
+				
+				if (ny != 0)
+				{
+					vy = vyPre;
+					y += dy;
+				}
 			}
 			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj)) {
 				vx = vxPre;

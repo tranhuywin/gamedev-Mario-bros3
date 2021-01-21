@@ -59,6 +59,8 @@ CMario::CMario(float x, float y) : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if(CGame::GetInstance()->GetLevel() != -1)
+		CGame::GetInstance()->SetLevel(level);
 	if (CGame::GetInstance()->GetReturnWorld() && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)) {
 		this->x = X_RETURN_WORLD_1;
 		this->y = Y_RETURN_WORLD_1;
@@ -419,6 +421,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						Shell->vy -= KOOPAS_DIE_DEFLECT_SPEED;
 					}
 				}
+				else if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_RED) {
+					if (e->ny < 0)
+					{
+						Shell->TypeKoopas = KOOPAS_TYPE_KOOPA_TROOPA_RED;
+						this->vy = -MARIO_JUMP_DEFLECT_SPEED * 2;
+					}
+					
+				}
 
 			}
 			else if (dynamic_cast<Brick*>(e->obj)) {
@@ -431,6 +441,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						
 						if (brick->CountCollBrickMulMoney >0 && brick->IdItemOfBrick == ITEM_MULTIPLE_MONEY) {
 							brick->CountCollBrickMulMoney--;
+
+							brick->QBick->SetState(BRICK_STATE_QUESTION_ON_UP);
+							brick->QBick->YCollition = brick->QBick->y;
 						}
 						else {
 							brick->BBox = false;

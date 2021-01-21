@@ -30,6 +30,7 @@ void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 		xBreak = this->x;
 		yBreak = this->y;
 	}
+
 	if (SwitchOff)
 	{
 		BBox = false;
@@ -44,11 +45,13 @@ void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 		for (UINT i = 0; i < sizeCo; i++)
 		{
 			LPGAMEOBJECT e = coEventsResult[i];
-			if (dynamic_cast<QuestionBrick*>(e)) // if e->obj is Goomba 
+			if (dynamic_cast<QuestionBrick*>(e))
 			{
-				QuestionBrick* Brick = dynamic_cast<QuestionBrick*>(e);
+				QuestionBrick* brick = dynamic_cast<QuestionBrick*>(e);
 				StoreItemQBrick = true;
-				QBick = Brick;
+				QBick = brick;
+				if (!this->IsBreaked)
+					this->y = brick->y;
 			}
 		}
 	}

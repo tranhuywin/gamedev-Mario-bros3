@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#define BBOX_TREE 16
 class Tree : public CGameObject
 {
 	int IdObj;

@@ -49,6 +49,7 @@ class CGame
 	int Money = 0;
 	int Life = 4;
 	int Time = 900;
+	int Level = -1;
 	int Card_1 = -1, Card_2 =-1, Card_3 = -1;
 	bool ReturnWorld;
 	unordered_map<int, LPSCENE> scenes;
@@ -78,6 +79,8 @@ public:
 	void SetCard_1(int Card_1) { this->Card_1 = Card_1; };
 	void SetCard_2(int Card_2) { this->Card_2 = Card_2; };
 	void SetCard_3(int Card_3) { this->Card_3 = Card_3; };
+	int GetLevel() { return Level; };
+	void SetLevel(int level) { this->Level = level; };
 	int Getcurrent_scene() { return current_scene; }
 	int IsKeyDown(int KeyCode);
 	int IsKeyUp(int KeyCode);

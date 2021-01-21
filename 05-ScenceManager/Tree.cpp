@@ -13,8 +13,8 @@ void Tree::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	left = x;
 	top = y;
-	right = x + 16;
-	bottom = y + 16;
+	right = x + BBOX_TREE;
+	bottom = y + BBOX_TREE;
 }
 
 Tree::Tree(int IdObj)
