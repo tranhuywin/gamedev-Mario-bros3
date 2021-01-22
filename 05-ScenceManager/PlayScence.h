@@ -19,19 +19,15 @@ protected:
 	TileMap *tileMap;
 	CMario* player;
 	//Grid
-	CGrid* gridObjMove;
-	CGrid* gridObjIdle;
-	vector<LPGAMEOBJECT> listAllObjMove;
-	vector<LPGAMEOBJECT> listAllObjIdle;
-	vector<LPGAMEOBJECT> listObjIdle;	//list obj dung yen
-	vector<LPGAMEOBJECT> listObjMove;
-	//vector<LPGAMEOBJECT> listMovingWood;
+	Grid* grid;
+	vector <LPGAMEOBJECT> listAllObject;
 
 	//MarioChooseMap* playerChoose;
 	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
 	vector<LPGAMEOBJECT> objectsItem;
 	vector<LPGAMEOBJECT> objects;
+
 	void _ParseSection_TEXTURES(string line);
 	void _ParseSection_SPRITES(string line);
 	void _ParseSection_ANIMATIONS(string line);
@@ -40,6 +36,7 @@ protected:
 	void _ParseSection_TITLE_MAP(string line);
 	void _ParseSection_EFFECT(string line);
 	void _ParseSection_STATUS_BAR(string line);
+	void _ParseSection_GRID(string line);
 public: 
 	float CamX = 0, CamY = 0;
 	CPlayScene(int id, LPCWSTR filePath);
@@ -48,7 +45,6 @@ public:
 	virtual void Render();
 	virtual void Unload();
 	void UpdateCammera(DWORD dt);
-	void InsertObjToGrid();
 	CMario * GetPlayer() { return player; } 
 	//friend class CPlayScenceKeyHandler;
 };

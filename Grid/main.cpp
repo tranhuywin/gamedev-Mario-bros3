@@ -1,0 +1,117 @@
+//#include "main.h"
+#include <vector>
+#include <iostream>
+#include<fstream>
+
+#define GRID_WIDTH	180
+#define GRID_HEIGHT  150
+
+#define OBJECT_TYPE_MARIO				0
+#define OBJECT_TYPE_BRICK				1
+#define OBJECT_TYPE_GOOMBA				2
+#define OBJECT_TYPE_KOOPAS				3
+#define OBJECT_TYPE_FIRE_BULLET			4
+#define OBJECT_TYPE_GROUND				5
+#define OBJECT_TYPE_LINE				6
+#define OBJECT_TYPE_TUBE				7
+#define OBJECT_TYPE_QUESTION_BRICK		8
+#define OBJECT_TYPE_WOODEN_BRICK		9
+#define OBJECT_TYPE_FIRE_PIRANHA_PLANT	10
+#define OBJECT_TYPE_ITEM				11
+#define OBJECT_TYPE_TREE				12
+#define OBJECT_TYPE_CARD				13
+#define OBJECT_TYPE_FLYING_WOOD			14
+#define OBJECT_TYPE_BROTHER				15
+
+#define OBJECT_TYPE_PORTAL				50
+
+#define SCENE_SECTION_UNKNOWN			-1
+#define SCENE_SECTION_TEXTURES			2
+#define SCENE_SECTION_SPRITES			3
+#define SCENE_SECTION_ANIMATIONS		4
+#define SCENE_SECTION_ANIMATION_SETS	5
+#define SCENE_SECTION_OBJECTS			6
+#define SCENE_SECTION_TITLE_MAP			7
+#define SCENE_SECTION_EFFECT			8
+#define SCENE_SECTION_STATUS_BAR		9
+
+using namespace std;
+vector<string> split(string line, string delimeter = "\t")
+{
+	vector<string> tokens;
+	size_t last = 0; size_t next = 0;
+	while ((next = line.find(delimeter, last)) != string::npos)
+	{
+		tokens.push_back(line.substr(last, next - last));
+		last = next + 1;
+	}
+	tokens.push_back(line.substr(last));
+
+	return tokens;
+}
+
+int main() {
+	string sceneFilePath = "C:\\Users\\Win\\Desktop\\New folder\\scene1-4End.txt";
+	string OutPut = "C:\\Users\\Win\\Desktop\\New folder\\Grid_scene1-4End.txt";
+	int id = -1;
+
+	ifstream fs;
+	ofstream ofs;
+	ofs.open(OutPut, ios::out);
+	fs.open(sceneFilePath, ios::in);
+
+	int section = -1;
+
+	if (fs.fail())
+	{
+		cout << "Load file scene fail";
+		return 0;
+	}
+	else {
+		char str[1024];
+		
+		while (fs.getline(str, 1024))
+		{
+			string line(str);
+			if (line == "") continue;
+			if (line[0] == '#')
+			{
+				//id = 0;
+				//ofs << line;
+				continue;
+			}
+			else
+			{
+				vector<string> tokens = split(line);
+				int Left, Top, Right, Bottom;
+				id++;
+				ofs << id << "\t";
+				//ofs << line << "\t";
+				Left = atoi(tokens[1].c_str());
+				Top = atoi(tokens[2].c_str());
+				int BBoxWidth = 16;
+				int BBoxHeight = 16;
+
+				if (tokens.size() > 4)
+					BBoxWidth = atoi(tokens[4].c_str());
+
+				Right = Left + BBoxWidth;
+				Bottom = Top + BBoxHeight;
+
+				//Done export file + BBOX
+				int ColStart = int(Left / GRID_WIDTH);
+				int RowStart = int(Top / GRID_HEIGHT);
+				int ColEnd = ceil(Right / GRID_WIDTH);
+				int RowEnd = ceil(Bottom / GRID_HEIGHT);
+
+				ofs << ColStart << "\t" << RowStart << "\t" << ColEnd << "\t" << RowEnd << "\t";
+				
+			}
+			ofs << "\n";
+		}
+	}
+	
+	fs.close();
+	ofs.close();
+	return 0;
+}

@@ -40,6 +40,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define SCENE_SECTION_TITLE_MAP			7
 #define SCENE_SECTION_EFFECT			8
 #define SCENE_SECTION_STATUS_BAR		9
+#define SCENE_SECTION_GRID				10
 
 #define OBJECT_TYPE_MARIO				0
 #define OBJECT_TYPE_BRICK				1
@@ -163,11 +164,11 @@ void CPlayScene::_ParseSection_TITLE_MAP(string line)
 	int tileset_width = atoi(tokens[5].c_str());
 	int tileset_height = atoi(tokens[6].c_str());
 
-	gridObjIdle = new CGrid();
-	gridObjIdle->Resize();
+	//gridObjIdle = new Grid();
+	//gridObjIdle->Resize();
 
-	gridObjMove = new CGrid();
-	gridObjMove->Resize();
+	//gridObjMove = new Grid();
+	//gridObjMove->Resize();
 
 	this->tileMap = new TileMap(ID, filePath_texture.c_str(), filePath_data.c_str(), num_row_on_texture, num_col_on_textture, tileset_width, tileset_height);
 }
@@ -186,6 +187,11 @@ void CPlayScene::_ParseSection_STATUS_BAR(string line) {
 	int SpritePowerState = atoi(tokens[3].c_str());
 	int SpriteCard = atoi(tokens[4].c_str());
 	statusBar = new StatusBar(player, SpriteStatusBar, SpriteCardBar, SpriteNumber0, SpritePowerState, SpriteCard);
+}
+void CPlayScene::_ParseSection_GRID(string line) {
+	vector<string> tokens = split(line);
+	wstring filePath = ToWSTR(tokens[0]);
+	grid = new Grid(filePath.c_str());
 }
 /*
 	Parse a line in section [OBJECTS] 
@@ -222,21 +228,23 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 				player->SetLevel(MARIO_LEVEL_MINI);
 			DebugOut(L"[INFO] Player object created!\n");
 		} break;
-		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); listObjIdle.push_back(obj); break;
-		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); listObjMove.push_back(obj); break;
-		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); listObjIdle.push_back(obj); break;
-		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); listObjIdle.push_back(obj); break;
-		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); listObjMove.push_back(obj); break;
+		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
+		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
+		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
+		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); break;
 		case OBJECT_TYPE_BROTHER: 
 		{
 			int IDType = atoi(tokens[4].c_str());
 			int AniWeapon = atoi(tokens[5].c_str());
 			BoomerangOfBrother* Boomerang1 = new BoomerangOfBrother(AniWeapon);
+			listAllObject.push_back(Boomerang1);
 			objects.push_back(Boomerang1);
 			BoomerangOfBrother* Boomerang2 = new BoomerangOfBrother(AniWeapon);
+			listAllObject.push_back(Boomerang2);
 			objects.push_back(Boomerang2);
 			obj = new Brothers(IDType, Boomerang1, Boomerang2);
-			listObjMove.push_back(obj);
+			
 		}break;
 		case OBJECT_TYPE_TREE:
 		{
@@ -248,25 +256,21 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			float Height = atoi(tokens[4].c_str());
 			int IDAni = atoi(tokens[5].c_str());
 			obj = new Tube(Height, IDAni);
-			listObjIdle.push_back(obj);
 		} break;
 		case OBJECT_TYPE_LINE: 
 		{
 			float Width = atoi(tokens[4].c_str());
 			obj = new Line(Width);
-			listObjIdle.push_back(obj);
 		}break;
 		case OBJECT_TYPE_GROUND: 
 		{
 			float Width = atoi(tokens[4].c_str());
 			obj = new Ground(Width);
-			listObjIdle.push_back(obj);
 		}break;
 		case OBJECT_TYPE_KOOPAS: 
 		{
 			int TypeKoopas = atoi(tokens[4].c_str());
 			obj = new CKoopas(TypeKoopas);
-			listObjMove.push_back(obj);
 		}break;
 		case OBJECT_TYPE_ITEM:
 		{
@@ -279,7 +283,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			else
 			{
 				obj = new Items(IdItem, SpriteEffectStart);
-				listObjIdle.push_back(obj);
 			}
 			
 		}break;
@@ -287,7 +290,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		{
 			int TypeGoomba = atoi(tokens[4].c_str());
 			obj = new CGoomba(TypeGoomba);
-			listObjMove.push_back(obj);
 		}break;
 		case OBJECT_TYPE_FIRE_PIRANHA_PLANT:
 		{
@@ -299,8 +301,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 			objects.push_back(objBullet);
 			obj = new VenusFireTrap(player, objBullet, TypeVenusFireTrap);
-			listObjMove.push_back(obj);
-			listObjMove.push_back(objBullet);
+			listAllObject.push_back(objBullet);
 		}break;
 		case OBJECT_TYPE_PORTAL:
 		{
@@ -308,7 +309,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			float b = atof(tokens[5].c_str());
 			int scene_id = atoi(tokens[6].c_str());
 			obj = new CPortal(x, y, r, b, scene_id);
-			listObjMove.push_back(obj);
 		}break;
 		default:
 			DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
@@ -322,6 +322,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		obj->SetAnimationSet(ani_set);
 		objects.push_back(obj);
+		if(!dynamic_cast<CMario*>(obj))
+			listAllObject.push_back(obj);
 	}
 	if (objItem != NULL)
 	{
@@ -331,6 +333,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		objItem->SetAnimationSet(ani_set);
 		objectsItem.push_back(objItem);
+		listAllObject.push_back(objItem);
 	}
 		
 }
@@ -370,6 +373,9 @@ void CPlayScene::Load()
 		if (line == "[STATUS_BAR]") {
 			section = SCENE_SECTION_STATUS_BAR; continue;
 		}
+		if (line == "[GRID]") {
+			section = SCENE_SECTION_GRID; continue;
+		}
 		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }	
 
 		//
@@ -385,13 +391,20 @@ void CPlayScene::Load()
 			case SCENE_SECTION_TITLE_MAP: _ParseSection_TITLE_MAP(line); break;
 			case SCENE_SECTION_EFFECT: _ParseSection_EFFECT(line); break;
 			case SCENE_SECTION_STATUS_BAR: _ParseSection_STATUS_BAR(line); break;
+			case SCENE_SECTION_GRID: _ParseSection_GRID(line); break;
 		}
 	}
 
 	f.close();
 
+	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
+	{
+		for (int i = 0; i < listAllObject.size(); i++)
+		{
+			grid->AddObjectToGrid(i, listAllObject);
+		}
+	}
 	CTextures::GetInstance()->Add(ID_TEX_BBOX, L"textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
-
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
 bool CheckObjInScreen(LPGAMEOBJECT Obj) {
@@ -410,70 +423,71 @@ void CPlayScene::Update(DWORD dt)
 {
 	vector<LPGAMEOBJECT> coObjects;
 	vector<LPGAMEOBJECT> coObjectsItem;
-
-	//gridObjIdle->MakeObjOutOfCam(listMovingWood);
-	gridObjMove->MakeObjOutOfCam(listObjMove);
-
-	//insert obj
-	InsertObjToGrid();
-	
-	for (int i = 0; i < objects.size(); i++)
+	vector<LPGAMEOBJECT> ObjectsInGrid;
+	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 	{
-		coObjects.push_back(objects[i]);
-	}
-
-	for (int i = 0; i < objects.size(); i++)
-	{
-		objects[i]->Update(dt, &coObjects);
-	}
-	//item
-	for (size_t i = 0; i < objects.size(); i++)
-	{
-		coObjectsItem.push_back(objects[i]);
-	}
-	coObjectsItem.push_back(player);
-	for (size_t i = 0; i < objectsItem.size(); i++)
-	{
-		objectsItem[i]->Update(dt, &coObjectsItem);
-	}
-	/*
-	//Push nhung Obj trong man hinh vao coObjects de xet va cham 
-	for (size_t i = 1; i < objects.size(); i++)
-	{
-		LPGAMEOBJECT e = objects[i];
-		if (dynamic_cast<Ground*>(e) || dynamic_cast<Line*>(e) || dynamic_cast<Tube*>(e) || dynamic_cast<Effect*>(e))
-			coObjects.push_back(objects[i]);
-		else if (dynamic_cast<CMario*>(e)) {
+		grid->GetGrid(ObjectsInGrid);
+		for (int i = 0; i < ObjectsInGrid.size(); i++)
+		{
+			if (!dynamic_cast<Items*>(ObjectsInGrid[i]))
+				coObjects.push_back(ObjectsInGrid[i]);
 		}
-		else if (CheckObjInScreen(objects[i]))
-			coObjects.push_back(objects[i]);
-	}
-
-	for (size_t i = 0; i < objects.size(); i++)
-	{
+		
+		for (int i = 0; i < ObjectsInGrid.size(); i++)
+		{
+			if (!dynamic_cast<Items*>(ObjectsInGrid[i]))
+				ObjectsInGrid[i]->Update(dt, &coObjects);
+			else
+			{
+				coObjects.push_back(player);
+				ObjectsInGrid[i]->Update(dt, &coObjects);
+			}
+		}
+		player->Update(dt, &coObjects);
+		//item
+		/*for (int i = 0; i < objects.size(); i++)
+		{
 			coObjectsItem.push_back(objects[i]);
-	}
-	for (size_t i = 0; i < objectsItem.size(); i++)
-	{
+		}
+		coObjectsItem.push_back(player);
+		for (int i = 0; i < objectsItem.size(); i++)
+		{
 			objectsItem[i]->Update(dt, &coObjectsItem);
+		}*/
 	}
-	// Update Obj is Active in screen
-	for (size_t i = 0; i < objects.size(); i++)
-	{
-		LPGAMEOBJECT e = objects[i];
-		if ( dynamic_cast<CMario*>(e))
+	else {
+		for (size_t i = 1; i < objects.size(); i++)
 		{
-			player->Update(dt, &coObjects);
+			coObjects.push_back(objects[i]);
 		}
-		else if (dynamic_cast<Brick*>(e) || dynamic_cast<QuestionBrick*>(e) || dynamic_cast<Tube*>(e))
-		{
-			objects[i]->Update(dt, &coObjects);
-		}
-		else if (CheckObjInScreen(objects[i]))
-			objects[i]->Update(dt, &coObjects);
-	}*/
 
-	player->Update(dt, &coObjects);
+		/*for (size_t i = 0; i < objects.size(); i++)
+		{
+			coObjectsItem.push_back(objects[i]);
+		}
+		for (size_t i = 0; i < objectsItem.size(); i++)
+		{
+			objectsItem[i]->Update(dt, &coObjectsItem);
+		}*/
+		player->Update(dt, &coObjects);
+		// Update Obj is Active in screen
+		/*for (size_t i = 0; i < objects.size(); i++)
+		{
+			LPGAMEOBJECT e = objects[i];
+			if (dynamic_cast<CMario*>(e))
+			{
+				player->Update(dt, &coObjects);
+			}
+			else if (dynamic_cast<Brick*>(e) || dynamic_cast<QuestionBrick*>(e) || dynamic_cast<Tube*>(e))
+			{
+				objects[i]->Update(dt, &coObjects);
+			}
+			else if (CheckObjInScreen(objects[i]))
+				objects[i]->Update(dt, &coObjects);
+		}*/
+	}
+
+	
 	if (player == NULL) return; 
 
 	if (player->x < 0)
@@ -498,24 +512,42 @@ void CPlayScene::Update(DWORD dt)
 	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - STATUS_BAR_MARGIN_TOP;
 	statusBar->Update(dt, XStatusBar, YStatusBar);
 	//
-	gridObjMove->ResetGrid(listObjMove);
-	//gridObjIdle->ResetGrid(listMovingWood);
+	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
+		grid->ResetGrid(listAllObject);
 }
 
 void CPlayScene::Render()
 {
+	vector<LPGAMEOBJECT> ObjectsInGrid;
+	vector<LPGAMEOBJECT> Objects;
 	tileMap->Draw();
 
-	for (size_t i = 0; i < objectsItem.size(); i++)
-	{
-		objectsItem[i]->Render();
+	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START) {
+		grid->GetGrid(ObjectsInGrid);
+
+		for (int i = 0; i < ObjectsInGrid.size(); i++)
+		{
+			ObjectsInGrid[i]->Render();
+		}
+		//item
+		for (int i = 0; i < objectsItem.size(); i++)
+		{
+			objectsItem[i]->Render();
+		}
 	}
-	for (int i = 0; i < objects.size(); i++)
-	{
-		objects[i]->Render();
+	else {
+		for (size_t i = 0; i < objectsItem.size(); i++)
+		{
+			objectsItem[i]->Render();
+		}
+		for (int i = 0; i < objects.size(); i++)
+		{
+			objects[i]->Render();
+		}
+		for (int i = 0; i < listAllObject.size(); i++)
+			listAllObject[i]->Render();
 	}
-	for (int i = 0; i < listObjIdle.size(); i++)
-		listObjIdle[i]->Render();
+
 
 	player->Render();
 			
@@ -528,30 +560,7 @@ void CPlayScene::Render()
 	statusBar->Render();
 }
 
-void CPlayScene::InsertObjToGrid()
-{
-	objects.clear();
-	listAllObjIdle.clear();
-	listAllObjMove.clear();
-	///gridObjIdle->GetGrid(listObjIdle);
-	for (UINT i = 0; i < listObjIdle.size(); i++)
-	{
-		objects.push_back(listObjIdle[i]);
-	}
 
-	gridObjIdle->GetGrid(listAllObjIdle);
-
-	for (UINT i = 0; i < listAllObjIdle.size(); i++)
-	{
-		objects.push_back(listAllObjIdle[i]);
-	}
-
-	gridObjMove->GetGrid(listAllObjMove);
-	for (UINT i = 0; i < listAllObjMove.size(); i++)
-	{
-		objects.push_back(listAllObjMove[i]);
-	}
-}
 void CPlayScene::Unload()
 {
 	for (int i = 0; i < objects.size(); i++)
@@ -560,10 +569,12 @@ void CPlayScene::Unload()
 	for (int i = 0; i < objectsItem.size(); i++)
 		delete objectsItem[i];
 	objectsItem.clear();
+	/*for (int i = 0; i < listAllObject.size(); i++)
+		delete listAllObject[i];*/
+	listAllObject.clear();
 
-	listObjIdle.clear();
-	listObjMove.clear();
-	
+	//delete grid;
+	grid = NULL;
 	player = NULL;
 	/*delete gridObjMove;
 	gridObjMove = NULL;

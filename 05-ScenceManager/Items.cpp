@@ -60,6 +60,7 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 
 void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	
 	if (!(CGame::GetInstance()->GetLevel() == MARIO_LEVEL_BIG) && IdItem == ITEM_ANI_TREE_LEAF)
 	{
 		IdItem = ITEM_ANI_MUSHROOM_RED;
@@ -76,8 +77,10 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Active = true;*/
 	if (BrickBreak != NULL)
 		if (IdItem == ITEM_MONEY_IDLE && BrickBreak->IsBreaked)
+		{
 			Active = false;
-	
+			BBox = false;
+		}
 	//x += dx;
 	//y += dy;
 	if (CollTail)
@@ -211,7 +214,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		for (UINT i = 0; i < sizeCo; i++)
 		{
 			LPGAMEOBJECT e = coEventsResult[i];
-			if (dynamic_cast<CMario*>(e)) // if e->obj is Goomba 
+			if (dynamic_cast<CMario*>(e))
 			{
 				CMario* mario = dynamic_cast<CMario*>(e);
 				if (IdItem == ITEM_TREE_LEAF)
@@ -266,6 +269,12 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				else if (IdItem == ITEM_MULTIPLE_MONEY) {
 					vy = -ITEM_DEFLECT_SPEED * dt;
 					Active = true;
+				}
+				else if (IdItem == ITEM_SWITCH) {
+					if (mario->vy > 0)
+					{
+						this->SetState(ITEM_SWITCH_STATE_OFF);
+					}
 				}
 				else if (IdItem == ITEM_CARD) {
 					int Frame = animation_set->at(ITEM_ANI_CARD)->GetcurrentFrame();
@@ -381,7 +390,7 @@ void Items::Render()
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)
