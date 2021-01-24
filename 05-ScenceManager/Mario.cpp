@@ -19,6 +19,7 @@
 #include "Brick.h"
 #include "FlyingWood.h"
 #include "BoomerangOfBrother.h"
+#include "Brothers.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -499,6 +500,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					x += dx;
 				}
 			}
+			else if (dynamic_cast<Brothers*>(e->obj)) {
+				Brothers* brother = dynamic_cast<Brothers*>(e->obj);
+				if (brother->GetState() != BROTHER_STATE_DIE) {
+					brother->SetState(BROTHER_STATE_DIE);
+				}
+			}
 			else if (dynamic_cast<Items*>(e->obj)) 
 			{
 				Items* item = dynamic_cast<Items*>(e->obj);
@@ -536,7 +543,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		CalCollisions(coObjects, coEventsResultColl);
 	if (state == MARIO_STATE_DIE && level == MARIO_LEVEL_SMALL && !CheckMarioInScreen())
 	{
-		CGame::GetInstance()->SwitchScene(SCENCE_START);				// scence Start
+		CGame::GetInstance()->SwitchScene(SCENCE_START);
+		return;
+	}
+	else if (this->y > (CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenWidth())&& CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4) {
+		CGame::GetInstance()->SwitchScene(SCENCE_START);
 		return;
 	}
 	if (coEventsResultColl.size() != 0)
@@ -555,6 +566,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 				{
+					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
+						CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					}
 					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
 						CGame::GetInstance()->SetReturnWorld(true);
 					}
@@ -574,6 +588,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 					TeleUp = false;
 					return;
+				}
+				else {
+					if (this->x < p->x)
+						vx = 0;
 				}
 			}
 			else if (dynamic_cast<Tube*>(e)) {

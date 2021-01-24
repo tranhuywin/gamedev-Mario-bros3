@@ -6,6 +6,8 @@
 #define BRICK_VX_BREAK			0.0002f
 #define BRICK_VY_BREAK			0.0005f
 #define BRICK_VY_START_BREAK	0.01f
+
+#define BRICK_TIME_OFF			7000
 class Brick : public CGameObject
 {
 	virtual void Render();
@@ -15,6 +17,10 @@ class Brick : public CGameObject
 	float vxBreak, vyBreak;
 	float xBreak, yBreak;
 	LPGAMEOBJECT items;
+	int Sleep;
+	bool count;
+	DWORD Sleep_start;
+	void StartSleep() { Sleep = 1; Sleep_start = GetTickCount64(); }
 public:
 	int IdItemOfBrick = -1;
 	int CountCollBrickMulMoney = 5;

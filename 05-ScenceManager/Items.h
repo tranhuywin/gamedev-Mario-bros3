@@ -39,6 +39,7 @@
 #define ITEM_STATE_ATIVE			200
 #define ITEM_SWITCH_STATE_OFF		300
 
+#define COUNT_COLLiTION_MARIO		5
 #define ITEM_ANI_TREE_LEAF			0
 #define ITEM_ANI_MONEY				1
 #define ITEM_ANI_SWITCH_ON			2
@@ -53,8 +54,9 @@ class Items : public CGameObject
 public:
 	Effect* effect = NULL;
 	Brick* BrickBreak = NULL;
+	bool EndScence;
 	int IdItem;
-	int CountColl = 5;
+	int CountColl = COUNT_COLLiTION_MARIO;
 	int AniEffect;
 	int SpriteEffectStart;
 	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail, OfBrick;

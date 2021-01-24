@@ -64,7 +64,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define MAX_SCENE_LINE 1024
 
 #define CAMERA_ON_PLATFORM 64.0f
-#define CAMERA_MOVE_VX		0.04f
+#define CAMERA_MOVE_VX		0.055f
 #define CAMERA_X_START_MAP	48.0f
 #define CAMERA_Y_START_MAP 32.0f
 #define CAMERA_X_WORLD_1_1	95.0f
@@ -191,7 +191,7 @@ void CPlayScene::_ParseSection_STATUS_BAR(string line) {
 void CPlayScene::_ParseSection_GRID(string line) {
 	vector<string> tokens = split(line);
 	wstring filePath = ToWSTR(tokens[0]);
-	grid = new Grid(filePath.c_str());
+	grid = new Grid(filePath.c_str(), listAllObject);
 }
 /*
 	Parse a line in section [OBJECTS] 
@@ -238,10 +238,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			int IDType = atoi(tokens[4].c_str());
 			int AniWeapon = atoi(tokens[5].c_str());
 			BoomerangOfBrother* Boomerang1 = new BoomerangOfBrother(AniWeapon);
-			listAllObject.push_back(Boomerang1);
+			//listAllObject.push_back(Boomerang1);
+			listWeaponEnemy.push_back(Boomerang1);
 			objects.push_back(Boomerang1);
 			BoomerangOfBrother* Boomerang2 = new BoomerangOfBrother(AniWeapon);
-			listAllObject.push_back(Boomerang2);
+			//listAllObject.push_back(Boomerang2);
+			listWeaponEnemy.push_back(Boomerang2);
 			objects.push_back(Boomerang2);
 			obj = new Brothers(IDType, Boomerang1, Boomerang2);
 			
@@ -278,7 +280,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			if (IdItem != ITEM_SWITCH)
 			{
 				objItem = new Items(IdItem, SpriteEffectStart);
-				//listObjIdle.push_back(objItem);
 			}
 			else
 			{
@@ -299,9 +300,11 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			LPANIMATION_SET aniPlant_set = animation_sets->Get(aniPlant);
 			objBullet->SetAnimationSet(aniPlant_set);
 
-			objects.push_back(objBullet);
+			listWeaponEnemy.push_back(objBullet);
+
+			//objects.push_back(objBullet);
 			obj = new VenusFireTrap(player, objBullet, TypeVenusFireTrap);
-			listAllObject.push_back(objBullet);
+			//listAllObject.push_back(objBullet);
 		}break;
 		case OBJECT_TYPE_PORTAL:
 		{
@@ -399,10 +402,12 @@ void CPlayScene::Load()
 
 	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 	{
-		for (int i = 0; i < listAllObject.size(); i++)
-		{
-			grid->AddObjectToGrid(i, listAllObject);
-		}
+		//for (int i = 0; i < listAllObject.size(); i++)
+		//{
+		//	grid->AddObjectToGrid(i, listAllObject);
+		//}
+		//grid->ResetGrid(listAllObject);
+
 	}
 	CTextures::GetInstance()->Add(ID_TEX_BBOX, L"textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
@@ -433,6 +438,11 @@ void CPlayScene::Update(DWORD dt)
 				coObjects.push_back(ObjectsInGrid[i]);
 		}
 		
+		for (int i = 0; i < listWeaponEnemy.size(); i++) {
+			coObjects.push_back(listWeaponEnemy[i]);
+		}
+
+
 		for (int i = 0; i < ObjectsInGrid.size(); i++)
 		{
 			if (!dynamic_cast<Items*>(ObjectsInGrid[i]))
@@ -443,48 +453,18 @@ void CPlayScene::Update(DWORD dt)
 				ObjectsInGrid[i]->Update(dt, &coObjects);
 			}
 		}
-		player->Update(dt, &coObjects);
-		//item
-		/*for (int i = 0; i < objects.size(); i++)
-		{
-			coObjectsItem.push_back(objects[i]);
-		}
-		coObjectsItem.push_back(player);
-		for (int i = 0; i < objectsItem.size(); i++)
-		{
-			objectsItem[i]->Update(dt, &coObjectsItem);
+		/*for (int i = 0; i < listWeaponEnemy.size(); i++) {
+			listWeaponEnemy[i]->Update(dt, &coObjects);
 		}*/
+		player->Update(dt, &coObjects);
 	}
 	else {
 		for (size_t i = 1; i < objects.size(); i++)
 		{
 			coObjects.push_back(objects[i]);
 		}
-
-		/*for (size_t i = 0; i < objects.size(); i++)
-		{
-			coObjectsItem.push_back(objects[i]);
-		}
-		for (size_t i = 0; i < objectsItem.size(); i++)
-		{
-			objectsItem[i]->Update(dt, &coObjectsItem);
-		}*/
 		player->Update(dt, &coObjects);
-		// Update Obj is Active in screen
-		/*for (size_t i = 0; i < objects.size(); i++)
-		{
-			LPGAMEOBJECT e = objects[i];
-			if (dynamic_cast<CMario*>(e))
-			{
-				player->Update(dt, &coObjects);
-			}
-			else if (dynamic_cast<Brick*>(e) || dynamic_cast<QuestionBrick*>(e) || dynamic_cast<Tube*>(e))
-			{
-				objects[i]->Update(dt, &coObjects);
-			}
-			else if (CheckObjInScreen(objects[i]))
-				objects[i]->Update(dt, &coObjects);
-		}*/
+
 	}
 
 	
@@ -497,6 +477,9 @@ void CPlayScene::Update(DWORD dt)
 
 	// Update camera 
 	UpdateCammera(dt);
+	//player->GetPosition(CamX, CamY);
+	//CamY += CGame::GetInstance()->GetScreenHeight() / 2;
+	//CamX += CGame::GetInstance()->GetScreenWidth() / 2;
 	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)
 	{
 		if (player->x < CamX)
@@ -511,9 +494,6 @@ void CPlayScene::Update(DWORD dt)
 	float XStatusBar = CGame::GetInstance()->GetCamPosX() + STATUS_BAR_MARGIN_LEFT;
 	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - STATUS_BAR_MARGIN_TOP;
 	statusBar->Update(dt, XStatusBar, YStatusBar);
-	//
-	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
-		grid->ResetGrid(listAllObject);
 }
 
 void CPlayScene::Render()
@@ -524,28 +504,17 @@ void CPlayScene::Render()
 
 	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START) {
 		grid->GetGrid(ObjectsInGrid);
-
+		
 		for (int i = 0; i < ObjectsInGrid.size(); i++)
 		{
 			ObjectsInGrid[i]->Render();
 		}
-		//item
-		for (int i = 0; i < objectsItem.size(); i++)
-		{
-			objectsItem[i]->Render();
-		}
 	}
 	else {
-		for (size_t i = 0; i < objectsItem.size(); i++)
-		{
-			objectsItem[i]->Render();
-		}
 		for (int i = 0; i < objects.size(); i++)
 		{
 			objects[i]->Render();
 		}
-		for (int i = 0; i < listAllObject.size(); i++)
-			listAllObject[i]->Render();
 	}
 
 
@@ -557,12 +526,16 @@ void CPlayScene::Render()
 	if (dynamic_cast<Tube*>(objects[1])) {
 		objects[1]->Render();	// cong che portal
 	}
+	/*for (int i = 0; i < listWeaponEnemy.size(); i++) {
+		listWeaponEnemy[i]->Render();
+	}*/
 	statusBar->Render();
 }
 
 
 void CPlayScene::Unload()
 {
+	CamX = 0; CamY = 0;
 	for (int i = 0; i < objects.size(); i++)
 		delete objects[i];
 	objects.clear();
@@ -572,14 +545,11 @@ void CPlayScene::Unload()
 	/*for (int i = 0; i < listAllObject.size(); i++)
 		delete listAllObject[i];*/
 	listAllObject.clear();
-
+	listWeaponEnemy.clear();
+	
 	//delete grid;
 	grid = NULL;
 	player = NULL;
-	/*delete gridObjMove;
-	gridObjMove = NULL;
-	delete gridObjIdle;
-	gridObjIdle = NULL;*/
 	delete tileMap;
 	tileMap = NULL;
 	delete statusBar;
@@ -595,8 +565,8 @@ void CPlayScene::UpdateCammera(DWORD dt)
 	//float CamX, CamY;
 	int CurSecene = game->Getcurrent_scene();
 	bool CammeraMove = false;
-	if (CurSecene == SCENCE_WORD_MAP_4)
-		CammeraMove = true;
+	//if (CurSecene == SCENCE_WORD_MAP_4)
+	//	CammeraMove = true;
 
 	
 	if (!CammeraMove)
@@ -633,7 +603,9 @@ void CPlayScene::UpdateCammera(DWORD dt)
 			CamY = CAMERA_Y_WORLD_1_1;
 		}
 		else if (CurSecene == SCENCE_WORD_MAP_4) {
-			CamY += game->GetScreenHeight() / 4;
+			player->GetPosition(CamX, CamY);
+			CamY -= game->GetScreenHeight() / 4;
+			CamX -= game->GetScreenWidth() / 2;
 		}
 		else if (CurSecene == SCENCE_WORD_MAP_4_1) {
 			CamY = CAMERA_Y_WORLD_4_1;
@@ -690,12 +662,16 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetPosition(2268, 70);
 		break;
 	case DIK_9:
-		mario->SetPosition(1970, 74);
+		mario->SetPosition(2010, 74);
 		((CPlayScene*)scence)->CamX = 1800;
 		break;
 	case DIK_8:
 		mario->SetPosition(988, 130);
 		((CPlayScene*)scence)->CamX = 810;
+		break;
+	case DIK_7:
+		mario->SetPosition(653, 94);
+		((CPlayScene*)scence)->CamX = 550;
 		break;
 	}
 }

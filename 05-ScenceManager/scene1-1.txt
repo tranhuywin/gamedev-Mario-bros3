@@ -9,6 +9,7 @@
 30	textures\StatusBar.png	255	0	255
 31	textures\PowerState.png	175	232	226
 32	textures\BackGroundStatusBar.png	255	255	255
+33	textures\EndScence.png	0	0	0
 40	textures\Miscc.png	166	185	255
 50	textures\Points.png	81	255	191
 # id	left	top	right	bottom	texture_id
@@ -400,6 +401,8 @@
 80107	148	25	164	33	50
 #1UP
 80108	167	25	183	33	50
+#End scence
+80109	0	0	153	58	33
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 1	1	100
@@ -899,7 +902,7 @@ bend over left Big
 50	2800	350	0	2810	418	0
 #50	2256	145	0	2287	180	4
 [GRID]
-Grid/grid1-1.txt
+Grid/Grid_scene1-1.txt
 [STATUS_BAR]
 80000	80001	80010	80020	80030
 [TITLEMAP]

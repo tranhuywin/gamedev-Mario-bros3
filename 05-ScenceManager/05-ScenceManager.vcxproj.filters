@@ -117,11 +117,11 @@
     <ClCompile Include="FlyingWood.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Brothers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BoomerangOfBrother.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Brothers.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -215,11 +215,11 @@
     <ClInclude Include="FlyingWood.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Brothers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BoomerangOfBrother.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Brothers.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

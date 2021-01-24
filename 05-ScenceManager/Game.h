@@ -14,6 +14,8 @@
 
 using namespace std;
 
+#define TIME				900
+#define LIFE				4
 #define KEYBOARD_BUFFER_SIZE 1024
 #define SCENCE_START			0
 #define SCENCE_WORD_MAP_1		1
@@ -47,8 +49,8 @@ class CGame
 	int screen_height; 
 	int Score = 0;
 	int Money = 0;
-	int Life = 4;
-	int Time = 900;
+	int Life = LIFE;
+	int Time = TIME;
 	int Level = -1;
 	int Card_1 = -1, Card_2 =-1, Card_3 = -1;
 	bool ReturnWorld;

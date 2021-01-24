@@ -23,13 +23,13 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 			if (IdItem == ITEM_MONEY_IDLE)
 			{
 				left = x - TAIL_BBOX_WIDTH;
-				bottom = y + ITEM_BBOX_MONEY_IDLE;
+				//bottom = y + ITEM_BBOX_MONEY_IDLE;
 			}
 			else if (IdItem == ITEM_MULTIPLE_MONEY) {
 				//left = x;
 				//top = y;
-				right = x + 16;
-				bottom = y + 17.0f;
+				right = x + ITEM_BBOX_MONEY_IDLE;
+				bottom = y + ITEM_BBOX_MONEY_IDLE + 1;
 			}
 		}
 		else {
@@ -90,7 +90,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (IdItem == ITEM_TREE_LEAF)
 		{
 			vy += ITEM_GRAVITY * dt;
-			vy = 2 * ITEM_GRAVITY * dt;
+			if (vy > 2 * ITEM_GRAVITY * dt)
+				vy = 2 * ITEM_GRAVITY * dt;
 			if ((this->x - this->X_Start) > ITEM_TREE_LEAF_X_DISTANCE_X_START)
 				vx -= ITEM_TREE_LEAF_VX * dt;
 			else
@@ -131,6 +132,15 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 			}
+		}
+		else if (IdItem == ITEM_CARD) {
+			if (EndScence) {
+				AniEffect = SpriteEffectStart + EFFECT_END_SCENCE;
+				float xdraw = CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()/3;
+				float ydraw = CGame::GetInstance()->GetCamPosY();
+				effect = new Effect(xdraw, ydraw, AniEffect);
+			}
+			
 		}
 	}
 	else {
@@ -177,6 +187,13 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					y += dy;
 				}
 			}
+			else if (dynamic_cast<Brick*>(e->obj)) {
+				if (nx != 0)
+				{
+					vx = vxPre;
+					x += dx;
+				}
+			}
 			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj)) {
 				vx = vxPre;
 				vy = vyPre;
@@ -193,8 +210,9 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	int sizeCo = coEventsResult.size();
 	if (!CollTail)
 	{
-		if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && !BrickBreak->IsBreaked)
-			Active = true;
+		if(BrickBreak != NULL)
+			if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && !BrickBreak->IsBreaked)
+				Active = true;
 
 		//if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE /*&& !BrickBreak->IsBreaked*/)
 		//	Active = true;
@@ -246,6 +264,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							//CollTail = true;
 							//DebugOut(L"Kill\n");
 							MarioGetMoney = true;
+
 						}
 						else if(Active)
 						{
@@ -256,6 +275,11 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							x = -100; y = -100; vy = 0; vx = 0;
 							BBox = false;
 							Active = false;
+							if (BrickBreak != NULL)
+							{
+								BrickBreak->x = -100;
+								BrickBreak->y = -100;
+							}
 						}
 					}
 				else if (IdItem == ITEM_MONEY_ROTATOR ) {
@@ -288,7 +312,9 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					else if (CGame::GetInstance()->GetCard_3() == -1) {
 						CGame::GetInstance()->SetCard_3(Frame + 1);
 					}
-					Active = false;
+					//Active = false;
+					EndScence = true;
+					vy = -0.03 * dt;
 					//x = -100; y = -100; vy = 0; vx = 0;
 					BBox = false;
 				}
@@ -390,7 +416,7 @@ void Items::Render()
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)

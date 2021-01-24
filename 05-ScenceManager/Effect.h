@@ -12,6 +12,7 @@
 #define EFFECT_4000			6
 #define EFFECT_8000			7
 #define EFFECT_1_UP			8
+#define EFFECT_END_SCENCE	9
 class Effect
 {
 public:

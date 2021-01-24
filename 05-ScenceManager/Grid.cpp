@@ -5,13 +5,13 @@
 #include <fstream>
 #include <vector>
 
-Grid::Grid(LPCWSTR filepatch) {
+Grid::Grid(LPCWSTR filepatch, vector<LPGAMEOBJECT> list) {
 	ifstream fs;
 	fs.open(filepatch, ios::in);
 
-	listIdObjects.resize(60 + 1);
-	for (int i = 0; i < 50 + 1; i++)
-		listIdObjects[i].resize(50 + 1);
+	listIdObjects.resize(200 );
+	for (int i = 0; i <  200; i++)
+		listIdObjects[i].resize(200);
 
 	if (fs.fail())
 	{
@@ -36,36 +36,27 @@ Grid::Grid(LPCWSTR filepatch) {
 					listIdObjects[i][j].push_back(IDObject);
 				}
 			}
+			Resize();
+			for (int i = RowStart; i < RowEnd; i++) {
+				for (int j = ColStart; j < ColEnd; j++) {
+					listCells[i][j].push_back(list[IDObject]);
+				}
+			}
 
+			//Resize();
+			////ClearGrid((int)MAP_HEIGHT / CELL_HEIGHT, (int)MAP_WIDTH / CELL_WIDTH);
+			//for (int i = 0; i < list.size(); i++)
+			//{
+			//	for (int row = RowStart; row < RowEnd; row++)
+			//		for (int col = ColStart; col < ColEnd; col++)
+			//			listCells[row][col].push_back(list[i]);
+			//}
 		}
 		DebugOut(L"[INFO]: Load Grid xong\n");
 	}
 	
 	fs.close();
-
-}
-
-void Grid::Resize()
-{
-	int totalCol = MAP_WIDTH / CELL_WIDTH;
-	int totalRow = MAP_HEIGHT / CELL_HEIGHT;
-
-	listCells.resize(totalRow + 2);
-	for (int i = 0; i < totalRow + 2; i++)
-		listCells[i].resize(totalCol + 2);
-
-	ClearGrid(totalRow, totalCol);
-}
-
-void Grid::ClearGrid(int numRow, int numCol)
-{
-	for (int i = 0; i < numRow; i++)
-		for (int j = 0; j < numCol; j++)
-			listCells[i][j].clear();
-}
-
-void Grid::ResetGrid(vector<LPGAMEOBJECT> list)
-{
+	Resize();
 	ClearGrid((int)MAP_HEIGHT / CELL_HEIGHT, (int)MAP_WIDTH / CELL_WIDTH);
 
 	for (int i = 0; i < list.size(); i++)
@@ -80,17 +71,37 @@ void Grid::ResetGrid(vector<LPGAMEOBJECT> list)
 		{
 			for (int row = Top; row < Bottom; row++)
 				for (int col = Left; col < Right; col++)
-					listCells[row][col].push_back(list[i]);
+				listCells[row][col].push_back(list[i]);
 		}
 	}
 }
 
-void Grid::AddObjectToGrid(int id, vector<LPGAMEOBJECT> object)
+void Grid::Resize()
 {
-	
 	int totalCol = MAP_WIDTH / CELL_WIDTH;
 	int totalRow = MAP_HEIGHT / CELL_HEIGHT;
-	//ClearGrid(totalRow, totalCol);
+
+	listCells.resize(totalRow + 2);
+	for (int i = 0; i < totalRow + 2; i++)
+		listCells[i].resize(totalCol + 2);
+
+	for (int i = 0; i < totalRow + 2; i++)
+		for (int j = 0; j < totalCol + 2; j++)
+			listCells[i][j].clear();
+
+}
+
+void Grid::ClearGrid(int numRow, int numCol)
+{
+	for (int i = 0; i < numRow; i++)
+		for (int j = 0; j < numCol; j++)
+			listCells[i][j].clear();
+}
+
+void Grid::AddObjectToGrid(int id, vector<LPGAMEOBJECT> object)
+{
+	int totalCol = MAP_WIDTH / CELL_WIDTH;
+	int totalRow = MAP_HEIGHT / CELL_HEIGHT;
 	Resize();
 
 	for (int i = 0; i < totalRow; i++) {
@@ -107,14 +118,6 @@ void Grid::AddObjectToGrid(int id, vector<LPGAMEOBJECT> object)
 	}
 }
 
-void Grid::MakeObjOutOfCam(vector<LPGAMEOBJECT>& list)			// set checkoncam == false
-{
-	for (int i = 0; i < list.size(); i++)
-	{
-		list[i]->checkOnCam = false;
-	}
-}
-
 void Grid::GetGrid(vector<LPGAMEOBJECT>& list)
 {
 	int firstCol = (int)(CGame::GetInstance()->GetCamPosX() / CELL_WIDTH);
@@ -128,11 +131,7 @@ void Grid::GetGrid(vector<LPGAMEOBJECT>& list)
 		{
 			for (int k = 0; k < listCells[i][j].size(); k++)
 			{
-				//if (!listCells[i][j][k]->checkOnCam)
-				{
-				//	listCells[i][j][k]->checkOnCam = true;
-					list.push_back(listCells[i][j][k]);
-				}
+				list.push_back(listCells[i][j][k]);
 			}
 		}
 	}

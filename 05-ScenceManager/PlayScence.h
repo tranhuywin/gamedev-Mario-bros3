@@ -21,13 +21,12 @@ protected:
 	//Grid
 	Grid* grid;
 	vector <LPGAMEOBJECT> listAllObject;
-
 	//MarioChooseMap* playerChoose;
 	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
 	vector<LPGAMEOBJECT> objectsItem;
 	vector<LPGAMEOBJECT> objects;
-
+	vector <LPGAMEOBJECT> listWeaponEnemy;
 	void _ParseSection_TEXTURES(string line);
 	void _ParseSection_SPRITES(string line);
 	void _ParseSection_ANIMATIONS(string line);

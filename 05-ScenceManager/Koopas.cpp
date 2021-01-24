@@ -41,14 +41,14 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	CGameObject::Update(dt);
 	if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_RED) {
 		vx = 0;
-		if (y < 32 && GetState() == KOOPAS_STATE_FLYING_UP)
+		if (y < KOOPA_PARATROOPA_RED_FLY_X_MIN && GetState() == KOOPAS_STATE_FLYING_UP)
 		{
 			SetState(KOOPAS_STATE_FLYING_DOWN);
-			vy = 0.005 * dt;
+			vy = KOOPA_PARATROOPA_RED_FLY_VY * dt;
 		}
-		if (y > 128 && GetState() == KOOPAS_STATE_FLYING_DOWN) {
+		if (y > KOOPA_PARATROOPA_RED_FLY_X_MAX && GetState() == KOOPAS_STATE_FLYING_DOWN) {
 			SetState(KOOPAS_STATE_FLYING_UP);
-			vy = -0.005 * dt;
+			vy = -KOOPA_PARATROOPA_RED_FLY_VY * dt;
 		}
 
 	}
@@ -128,10 +128,14 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-		if (nx != 0 && GetState() == KOOPAS_STATE_ROTATORY)
+		if (nx != 0 && (GetState() == KOOPAS_STATE_ROTATORY) /*|| TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED*/)
 			vx = -vx;
 		if (ny != 0)
 			vy = 0;
+		if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN && ny < 0)
+		{
+			vy = -KOOPAS_PARATROOPA_GREEN_DEFLECT_SPEED * dt;
+		}
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -160,7 +164,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 				}
 				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
-					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
+					//vy = -KOOPAS_PARATROOPA_GREEN_DEFLECT_SPEED * dt;
 				}
 			}
 			else if (dynamic_cast<Brick*>(e->obj))
@@ -216,8 +220,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 			}
 			else if (dynamic_cast<Ground*>(e->obj)) {
-				if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
-					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
+				//if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
+				//	vy = -KOOPAS_PARATROOPA_GREEN_DEFLECT_SPEED * dt;
 			}
 			else if (dynamic_cast<QuestionBrick*>(e->obj) && state == KOOPAS_STATE_ROTATORY)
 			{
@@ -348,11 +352,12 @@ void CKoopas::SetState(int state)
 		break;
 	case KOOPAS_STATE_ROTATORY:
 		vx = KOOPAS_ROTATORY_SPEED;
+		//vy = 0;
 		break;
 	case KOOPAS_STATE_WALKING:
 		vx = -KOOPAS_WALKING_SPEED / 3;
-		if (this->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
-			vx = -KOOPAS_PARATROOPA_WALKING_SPEED;
+		//if (this->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
+		//	vx = -0.015f;
 		/*else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_TROOPA_RED)
 		{
 			vy = -0.015f;

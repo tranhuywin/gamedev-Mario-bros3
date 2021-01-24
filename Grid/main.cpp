@@ -6,6 +6,8 @@
 #define GRID_WIDTH	180
 #define GRID_HEIGHT  150
 
+#define BBOX_WIDTH		16
+#define BBOX_HEIGHT		16
 #define OBJECT_TYPE_MARIO				0
 #define OBJECT_TYPE_BRICK				1
 #define OBJECT_TYPE_GOOMBA				2
@@ -51,8 +53,8 @@ vector<string> split(string line, string delimeter = "\t")
 }
 
 int main() {
-	string sceneFilePath = "C:\\Users\\Win\\Desktop\\New folder\\scene1-4End.txt";
-	string OutPut = "C:\\Users\\Win\\Desktop\\New folder\\Grid_scene1-4End.txt";
+	string sceneFilePath = "C:\\Users\\Win\\Desktop\\New folder\\scene1-4.txt";
+	string OutPut = "C:\\Users\\Win\\Desktop\\New folder\\Grid_scene1-4.txt";
 	int id = -1;
 
 	ifstream fs;
@@ -86,11 +88,11 @@ int main() {
 				int Left, Top, Right, Bottom;
 				id++;
 				ofs << id << "\t";
-				//ofs << line << "\t";
+				int idobj = atoi(tokens[0].c_str());
 				Left = atoi(tokens[1].c_str());
 				Top = atoi(tokens[2].c_str());
-				int BBoxWidth = 16;
-				int BBoxHeight = 16;
+				int BBoxWidth = BBOX_WIDTH;
+				int BBoxHeight = BBOX_HEIGHT;
 
 				if (tokens.size() > 4)
 					BBoxWidth = atoi(tokens[4].c_str());
@@ -102,9 +104,30 @@ int main() {
 				int ColStart = int(Left / GRID_WIDTH);
 				int RowStart = int(Top / GRID_HEIGHT);
 				int ColEnd = ceil(Right / GRID_WIDTH);
-				int RowEnd = ceil(Bottom / GRID_HEIGHT);
+				int RowEnd = ceil(Bottom / GRID_HEIGHT); 
 
-				ofs << ColStart << "\t" << RowStart << "\t" << ColEnd << "\t" << RowEnd << "\t";
+				switch (idobj)
+				{
+				case OBJECT_TYPE_GOOMBA:
+					if (ColStart > 0)
+						ColStart--;
+					ColEnd++;
+					RowEnd++;
+					break;
+				case OBJECT_TYPE_KOOPAS	:
+					ColStart = 0;
+					ColEnd++;
+					RowEnd++;
+					break;
+				case OBJECT_TYPE_TUBE:
+					RowEnd++;
+					break;
+				}
+				
+				if (idobj != 0)
+					ofs << ColStart << "\t" << RowStart << "\t" << ColEnd << "\t" << RowEnd << "\t";
+				else
+					id--;
 				
 			}
 			ofs << "\n";

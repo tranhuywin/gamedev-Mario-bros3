@@ -3,16 +3,23 @@
 
 void Brothers::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	left = x;
-	top = y;
-	right = x + 16;
-	bottom = y + 23;
+	if (BBox) {
+		left = x;
+		top = y;
+		right = x + BROTHER_BBOX_WIDTH;
+		bottom = y + BROTHER_BBOX_HEIGHT;
+	}
 }
 
 void Brothers::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (WaitAttackBoom1)
-		Boomerang1->Attack(this->x, this->y);
+	{
+			Boomerang1->Attack(this->x, this->y);
+			/*if (!WaitThrow1) {
+				Boomerang1->x = this->x - 5;
+			}*/
+	}
 	else {
 		Boomerang1->CatchBoomerang(this->x, this->y);
 	}
@@ -25,21 +32,38 @@ void Brothers::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	Boomerang2->Update(dt);*/
 	if (Boomerang1->CatchDone /*&& Boomerang2->CatchDone*/) {
 		StartWaitAttackBoom1();
-		//StartWaitAttackBoom2();
+		
 	}
 	if (Boomerang2->CatchDone) {
 		StartWaitAttackBoom2();
 	}
+	ani = 0;
 	if (WaitAttackBoom1 && GetTickCount64() - WaitAttackBoom1_start > BOOMERANG_1_TIME_WAIT_ATTACK)
 	{
 		WaitAttackBoom1 = 0;
 		WaitAttackBoom1_start = 0;
+		if(WaitThrow1 == 0)
+		StartWaitThrow1();
+		
 	}
 	if (WaitAttackBoom2 && GetTickCount64() - WaitAttackBoom2_start > BOOMERANG_2_TIME_WAIT_ATTACK)
 	{
 		WaitAttackBoom2 = 0;
 		WaitAttackBoom2_start = 0;
 	}
+	if (WaitThrow1 && GetTickCount64() - WaitThrow1_start > 1000)
+	{
+		WaitThrow1 = 0;
+		WaitThrow1_start = 0;
+	}
+	if (WaitThrow2 && GetTickCount64() - WaitThrow2_start > 1000)
+	{
+		WaitThrow2 = 0;
+		WaitThrow2_start = 0;
+	}
+	Boomerang2->Update(dt);
+	Boomerang1->Update(dt);
+
 	CGameObject::Update(dt);
 	
 	vy += BROTHER_SPEED_VX * dt;
@@ -80,6 +104,9 @@ void Brothers::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void Brothers::Render()
 {
+	Boomerang2->Render();
+	Boomerang1->Render();
+
 	if (!WaitAttackBoom1)
 		Boomerang1->RenderWeapon = true;
 	else
@@ -88,8 +115,11 @@ void Brothers::Render()
 		Boomerang2->RenderWeapon = true;
 	else
 		Boomerang2->RenderWeapon = false;
+	if (WaitAttackBoom1 || WaitAttackBoom2)
+		animation_set->at(0)->Render(x, y);
+	else
+		animation_set->at(1)->Render(x, y);
 
-	animation_set->at(0)->Render(x, y);
 }
 
 void Brothers::SetState(int state)
@@ -100,6 +130,12 @@ void Brothers::SetState(int state)
 		case BROTHER_STATE_ATTACK:
 		{
 			this->vx = BROTHER_SPEED_VX_START;
+		}
+		break;
+		case BROTHER_STATE_DIE:
+		{
+			vy = -BROTHER_DEFLECT_SPEED;
+			BBox = false;
 		}
 		break;
 	}

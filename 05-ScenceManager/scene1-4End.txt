@@ -9,6 +9,7 @@
 30	textures\StatusBar.png	255	0	255
 31	textures\PowerState.png	175	232	226
 32	textures\BackGroundStatusBar.png	255	255	255
+33	textures\EndScence.png	0	0	0
 40	textures\Miscc.png	166	185	255
 50	textures\Points.png	81	255	191
 # id	left	top	right	bottom	texture_id
@@ -413,6 +414,8 @@
 80107	148	25	164	33	50
 #1UP
 80108	167	25	183	33	50
+#End scence
+80109	0	0	153	58	33
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 1	1	100
@@ -597,8 +600,10 @@ bend over left Big
 #die
 708	30020	200
 #####		Bumerang	############
-710	60110	100	60111	100	60112	100	60113	100
+#710	60110	100	60111	100	60112	100	60113	100
+710	60110	100	60111	100
 711	60120	75	60121	75	60122	75	60123	75
+712	60112	100	60113	100
 ############ FIRE BULLET   #################
 800	50001	100	50002	100	50003	100	50004	100
 801	50005	100	50006	100	50007	100	50008	100
@@ -699,7 +704,7 @@ bend over left Big
 #flying wood
 14	820
 #bumerang
-15	710
+15	712	710
 #weapon
 16	711
 [EFFECT]
@@ -712,20 +717,19 @@ bend over left Big
 7	128	144	10	64	1
 # MARIO
 # start
-0	139	150	1
+0	139	135	1
 #Ground
 5	0	176	1	512
 #Card
 11	385	96	12	7
 #tube
 7	128	144	10	32	-1
-
 15	50	130	15	0	16
 # ---- fire bullet	----
 4	-100	0	4
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-#50	128	144	0	1960	140	0
+50	496	150	0	510	180	0
 #50	2800	350	0	2810	418	0
 #50	2256	145	0	2287	180	4
 [GRID]

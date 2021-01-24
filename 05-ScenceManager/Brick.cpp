@@ -13,6 +13,7 @@ void Brick::Render()
 			animation_set->at(1)->Render(xBreak + dxBreak / 2, yBreak + dyBreak / 2);
 			animation_set->at(1)->Render(xBreak - dxBreak / 2, yBreak + dyBreak / 2);
 		}
+	//RenderBoundingBox();
 }
 
 void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
@@ -31,9 +32,18 @@ void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 		yBreak = this->y;
 	}
 
-	if (SwitchOff)
+	if (SwitchOff && !count)
 	{
 		BBox = false;
+		StartSleep();
+		count = true;
+	}
+	if (GetTickCount64() - Sleep_start > BRICK_TIME_OFF && SwitchOff)
+	{
+		Sleep_start = 0;
+		Sleep = 0;
+		SwitchOff = false;
+		BBox = true;
 	}
 	vector<LPGAMEOBJECT> coEventsResult;
 	coEventsResult.clear();
