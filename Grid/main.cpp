@@ -53,8 +53,8 @@ vector<string> split(string line, string delimeter = "\t")
 }
 
 int main() {
-	string sceneFilePath = "C:\\Users\\Win\\Desktop\\New folder\\scene1-4.txt";
-	string OutPut = "C:\\Users\\Win\\Desktop\\New folder\\Grid_scene1-4.txt";
+	string sceneFilePath = "D:\\Project Game\\gamedev-intro-tutorials-master\\05-ScenceManager\\Grid\\New folder\\scene1-1.txt";
+	string OutPut = "D:\\Project Game\\gamedev-intro-tutorials-master\\05-ScenceManager\\Grid\\New folder\\Grid_scene1-1.txt";
 	int id = -1;
 
 	ifstream fs;

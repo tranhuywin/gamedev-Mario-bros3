@@ -21,6 +21,7 @@ Grid::Grid(LPCWSTR filepatch, vector<LPGAMEOBJECT> list) {
 	else {
 		char str[1024];
 		DebugOut(L"[INFO]: Loading Grid\n");
+		Resize();
 		while (fs.getline(str, 1024))
 		{
 			string line(str);
@@ -36,44 +37,16 @@ Grid::Grid(LPCWSTR filepatch, vector<LPGAMEOBJECT> list) {
 					listIdObjects[i][j].push_back(IDObject);
 				}
 			}
-			Resize();
-			for (int i = RowStart; i < RowEnd; i++) {
-				for (int j = ColStart; j < ColEnd; j++) {
+			for (int i = RowStart; i <= RowEnd; i++) {
+				for (int j = ColStart; j <= ColEnd; j++) {
 					listCells[i][j].push_back(list[IDObject]);
 				}
 			}
-
-			//Resize();
-			////ClearGrid((int)MAP_HEIGHT / CELL_HEIGHT, (int)MAP_WIDTH / CELL_WIDTH);
-			//for (int i = 0; i < list.size(); i++)
-			//{
-			//	for (int row = RowStart; row < RowEnd; row++)
-			//		for (int col = ColStart; col < ColEnd; col++)
-			//			listCells[row][col].push_back(list[i]);
-			//}
 		}
 		DebugOut(L"[INFO]: Load Grid xong\n");
 	}
 	
 	fs.close();
-	Resize();
-	ClearGrid((int)MAP_HEIGHT / CELL_HEIGHT, (int)MAP_WIDTH / CELL_WIDTH);
-
-	for (int i = 0; i < list.size(); i++)
-	{
-		float l, t, r, b;
-		list[i]->GetBoundingBox(l, t, r, b);
-		int Top = int(t / CELL_HEIGHT);
-		int Left = int(l / CELL_WIDTH);
-		int Right = ceil(r / CELL_WIDTH);
-		int Bottom = ceil(b / CELL_HEIGHT);
-		/*if (!list[i]->isdone)*/
-		{
-			for (int row = Top; row < Bottom; row++)
-				for (int col = Left; col < Right; col++)
-				listCells[row][col].push_back(list[i]);
-		}
-	}
 }
 
 void Grid::Resize()
@@ -124,14 +97,22 @@ void Grid::GetGrid(vector<LPGAMEOBJECT>& list)
 	int lastCol = (int)((CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()) / CELL_WIDTH) + 1;
 	int firstRow = (int)(CGame::GetInstance()->GetCamPosY() / CELL_HEIGHT);
 	int lastRow = (int)((CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()) / CELL_HEIGHT) + 1;
-
+	vector<LPGAMEOBJECT> ObjectUpdated;
 	for (int i = firstRow; i < lastRow; i++)
 	{
 		for (int j = firstCol; j < lastCol; j++)
 		{
 			for (int k = 0; k < listCells[i][j].size(); k++)
 			{
-				list.push_back(listCells[i][j][k]);
+				for (int m = 0; m < ObjectUpdated.size(); m++) {
+					if (listCells[i][j][k] == ObjectUpdated[m])
+					{
+						list.push_back(listCells[i][j][k]);
+						ObjectUpdated.push_back(listCells[i][j][k]);
+					}
+
+				}
+				
 			}
 		}
 	}
