@@ -2,8 +2,8 @@
 #include "GameObject.h"
 #include "Game.h"
 
-#define CELL_WIDTH 195
-#define CELL_HEIGHT 150
+#define CELL_WIDTH	250
+#define CELL_HEIGHT 250
 
 #define MAP_WIDTH	3000
 #define MAP_HEIGHT  1000
@@ -20,5 +20,4 @@ public:
 	void ClearGrid(int numsRow, int numsCol);
 	void AddObjectToGrid(int id, vector<LPGAMEOBJECT> object);
 	void GetGrid(vector<LPGAMEOBJECT>& list);
-	//void MakeObjOutOfCam(vector<LPGAMEOBJECT>& list);
 };

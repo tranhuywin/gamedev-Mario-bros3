@@ -1,6 +1,7 @@
 #include "Brick.h"
 #include "Items.h"
 #include "QuestionBrick.h"
+#include "Utils.h"
 void Brick::Render()
 {
 	if(!SwitchOff)
@@ -13,7 +14,9 @@ void Brick::Render()
 			animation_set->at(1)->Render(xBreak + dxBreak / 2, yBreak + dyBreak / 2);
 			animation_set->at(1)->Render(xBreak - dxBreak / 2, yBreak + dyBreak / 2);
 		}
-	//RenderBoundingBox();
+	else {
+		RenderBoundingBox();
+	}
 }
 
 void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
@@ -45,6 +48,7 @@ void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 		SwitchOff = false;
 		BBox = true;
 	}
+
 	vector<LPGAMEOBJECT> coEventsResult;
 	coEventsResult.clear();
 

@@ -10,15 +10,12 @@
 #define BRICK_TIME_OFF			7000
 class Brick : public CGameObject
 {
-	virtual void Render();
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
-	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 	float dxBreak, dyBreak;
 	float vxBreak, vyBreak;
 	float xBreak, yBreak;
 	LPGAMEOBJECT items;
 	int Sleep;
-	bool count;
+	bool count = false;
 	DWORD Sleep_start;
 	void StartSleep() { Sleep = 1; Sleep_start = GetTickCount64(); }
 public:
@@ -27,5 +24,8 @@ public:
 	bool IsBreaked, SwitchOff, StoreItemQBrick;
 	QuestionBrick* QBick = NULL;
 	Brick(LPGAMEOBJECT item);
+	virtual void Render();
+	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
+	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 };
 

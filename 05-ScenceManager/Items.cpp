@@ -16,18 +16,17 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 			left = x + ITEM_BBOX_L;
 			top = y + ITEM_BBOX_T;
 		}
+		
 		if (!Active)
 		{
 			right = x + ITEM_BBOX_R;
 			bottom = y + ITEM_BBOX_B;
 			if (IdItem == ITEM_MONEY_IDLE)
 			{
-				left = x - TAIL_BBOX_WIDTH;
+				left = x;// -TAIL_BBOX_WIDTH;
 				//bottom = y + ITEM_BBOX_MONEY_IDLE;
 			}
 			else if (IdItem == ITEM_MULTIPLE_MONEY) {
-				//left = x;
-				//top = y;
 				right = x + ITEM_BBOX_MONEY_IDLE;
 				bottom = y + ITEM_BBOX_MONEY_IDLE + 1;
 			}
@@ -60,8 +59,8 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 
 void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	
-	if (!(CGame::GetInstance()->GetLevel() == MARIO_LEVEL_BIG) && IdItem == ITEM_ANI_TREE_LEAF)
+	//TODO: fix items( mushroom, coin)
+	if (!(CGame::GetInstance()->GetLevel() == MARIO_LEVEL_RACCOON) && IdItem == ITEM_ANI_TREE_LEAF)
 	{
 		IdItem = ITEM_ANI_MUSHROOM_RED;
 	}
@@ -73,149 +72,152 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (effect != NULL)
 		effect->Update(dt);
-	/*if (IdItem == ITEM_MONEY_IDLE && !OfBrick)			
-		Active = true;*/
+
 	if (BrickBreak != NULL)
-		if (IdItem == ITEM_MONEY_IDLE && BrickBreak->IsBreaked)
+		if (IdItem == ITEM_MONEY_IDLE && BrickBreak->IsBreaked)	//brick da bi be
 		{
 			Active = false;
 			BBox = false;
+		}else if (BrickBreak->SwitchOff)
+		{
+			Active = true;
 		}
-	//x += dx;
-	//y += dy;
-	if (CollTail)
-		Active = false;
-	if (Active)
+
+	//Active == true thi se co chuyen gi xay ra 
 	{
-		if (IdItem == ITEM_TREE_LEAF)
+		if (Active)
 		{
-			vy += ITEM_GRAVITY * dt;
-			if (vy > 2 * ITEM_GRAVITY * dt)
-				vy = 2 * ITEM_GRAVITY * dt;
-			if ((this->x - this->X_Start) > ITEM_TREE_LEAF_X_DISTANCE_X_START)
-				vx -= ITEM_TREE_LEAF_VX * dt;
-			else
-				vx += ITEM_TREE_LEAF_VX * dt;
-		}
-		else if (IdItem == ITEM_MONEY || IdItem == ITEM_MULTIPLE_MONEY) {
-			vy += ITEM_GRAVITY * dt;
-			if (y - Y_Start > 0 && vy != 0)
+			if (IdItem == ITEM_TREE_LEAF)
 			{
-				int CurentScore = CGame::GetInstance()->GetScore();
-				CGame::GetInstance()->SetScore(CurentScore + 100);
-				int CurentMoney = CGame::GetInstance()->GetMoney();
-				CGame::GetInstance()->SetMoney(CurentMoney + 1);
-				AniEffect = SpriteEffectStart + EFFECT_100;
-				effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
-				vx = 0; vy = 0;
-				CountColl--;
-				if (CountColl <= 0)
-					BBox = false;
-				if (IdItem == ITEM_MULTIPLE_MONEY) {
-					this->x = X_Start;
-					this->y = Y_Start;
-				}
-				Active = false;
+				vy += ITEM_GRAVITY * dt;
+				if (vy > 2 * ITEM_GRAVITY * dt)
+					vy = 2 * ITEM_GRAVITY * dt;
+				if ((this->x - this->X_Start) > ITEM_TREE_LEAF_X_DISTANCE_X_START)
+					vx -= ITEM_TREE_LEAF_VX * dt;
+				else
+					vx += ITEM_TREE_LEAF_VX * dt;
 			}
-		}
-		else if (IdItem == ITEM_SWITCH)
-		{
-			if (Y_Start - y > ITEM_SWITCH_YSTART_DISTANCE_Y)
-				vy = 0;
-			if (state == ITEM_SWITCH_STATE_OFF) {
-				for (int i = 0; i < coObjects->size(); i++) {
-					if (dynamic_cast<Brick*>(coObjects->at(i)))
-					{
-						//Active = false;
-						Brick* brick = dynamic_cast<Brick*>(coObjects->at(i));
-						brick->SwitchOff = true;
+			else if (IdItem == ITEM_MONEY || IdItem == ITEM_MULTIPLE_MONEY) {
+				vy += ITEM_GRAVITY * dt;
+				if (y - Y_Start > 0 && vy != 0)
+				{
+					int CurentScore = CGame::GetInstance()->GetScore();
+					CGame::GetInstance()->SetScore(CurentScore + 100);
+					int CurentMoney = CGame::GetInstance()->GetMoney();
+					CGame::GetInstance()->SetMoney(CurentMoney + 1);
+					AniEffect = SpriteEffectStart + EFFECT_100;
+					effect = new Effect(this->x, this->y - BRICK_BBOX_HEIGHT, AniEffect);
+					vx = 0; vy = 0;
+					CountColl--;
+					if (CountColl <= 0)
+						BBox = false;
+					if (IdItem == ITEM_MULTIPLE_MONEY) {
+						this->x = X_Start;
+						this->y = Y_Start;
+					}
+					Active = false;
+				}
+			}
+			else if (IdItem == ITEM_SWITCH)
+			{
+				if (Y_Start - y > ITEM_SWITCH_YSTART_DISTANCE_Y)
+					vy = 0;
+				if (state == ITEM_SWITCH_STATE_OFF) {
+					for (int i = 0; i < coObjects->size(); i++) {
+						if (dynamic_cast<Brick*>(coObjects->at(i)))
+						{
+							Brick* brick = dynamic_cast<Brick*>(coObjects->at(i));
+							brick->SwitchOff = true;
+						}
 					}
 				}
 			}
-		}
-		else if (IdItem == ITEM_CARD) {
-			if (EndScence) {
-				AniEffect = SpriteEffectStart + EFFECT_END_SCENCE;
-				float xdraw = CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()/3;
-				float ydraw = CGame::GetInstance()->GetCamPosY();
-				effect = new Effect(xdraw, ydraw, AniEffect);
+			else if (IdItem == ITEM_CARD) {
+				if (EndScence) {
+					AniEffect = SpriteEffectStart + EFFECT_END_SCENCE;
+					float xdraw = CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth() / 3;
+					float ydraw = CGame::GetInstance()->GetCamPosY();
+					effect = new Effect(xdraw, ydraw, AniEffect);
+				}
+
 			}
-			
+		}
+		else {
+			vy = 0; vx = 0;
 		}
 	}
-	else {
-		vy = 0; vx = 0;
-	}
-	CGameObject::Update(dt);
-	vector<LPCOLLISIONEVENT> coEvents;
-	vector<LPCOLLISIONEVENT> coEventsResultPro;
-	coEvents.clear();
-	if(Active && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
-		CalcPotentialCollisions(coObjects, coEvents);
-	if (coEvents.size() == 0)
+	//
+	// Canh bao truoc khi va cham cho mushroom
 	{
-		x += dx;
-		y += dy;
-	}
-	else {
-		float min_tx, min_ty, nx = 0, ny;
-		float rdx = 0, rdy = 0;
-		float vxPre = vx, vyPre = vy;
-		FilterCollision(coEvents, coEventsResultPro, min_tx, min_ty, nx, ny, rdx, rdy);
-		x += min_tx * dx + nx * 0.3f;
-		y += min_ty * dy + ny * 0.3f;
-
-
-		if (nx != 0)
-			vx = 0;
-		//if (nx != 0 && ny != 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
-		//	vx = -vx;
-		if (ny != 0)
-			vy = 0;
-		for (UINT i = 0; i < coEventsResultPro.size(); i++)
+		CGameObject::Update(dt);
+		vector<LPCOLLISIONEVENT> coEvents;
+		vector<LPCOLLISIONEVENT> coEventsResultPro;
+		coEvents.clear();
+		if (Active && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
+			CalcPotentialCollisions(coObjects, coEvents);
+		if (coEvents.size() == 0)
 		{
-			LPCOLLISIONEVENT e = coEventsResultPro[i];
-			if (dynamic_cast<CMario*>(e->obj)) {
-				if (nx != 0) {
-					vx = vxPre;
-					x += dx;
+			x += dx;
+			y += dy;
+		}
+		else {
+			float min_tx, min_ty, nx = 0, ny;
+			float rdx = 0, rdy = 0;
+			float vxPre = vx, vyPre = vy;
+			FilterCollision(coEvents, coEventsResultPro, min_tx, min_ty, nx, ny, rdx, rdy);
+			x += min_tx * dx + nx * 0.3f;
+			y += min_ty * dy + ny * 0.3f;
+
+			if (nx != 0)
+			{
+				vx = 0;
+			}
+			//if (nx != 0 && ny != 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
+			//	vx = -vx;
+			if (ny != 0)
+				vy = 0;
+			for (UINT i = 0; i < coEventsResultPro.size(); i++)
+			{
+				LPCOLLISIONEVENT e = coEventsResultPro[i];
+				if (dynamic_cast<CMario*>(e->obj)) {
+					if (nx != 0) {
+						vx = vxPre;
+						x += dx;
+					}
+					if (ny != 0) {
+						vy = vyPre;
+						y += dy;
+					}
 				}
-				
-				if (ny != 0)
-				{
+				else if (dynamic_cast<Brick*>(e->obj)) {
+					if (nx != 0)
+					{
+						vx = vxPre;
+						x += dx;
+					}
+				}
+				else if (dynamic_cast<BulletPiranhaPlant*>(e->obj)) {
+					vx = vxPre;
 					vy = vyPre;
-					y += dy;
+					x += dx; y += dy;
 				}
-			}
-			else if (dynamic_cast<Brick*>(e->obj)) {
-				if (nx != 0)
-				{
-					vx = vxPre;
-					x += dx;
-				}
-			}
-			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj)) {
-				vx = vxPre;
-				vy = vyPre;
-				x += dx; y += dy;
 			}
 		}
+		for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	}
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-
+	//
+	//canh bao trong khi va cham cho tat ca items
 	vector<LPGAMEOBJECT> coEventsResult;
 	coEventsResult.clear();
-
 	CalCollisions(coObjects, coEventsResult);
 	int sizeCo = coEventsResult.size();
-	if (!CollTail)
 	{
-		if(BrickBreak != NULL)
-			if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && !BrickBreak->IsBreaked)
+		//if(BrickBreak != NULL)
+			//if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && (!BrickBreak->IsBreaked ||BrickBreak->SwitchOff))
+			/*if (BrickBreak->SwitchOff)
+			{
 				Active = true;
-
-		//if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE /*&& !BrickBreak->IsBreaked*/)
-		//	Active = true;
+			}*/
 	}
 
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
@@ -259,14 +261,13 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				else if (IdItem == ITEM_MONEY_IDLE)
 					{
-						if (mario->Iskilling)
-						{
-							//CollTail = true;
-							//DebugOut(L"Kill\n");
-							MarioGetMoney = true;
-
-						}
-						else if(Active)
+						//if (mario->Iskilling)
+						//{
+						//	//CollTail = true;
+						//	//DebugOut(L"Kill\n");
+						//	//MarioGetMoney = true;
+						//}
+						if(Active)
 						{
 							int CurentScore = CGame::GetInstance()->GetScore();
 							CGame::GetInstance()->SetScore(CurentScore + 100);
@@ -275,11 +276,12 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							x = -100; y = -100; vy = 0; vx = 0;
 							BBox = false;
 							Active = false;
-							if (BrickBreak != NULL)
+							BrickBreak->IsBreaked = true;
+							/*if (BrickBreak != NULL)
 							{
 								BrickBreak->x = -100;
 								BrickBreak->y = -100;
-							}
+							}*/
 						}
 					}
 				else if (IdItem == ITEM_MONEY_ROTATOR ) {
@@ -315,7 +317,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					//Active = false;
 					EndScence = true;
 					vy = -0.03 * dt;
-					//x = -100; y = -100; vy = 0; vx = 0;
 					BBox = false;
 				}
 				else if ((IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) && vx != 0) {
@@ -341,18 +342,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					BBox = false;
 				}
 			}
-			else if (dynamic_cast<CKoopas*>(e)) {
-				CKoopas* koopas = dynamic_cast<CKoopas*>(e);
-				if (koopas->GetState() == KOOPAS_STATE_ROTATORY) {
-					if (IdItem == ITEM_MONEY_IDLE)
-					{
-						MarioGetMoney = true;			//lam tam, chua toi uu
-						x = -100; y = -100; vy = 0; vx = 0;
-						BBox = false;
-						Active = false;
-					}
-				}
-			}
 			else if (dynamic_cast<QuestionBrick*>(e))
 			{
 				//brick->StoreItemQBrick = true;
@@ -375,7 +364,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						Active = true;
 				}
 			}
-			else if (dynamic_cast<Brick*>(e)) {
+			else if (dynamic_cast<Brick*>(e) && BrickBreak == NULL) {
 				// multiple coin
 				//Active = false;
 				//OfBrick = true;
@@ -416,7 +405,7 @@ void Items::Render()
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)

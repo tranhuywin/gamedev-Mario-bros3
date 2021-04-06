@@ -26,7 +26,7 @@
 #define ITEM_BBOX_MUSHROOM		15
 
 #define ITEM_DEFLECT_SPEED						0.02f
-#define ITEM_MUSHROOM_SPEEED_VX					0.0035f
+#define ITEM_MUSHROOM_SPEEED_VX					0.004f
 #define ITEM_GRAVITY							0.0015f
 #define ITEM_TREE_LEAF_VX						0.0005f
 #define ITEM_TREE_LEAF_X_DISTANCE_X_START		20.0f
@@ -59,7 +59,7 @@ public:
 	int CountColl = COUNT_COLLiTION_MARIO;
 	int AniEffect;
 	int SpriteEffectStart;
-	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, CollTail, OfBrick;
+	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, OfBrick;
 	bool DrawEffect;
 	float X_Start, Y_Start;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);

@@ -3,8 +3,8 @@
 #include <iostream>
 #include<fstream>
 
-#define GRID_WIDTH	180
-#define GRID_HEIGHT  150
+#define GRID_WIDTH	250
+#define GRID_HEIGHT  250
 
 #define BBOX_WIDTH		16
 #define BBOX_HEIGHT		16
@@ -37,6 +37,7 @@
 #define SCENE_SECTION_EFFECT			8
 #define SCENE_SECTION_STATUS_BAR		9
 
+#define MAX_SCENE_LINE					1024
 using namespace std;
 vector<string> split(string line, string delimeter = "\t")
 {
@@ -51,10 +52,12 @@ vector<string> split(string line, string delimeter = "\t")
 
 	return tokens;
 }
+void _ParseSection_OBJECTS(string line) {
 
+}
 int main() {
 	string sceneFilePath = "D:\\Project Game\\gamedev-intro-tutorials-master\\05-ScenceManager\\Grid\\New folder\\scene1-1.txt";
-	string OutPut = "D:\\Project Game\\gamedev-intro-tutorials-master\\05-ScenceManager\\Grid\\New folder\\Grid_scene1-1.txt";
+	string OutPut = "D:\\Project Game\\gamedev-intro-tutorials-master\\05-ScenceManager\\Grid\\New folder\\Grid_sence1_1.txt";
 	int id = -1;
 
 	ifstream fs;
@@ -70,24 +73,24 @@ int main() {
 		return 0;
 	}
 	else {
-		char str[1024];
+		char str[MAX_SCENE_LINE];
 		
-		while (fs.getline(str, 1024))
+		while (fs.getline(str, MAX_SCENE_LINE))
 		{
 			string line(str);
 			if (line == "") continue;
-			if (line[0] == '#')
-			{
-				//id = 0;
-				//ofs << line;
-				continue;
+			if (line[0] == '#') continue;	// skip comment lines	
+			if (line == "[OBJECTS]") {
+				section = SCENE_SECTION_OBJECTS; continue;
 			}
-			else
-			{
+			//else { section = SCENE_SECTION_UNKNOWN; continue; }
+
+			switch (section) {
+			case SCENE_SECTION_OBJECTS: {
 				vector<string> tokens = split(line);
 				int Left, Top, Right, Bottom;
 				id++;
-				ofs << id << "\t";
+				//ofs << id << "\t";
 				int idobj = atoi(tokens[0].c_str());
 				Left = atoi(tokens[1].c_str());
 				Top = atoi(tokens[2].c_str());
@@ -104,7 +107,7 @@ int main() {
 				int ColStart = int(Left / GRID_WIDTH);
 				int RowStart = int(Top / GRID_HEIGHT);
 				int ColEnd = ceil(Right / GRID_WIDTH);
-				int RowEnd = ceil(Bottom / GRID_HEIGHT); 
+				int RowEnd = ceil(Bottom / GRID_HEIGHT);
 
 				switch (idobj)
 				{
@@ -114,7 +117,7 @@ int main() {
 					ColEnd++;
 					RowEnd++;
 					break;
-				case OBJECT_TYPE_KOOPAS	:
+				case OBJECT_TYPE_KOOPAS:
 					ColStart = 0;
 					ColEnd++;
 					RowEnd++;
@@ -123,14 +126,13 @@ int main() {
 					RowEnd++;
 					break;
 				}
-				
+
 				if (idobj != 0)
-					ofs << ColStart << "\t" << RowStart << "\t" << ColEnd << "\t" << RowEnd << "\t";
+					ofs << id << "\t" << ColStart << "\t" << RowStart << "\t" << ColEnd << "\t" << RowEnd << "\t" << idobj << "\n";
 				else
 					id--;
-				
+				} break;
 			}
-			ofs << "\n";
 		}
 	}
 	

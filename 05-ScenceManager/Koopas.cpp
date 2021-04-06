@@ -50,7 +50,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			SetState(KOOPAS_STATE_FLYING_UP);
 			vy = -KOOPA_PARATROOPA_RED_FLY_VY * dt;
 		}
-
 	}
 	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED || TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_GREEN) {
 		if (state == KOOPAS_STATE_PREPARE_WAKE_UP)
@@ -128,7 +127,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-		if (nx != 0 && (GetState() == KOOPAS_STATE_ROTATORY) /*|| TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED*/)
+		if (nx != 0 && (GetState() == KOOPAS_STATE_ROTATORY || GetState() == KOOPAS_STATE_WALKING) /*|| TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED*/)
 			vx = -vx;
 		if (ny != 0)
 			vy = 0;

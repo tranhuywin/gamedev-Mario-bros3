@@ -212,13 +212,13 @@
     <ClInclude Include="Grid.h">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
-    <ClInclude Include="FlyingWood.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Brothers.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="BoomerangOfBrother.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Brothers.h">
+    <ClInclude Include="FlyingWood.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>

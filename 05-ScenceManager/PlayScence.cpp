@@ -477,9 +477,6 @@ void CPlayScene::Update(DWORD dt)
 
 	// Update camera 
 	UpdateCammera(dt);
-	//player->GetPosition(CamX, CamY);
-	//CamY += CGame::GetInstance()->GetScreenHeight() / 2;
-	//CamX += CGame::GetInstance()->GetScreenWidth() / 2;
 	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)
 	{
 		if (player->x < CamX)
@@ -526,9 +523,6 @@ void CPlayScene::Render()
 	if (dynamic_cast<Tube*>(objects[1])) {
 		objects[1]->Render();	// cong che portal
 	}
-	/*for (int i = 0; i < listWeaponEnemy.size(); i++) {
-		listWeaponEnemy[i]->Render();
-	}*/
 	statusBar->Render();
 }
 
@@ -565,39 +559,41 @@ void CPlayScene::UpdateCammera(DWORD dt)
 	//float CamX, CamY;
 	int CurSecene = game->Getcurrent_scene();
 	bool CammeraMove = false;
-	//if (CurSecene == SCENCE_WORD_MAP_4)
-	//	CammeraMove = true;
+	if (CurSecene == SCENCE_WORD_MAP_4)
+		CammeraMove = true;
 
 	
 	if (!CammeraMove)
 	{
 		player->GetPosition(CamX, CamY);
 		CamX -= game->GetScreenWidth() / 2;
-		if (CamX > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
-			CamX = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
-		if (player->IsFlying && CamY < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))
-		{
+		
+		if (player->IsFlying && CamY < (tileMap->GetHeightMap() - game->GetScreenHeight() / 2))			// camY theo bay
 			CamY -= game->GetScreenHeight() / 2;
-		}
-		else if (player->IsLimitFlying && CamY < (tileMap->GetHeightMap() - game->GetScreenHeight() - SCREEN_BORDER))
+		else if (player->IsLimitFlying && CamY < (tileMap->GetHeightMap() - game->GetScreenHeight()))  // camY theo rot
 			CamY -= game->GetScreenHeight() / 2;
-		else
+		else																							// camY theo di bo
 		{
-			if (CurSecene == SCENCE_WORD_MAP_1)
-				CamY = tileMap->GetHeightMap() / 2 + SCREEN_BORDER + game->GetScreenHeight() / 10;
-			if (player->y < 192 && CurSecene == SCENCE_WORD_MAP_1)
+			CamY = tileMap->GetHeightMap() -( game->GetScreenHeight() - 20);
+			if (player->y < 192)					// vi tri tren troi TODO: them so 192 tu file txt
 				CamY -= game->GetScreenHeight();
 		}
-		if (CamX < SCREEN_BORDER)
-			CamX = SCREEN_BORDER;
-		if (CamY < SCREEN_BORDER)
-			CamY = SCREEN_BORDER;
+
+		// gioi han camX
+		if (CamX < 0.0f)
+			CamX = 0.0f;
+		if (CamX > tileMap->GetWidthMap() - game->GetScreenWidth())
+			CamX = tileMap->GetWidthMap() - game->GetScreenWidth();
+		// gioi han camY
+		if (CamY < 0.0f)
+			CamY = 0.0f;
+		//cam of scence start 
 		if (CurSecene == SCENCE_START)
 		{
 			CamX = -CAMERA_X_START_MAP;
 			CamY = -CAMERA_Y_START_MAP;
 		}
-		else if (CurSecene == SCENCE_WORD_MAP_1_1)
+		/*else if (CurSecene == SCENCE_WORD_MAP_1_1)
 		{
 			CamX = CAMERA_X_WORLD_1_1;
 			CamY = CAMERA_Y_WORLD_1_1;
@@ -609,7 +605,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 		}
 		else if (CurSecene == SCENCE_WORD_MAP_4_1) {
 			CamY = CAMERA_Y_WORLD_4_1;
-		}
+		}*/
 	}
 	else
 	{
