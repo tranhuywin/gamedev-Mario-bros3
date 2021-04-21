@@ -691,9 +691,9 @@ bend over left Big
 7	2320	384	10	64	1
 # MARIO
 # start
-#0	50.0	350.0	1
+0	50.0	350.0	1
 #Brick
-0	1940.0	350.0	1
+#0	1940.0	350.0	1
 # 3 con koopas xanh
 #0	1390.0	380.0	1
 #0	890.0	380.0	1
@@ -906,5 +906,9 @@ bend over left Big
 Grid/Grid_scene1-1.txt
 [STATUS_BAR]
 80000	80001	80010	80020	80030
+[CAMERA]
+#isMove(1==true,0==false)		Sky	hightStatusBar
+0	192	20
 [TITLEMAP]
+#ID	textture	data	row	col	width	height
 200000	textures\tile_map.png	textures\tile_map.txt	16	6	16	16

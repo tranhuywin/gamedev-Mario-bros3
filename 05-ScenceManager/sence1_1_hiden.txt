@@ -721,5 +721,8 @@ bend over left Big
 Grid\Grid_sence1_1_hiden.txt
 [STATUS_BAR]
 80000	80001	80010	80020	80030
+[CAMERA]
+#isMove(1==true,0==false)		Sky	hightStatusBar
+0	192	20
 [TITLEMAP]
 900000	textures\mini_map_1.png	textures\mini_map_1.txt	16	1	16	16

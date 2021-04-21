@@ -233,8 +233,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
 		// block every object first!
-		x += min_tx*dx + nx*0.3f;
-		y += min_ty*dy + ny*0.3f;
+		x += min_tx*dx + nx*0.4f;
+		y += min_ty*dy + ny*0.4f;
 
 		if (nx!=0 && !OnPlatform)
 			vx = 0;
@@ -436,19 +436,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (e->ny > 0)
 				{
-					
 					if (brick->StoreItemQBrick)
 					{
-						
-						if (brick->CountCollBrickMulMoney >0 && brick->IdItemOfBrick == ITEM_MULTIPLE_MONEY) {
+						if (brick->CountCollBrickMulMoney > 0 && brick->IdItemOfBrick == ITEM_MULTIPLE_MONEY) {
 							brick->CountCollBrickMulMoney--;
-
 							brick->QBick->SetState(BRICK_STATE_QUESTION_ON_UP);
 							brick->QBick->YCollition = brick->QBick->y;
 						}
 						else {
 							brick->BBox = false;
 							brick->SwitchOff = true;
+							brick->isDispread = true;
 							if (brick->QBick != NULL && brick->QBick->GetState() == BRICK_STATE_QUESTION_ON)
 							{
 								brick->QBick->SetState(BRICK_STATE_QUESTION_ON_UP);
@@ -456,8 +454,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							}
 						}
 					}
-					else
-						brick->IsBreaked = true;
+					//else
+						//brick->IsBreaked = true;
+						//brick->BBox = false;
 				}
 			}
 			else if (dynamic_cast<QuestionBrick*>(e->obj))
@@ -517,14 +516,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<FlyingWood*>(e->obj)) {
 				FlyingWood* flyingWood = dynamic_cast<FlyingWood*>(e->obj);
-				if(e->ny < 0)
+				if (e->ny < 0)
+				{
 					flyingWood->IsCollMario = true;
-				//if (e->nx < 0)
-				//{
-				//	//this->x = flyingWood->x - MARIO_BIG_BBOX_WIDTH;
-				//	vx = flyingWood->vx;
-				//	
-				//}
+					//this->y = flyingWood->y - MARIO_BIG_BBOX_HEIGHT + flyingWood->dy;
+				}
+				if (e->nx < 0)
+				{
+					//this->x = flyingWood->x - MARIO_BIG_BBOX_WIDTH;
+					//vx = flyingWood->vx;
+					
+				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{

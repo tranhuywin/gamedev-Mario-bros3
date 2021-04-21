@@ -16,6 +16,8 @@ class CPlayScene: public CScene
 {
 protected: 
 	int SpriteEffectStart;
+	bool isCammeraMove = false;
+	int possitonCammeraInTheSky = 0, hightCammeraStatusBar = 0;
 	TileMap *tileMap;
 	CMario* player;
 	//Grid
@@ -36,6 +38,7 @@ protected:
 	void _ParseSection_EFFECT(string line);
 	void _ParseSection_STATUS_BAR(string line);
 	void _ParseSection_GRID(string line);
+	void _ParseSection_CAMERA(string line);
 public: 
 	float CamX = 0, CamY = 0;
 	CPlayScene(int id, LPCWSTR filePath);

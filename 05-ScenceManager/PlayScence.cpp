@@ -41,6 +41,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define SCENE_SECTION_EFFECT			8
 #define SCENE_SECTION_STATUS_BAR		9
 #define SCENE_SECTION_GRID				10
+#define SCENE_SECTION_CAMERA			11
 
 #define OBJECT_TYPE_MARIO				0
 #define OBJECT_TYPE_BRICK				1
@@ -164,12 +165,6 @@ void CPlayScene::_ParseSection_TITLE_MAP(string line)
 	int tileset_width = atoi(tokens[5].c_str());
 	int tileset_height = atoi(tokens[6].c_str());
 
-	//gridObjIdle = new Grid();
-	//gridObjIdle->Resize();
-
-	//gridObjMove = new Grid();
-	//gridObjMove->Resize();
-
 	this->tileMap = new TileMap(ID, filePath_texture.c_str(), filePath_data.c_str(), num_row_on_texture, num_col_on_textture, tileset_width, tileset_height);
 }
 void CPlayScene::_ParseSection_EFFECT(string line) {
@@ -192,6 +187,18 @@ void CPlayScene::_ParseSection_GRID(string line) {
 	vector<string> tokens = split(line);
 	wstring filePath = ToWSTR(tokens[0]);
 	grid = new Grid(filePath.c_str(), listAllObject);
+}
+void CPlayScene::_ParseSection_CAMERA(string line) {
+	vector<string> tokens = split(line);
+	if (tokens.size() < 3) return; // skip invalid lines
+
+	int Move = atoi(tokens[0].c_str());
+	if (Move == 1)
+		isCammeraMove = true;
+	else
+		isCammeraMove = false;
+	possitonCammeraInTheSky = atoi(tokens[1].c_str());
+	hightCammeraStatusBar = atoi(tokens[2].c_str());
 }
 /*
 	Parse a line in section [OBJECTS] 
@@ -320,7 +327,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	if (obj != NULL)
 	{
 		obj->SetPosition(x, y);
-		//obj->SetXYStartLive(x, y);
 		LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 
 		obj->SetAnimationSet(ani_set);
@@ -331,7 +337,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	if (objItem != NULL)
 	{
 		objItem->SetPosition(x, y);
-		//obj->SetXYStartLive(x, y);
 		LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 
 		objItem->SetAnimationSet(ani_set);
@@ -379,6 +384,9 @@ void CPlayScene::Load()
 		if (line == "[GRID]") {
 			section = SCENE_SECTION_GRID; continue;
 		}
+		if (line == "[CAMERA]") {
+			section = SCENE_SECTION_CAMERA; continue;
+		}
 		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }	
 
 		//
@@ -395,20 +403,12 @@ void CPlayScene::Load()
 			case SCENE_SECTION_EFFECT: _ParseSection_EFFECT(line); break;
 			case SCENE_SECTION_STATUS_BAR: _ParseSection_STATUS_BAR(line); break;
 			case SCENE_SECTION_GRID: _ParseSection_GRID(line); break;
+			case SCENE_SECTION_CAMERA: _ParseSection_CAMERA(line); break;
 		}
 	}
 
 	f.close();
 
-	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
-	{
-		//for (int i = 0; i < listAllObject.size(); i++)
-		//{
-		//	grid->AddObjectToGrid(i, listAllObject);
-		//}
-		//grid->ResetGrid(listAllObject);
-
-	}
 	CTextures::GetInstance()->Add(ID_TEX_BBOX, L"textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
@@ -453,9 +453,6 @@ void CPlayScene::Update(DWORD dt)
 				ObjectsInGrid[i]->Update(dt, &coObjects);
 			}
 		}
-		/*for (int i = 0; i < listWeaponEnemy.size(); i++) {
-			listWeaponEnemy[i]->Update(dt, &coObjects);
-		}*/
 		player->Update(dt, &coObjects);
 	}
 	else {
@@ -477,16 +474,6 @@ void CPlayScene::Update(DWORD dt)
 
 	// Update camera 
 	UpdateCammera(dt);
-	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)
-	{
-		if (player->x < CamX)
-		{
-			player->SetPosition(CamX, player->y);
-			player->SetState(MARIO_STATE_WALKING_RIGHT);
-		}
-		if(player->x > CamX + CGame::GetInstance()->GetScreenWidth())
-			player->SetPosition(CamX + CGame::GetInstance()->GetScreenWidth(), player->y);
-	}
 	// Update Status bar
 	float XStatusBar = CGame::GetInstance()->GetCamPosX() + STATUS_BAR_MARGIN_LEFT;
 	float YStatusBar = CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() - STATUS_BAR_MARGIN_TOP;
@@ -513,7 +500,6 @@ void CPlayScene::Render()
 			objects[i]->Render();
 		}
 	}
-
 
 	player->Render();
 			
@@ -558,12 +544,8 @@ void CPlayScene::UpdateCammera(DWORD dt)
 	CGame* game = CGame::GetInstance();
 	//float CamX, CamY;
 	int CurSecene = game->Getcurrent_scene();
-	bool CammeraMove = false;
-	if (CurSecene == SCENCE_WORD_MAP_4)
-		CammeraMove = true;
 
-	
-	if (!CammeraMove)
+	if (!isCammeraMove)
 	{
 		player->GetPosition(CamX, CamY);
 		CamX -= game->GetScreenWidth() / 2;
@@ -574,11 +556,10 @@ void CPlayScene::UpdateCammera(DWORD dt)
 			CamY -= game->GetScreenHeight() / 2;
 		else																							// camY theo di bo
 		{
-			CamY = tileMap->GetHeightMap() -( game->GetScreenHeight() - 20);
-			if (player->y < 192)					// vi tri tren troi TODO: them so 192 tu file txt
+			CamY = tileMap->GetHeightMap() -( game->GetScreenHeight() - hightCammeraStatusBar);
+			if (player->y < possitonCammeraInTheSky)					// vi tri tren troi TODO: them so 192 tu file txt
 				CamY -= game->GetScreenHeight();
 		}
-
 		// gioi han camX
 		if (CamX < 0.0f)
 			CamX = 0.0f;

@@ -13,6 +13,7 @@
 
 CKoopas::CKoopas(int TypeKoopas)
 {
+	nx = -1;
 	SetState(KOOPAS_STATE_WALKING);
 	this->TypeKoopas = TypeKoopas;
 	if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_RED) {
@@ -23,11 +24,11 @@ CKoopas::CKoopas(int TypeKoopas)
 void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
 	left = x;
-	top = y + 1;
+	top = y;
 	right = x + KOOPAS_BBOX_WIDTH;
 
 	if (state == KOOPAS_STATE_WALKING)
-		bottom = y + KOOPAS_BBOX_HEIGHT - 1;
+		bottom = y + KOOPAS_BBOX_HEIGHT;
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL - 1;
 }
@@ -38,6 +39,35 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		effect->Update(dt);
 	if(!IsCatching && TypeKoopas != KOOPAS_TYPE_KOOPA_PARATROOPA_RED)
 		vy += KOOPAS_GRAVITY/2 * dt;
+	// check falling
+	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED && GetState() == KOOPAS_STATE_WALKING)
+	{
+		
+		if (nx == 1)
+		{
+			objCheckFalling->SetPosition(x + 5, y);
+			if (objCheckFalling->isFalling)
+			{
+				nx = -1;
+				objCheckFalling->SetPosition(x - 15, y);
+				SetState(KOOPAS_STATE_WALKING);
+			}
+		}
+		else if (nx == -1)
+		{
+			objCheckFalling->SetPosition(x - 10, y);
+			if (objCheckFalling->isFalling)
+			{
+				nx = 1;
+				objCheckFalling->SetPosition(x + 5, y);
+				SetState(KOOPAS_STATE_WALKING);
+			}
+		}
+
+	}
+	if (objCheckFalling != NULL)
+		objCheckFalling->Update(dt, coObjects);
+	//
 	CGameObject::Update(dt);
 	if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_RED) {
 		vx = 0;
@@ -72,8 +102,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			PrepareWakeUp_start = 0;
 			PrepareWakeUp = 0;
 			y -= 12.0f;
-			state = KOOPAS_STATE_WALKING;
-			vx = KOOPAS_WALKING_SPEED;
+			SetState(KOOPAS_STATE_WALKING);
 		}
 	}
 	
@@ -98,8 +127,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							SetState(KOOPAS_STATE_SHELL);
 							vx = KOOPAS_SHIEL_DEFLECT_SPEED_VX * dt;
 						}
-						/*else
-							vx = 0;*/
 					}
 				}
 			}
@@ -111,7 +138,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	coEvents.clear();
 	if(state != KOOPAS_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
-
+	
 	if (coEvents.size() == 0)
 	{
 		x += dx;
@@ -125,20 +152,23 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		float vyLine = vy;
 		float vyPre = vy, vxPre = vx;
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+		
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-		if (nx != 0 && (GetState() == KOOPAS_STATE_ROTATORY || GetState() == KOOPAS_STATE_WALKING) /*|| TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED*/)
-			vx = -vx;
+		//if (nx != 0 && (GetState() == KOOPAS_STATE_ROTATORY || GetState() == KOOPAS_STATE_WALKING) /*|| TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED*/)
+		//	vx = -vx;
 		if (ny != 0)
+		{
 			vy = 0;
+		}
 		if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN && ny < 0)
 		{
 			vy = -KOOPAS_PARATROOPA_GREEN_DEFLECT_SPEED * dt;
 		}
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
-			LPCOLLISIONEVENT e = coEventsResult[i];
-
+			LPCOLLISIONEVENT e = coEventsResult[i];	
+			
 			if (dynamic_cast<Line*>(e->obj))
 			{
 				Line* line = dynamic_cast<Line*>(e->obj);
@@ -170,40 +200,16 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			{
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+					if (nx != 0 && GetState() == KOOPAS_STATE_WALKING)
+					{
+						//if ((nx == 1 && vx < 0) || (nx == -1 && vx > 0))
+						//	vx = -vx;
+						x += dx * 2;
+					}
 					if (GetState() == KOOPAS_STATE_SHELL) {
 						vx = 0;
 					}
 					
-					if (XLeftBrick == 0 && XRightBrick == 0)
-					{
-						XLeftBrick = brick->x; XRightBrick = brick->x + BRICK_BBOX_WIDTH;
-					}
-					if (this->vx < 0 && nx > 0)
-						x -= 0.4f;
-					if (this->vx < 0 && brick->x < XLeftBrick)
-					{
-						XLeftBrick = brick->x;
-						vx = vxPre;
-						x -= 0.4f;
-					}
-					
-					if (vx < 0 && x < XLeftBrick - KOOPAS_BBOX_WIDTH / 2 && state == KOOPAS_STATE_WALKING) {
-						x = XLeftBrick;
-						vx = -vx;
-					}
-					if (this->vx > 0 && nx < 0)
-						x += 0.4f;
-
-					if (this->vx > 0 && XRightBrick < brick->x + BRICK_BBOX_WIDTH)
-					{
-						XRightBrick = brick->x + BRICK_BBOX_WIDTH;
-						vx = vxPre;
-						x += 0.4f;
-					}
-					if (vx > 0 && x > XRightBrick - KOOPAS_BBOX_WIDTH /3 && state == KOOPAS_STATE_WALKING) {
-						x = XRightBrick - KOOPAS_BBOX_WIDTH / 3; 
-						vx = -vx;
-					}
 					if (e->ny > 0)
 					{
 						vy = vyLine;
@@ -214,13 +220,18 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 				}
 
-				if (state == KOOPAS_STATE_ROTATORY  && nx != 0) {
-					brick->IsBreaked = true;					
+				if (GetState() == KOOPAS_STATE_ROTATORY  && nx != 0 && (brick->y -this->y < KOOPAS_BBOX_HEIGHT_SHELL - 1)) {
+					brick->IsBreaked = true;	
+					vx = -vx;	//bat nguoc lai
 				}
 			}
 			else if (dynamic_cast<Ground*>(e->obj)) {
-				//if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
-				//	vy = -KOOPAS_PARATROOPA_GREEN_DEFLECT_SPEED * dt;
+				if(nx != 0)
+					vx = -vx;	//bat nguoc lai
+			}
+			else if (dynamic_cast<Tube*>(e->obj)) {
+				if (nx != 0)
+					vx = -vx;	//bat nguoc lai
 			}
 			else if (dynamic_cast<QuestionBrick*>(e->obj) && state == KOOPAS_STATE_ROTATORY)
 			{
@@ -234,7 +245,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			else if (dynamic_cast<CGoomba*>(e->obj) && state == KOOPAS_STATE_ROTATORY) {
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				goomba->SetState(GOOMBA_STATE_DIE);
-				vx = vxPre;
+				//vx = vxPre;
 				x += dx;
 			}
 		}
@@ -245,6 +256,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 void CKoopas::Render()
 {
+	//if (objCheckFalling != NULL)
+	//	objCheckFalling->Render();
 	if (effect != NULL)
 		effect->Render();
 	int ani = KOOPAS_ANI_WALKING_LEFT_RED;
@@ -351,17 +364,13 @@ void CKoopas::SetState(int state)
 		break;
 	case KOOPAS_STATE_ROTATORY:
 		vx = KOOPAS_ROTATORY_SPEED;
-		//vy = 0;
 		break;
 	case KOOPAS_STATE_WALKING:
-		vx = -KOOPAS_WALKING_SPEED / 3;
-		//if (this->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
-		//	vx = -0.015f;
-		/*else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_TROOPA_RED)
-		{
-			vy = -0.015f;
-			vx = 0;
-		}*/
+		vx = -KOOPAS_WALKING_SPEED;
+		if (nx == 1)
+			vx = KOOPAS_WALKING_SPEED;
+		else if (nx == -1)
+			vx = -KOOPAS_WALKING_SPEED;
 		break;
 	case KOOPAS_STATE_FLYING_UP:
 		break;

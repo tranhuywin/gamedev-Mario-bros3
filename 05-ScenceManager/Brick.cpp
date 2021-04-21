@@ -4,7 +4,7 @@
 #include "Utils.h"
 void Brick::Render()
 {
-	if(!SwitchOff)
+	if(!SwitchOff && !isDispread)
 		if(!IsBreaked)
 			animation_set->at(0)->Render(x, y);
 		else
@@ -15,7 +15,7 @@ void Brick::Render()
 			animation_set->at(1)->Render(xBreak - dxBreak / 2, yBreak + dyBreak / 2);
 		}
 	else {
-		RenderBoundingBox();
+		//RenderBoundingBox();
 	}
 }
 

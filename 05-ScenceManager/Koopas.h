@@ -2,7 +2,8 @@
 
 #include "GameObject.h"
 #include "Effect.h"
-#define KOOPAS_WALKING_SPEED				0.04f
+#include "ObjCheckFalling.h"
+#define KOOPAS_WALKING_SPEED				0.014f
 #define KOOPAS_PARATROOPA_WALKING_SPEED		0.01f
 #define KOOPAS_ROTATORY_SPEED	0.2f
 #define KOOPAS_DIE_DEFLECT_SPEED 0.02f
@@ -68,6 +69,7 @@ public:
 	int TypeKoopas;
 	Effect* effect = NULL;
 	CKoopas(int TypeKoopas);
+	ObjCheckFalling* objCheckFalling = new ObjCheckFalling();
 	virtual void SetState(int state);
 	void BeCatch(LPGAMEOBJECT mario, float YShell);
 	void StartSleep() { Sleep = 1; Sleep_start = GetTickCount64(); }

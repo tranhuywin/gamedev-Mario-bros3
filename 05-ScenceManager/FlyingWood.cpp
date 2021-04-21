@@ -2,7 +2,7 @@
 
 void FlyingWood::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 {
-	vx = -FLYING_WOOD_VX * dt;
+	//vx = -FLYING_WOOD_VX * dt;
 	if (IsCollMario)
 	{
 		vy = FLYING_WOOD_VY * dt;

@@ -21,7 +21,7 @@ class Brick : public CGameObject
 public:
 	int IdItemOfBrick = -1;
 	int CountCollBrickMulMoney = 5;
-	bool IsBreaked, SwitchOff, StoreItemQBrick;
+	bool IsBreaked, SwitchOff, StoreItemQBrick, isDispread = false;
 	QuestionBrick* QBick = NULL;
 	Brick(LPGAMEOBJECT item);
 	virtual void Render();

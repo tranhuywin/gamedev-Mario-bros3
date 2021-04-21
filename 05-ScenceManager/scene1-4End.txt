@@ -736,5 +736,8 @@ bend over left Big
 Grid\Grid_scene1-4End.txt
 [STATUS_BAR]
 80000	80001	80010	80020	80030
+[CAMERA]
+#isMove(1==true,0==false)		Sky	hightStatusBar
+0	192	20
 [TITLEMAP]
 200000	textures\tile_map1-4end.png	textures\tile_map1-4end.txt	8	5	16	16

@@ -123,6 +123,9 @@
     <ClCompile Include="FlyingWood.cpp">
       <Filter>Source Files\Map</Filter>
     </ClCompile>
+    <ClCompile Include="ObjCheckFalling.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -219,6 +222,9 @@
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="FlyingWood.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjCheckFalling.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>

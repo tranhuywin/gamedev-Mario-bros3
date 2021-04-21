@@ -132,6 +132,7 @@
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="FlyingWood.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="ObjCheckFalling.cpp" />
     <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="Tree.cpp" />
     <ClCompile Include="VenusFireTrap.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="FlyingWood.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="ObjCheckFalling.h" />
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="Tree.h" />
     <ClInclude Include="VenusFireTrap.h" />

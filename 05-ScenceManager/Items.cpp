@@ -23,8 +23,7 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 			bottom = y + ITEM_BBOX_B;
 			if (IdItem == ITEM_MONEY_IDLE)
 			{
-				left = x;// -TAIL_BBOX_WIDTH;
-				//bottom = y + ITEM_BBOX_MONEY_IDLE;
+				left = x;
 			}
 			else if (IdItem == ITEM_MULTIPLE_MONEY) {
 				right = x + ITEM_BBOX_MONEY_IDLE;
@@ -59,7 +58,6 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 
 void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	//TODO: fix items( mushroom, coin)
 	if (!(CGame::GetInstance()->GetLevel() == MARIO_LEVEL_RACCOON) && IdItem == ITEM_ANI_TREE_LEAF)
 	{
 		IdItem = ITEM_ANI_MUSHROOM_RED;
@@ -80,7 +78,8 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			BBox = false;
 		}else if (BrickBreak->SwitchOff)
 		{
-			Active = true;
+			if(IdItem != ITEM_MULTIPLE_MONEY)
+				Active = true;
 		}
 
 	//Active == true thi se co chuyen gi xay ra 
@@ -102,6 +101,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (y - Y_Start > 0 && vy != 0)
 				{
 					int CurentScore = CGame::GetInstance()->GetScore();
+					DebugOut(L"CurentScore%d\n", CurentScore);
 					CGame::GetInstance()->SetScore(CurentScore + 100);
 					int CurentMoney = CGame::GetInstance()->GetMoney();
 					CGame::GetInstance()->SetMoney(CurentMoney + 1);
@@ -168,12 +168,11 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			x += min_tx * dx + nx * 0.3f;
 			y += min_ty * dy + ny * 0.3f;
 
-			if (nx != 0)
+			if (nx != 0 && ny != 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 			{
-				vx = 0;
+				vx = -vx;
+				this->nx = -this->nx;
 			}
-			//if (nx != 0 && ny != 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
-			//	vx = -vx;
 			if (ny != 0)
 				vy = 0;
 			for (UINT i = 0; i < coEventsResultPro.size(); i++)
@@ -184,10 +183,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						vx = vxPre;
 						x += dx;
 					}
-					if (ny != 0) {
-						vy = vyPre;
-						y += dy;
-					}
+					
 				}
 				else if (dynamic_cast<Brick*>(e->obj)) {
 					if (nx != 0)
@@ -211,14 +207,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEventsResult.clear();
 	CalCollisions(coObjects, coEventsResult);
 	int sizeCo = coEventsResult.size();
-	{
-		//if(BrickBreak != NULL)
-			//if (sizeCo == 0 && !MarioGetMoney && IdItem == ITEM_MONEY_IDLE && (!BrickBreak->IsBreaked ||BrickBreak->SwitchOff))
-			/*if (BrickBreak->SwitchOff)
-			{
-				Active = true;
-			}*/
-	}
 
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{
@@ -338,7 +326,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 					}
 					this->Active = false;
-					//x = -100; y = -100.0f; vy = 0; vx = 0;
 					BBox = false;
 				}
 			}
@@ -405,7 +392,7 @@ void Items::Render()
 		}
 	if(ani != -1)
 		animation_set->at(ani)->Render(x, y);
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)
