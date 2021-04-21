@@ -421,6 +421,31 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						Shell->SetState(KOOPAS_STATE_SHELL);
 						Shell->vy -= KOOPAS_DIE_DEFLECT_SPEED;
 					}
+					else if ((e->nx != 0 && !Iskilling) || (e->ny > 0)) {
+						y -= min_ty * dy + ny * 0.4f;	//k bi rot
+						if (untouchable == 0)
+						{
+								if (level > MARIO_LEVEL_BIG)
+								{
+									SetLevel(MARIO_LEVEL_BIG);
+									this->x -= MARIO_RACCOON_BBOX_TAIL;
+									this->y -= 1;		// khong bi rot xuong Coobj
+									StartUntouchable();
+								}
+								else if (level > MARIO_LEVEL_SMALL)
+								{
+									level = MARIO_LEVEL_SMALL;
+									StartUntouchable();
+								}
+								else
+									SetState(MARIO_STATE_DIE);
+							
+						}
+						else {
+							vx = vxPre;
+							x += dx;
+						}
+					}
 				}
 				else if (Shell->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_RED) {
 					if (e->ny < 0)
@@ -470,9 +495,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj))
 			{
-				vx = vxPre;
-				vy = vyPre;
-				x += dx; y += dy;
+				y -= min_ty * dy + ny * 0.4f;
 			}
 			else if (dynamic_cast<VenusFireTrap*>(e->obj))
 			{

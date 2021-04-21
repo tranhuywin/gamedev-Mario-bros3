@@ -101,7 +101,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (y - Y_Start > 0 && vy != 0)
 				{
 					int CurentScore = CGame::GetInstance()->GetScore();
-					DebugOut(L"CurentScore%d\n", CurentScore);
 					CGame::GetInstance()->SetScore(CurentScore + 100);
 					int CurentMoney = CGame::GetInstance()->GetMoney();
 					CGame::GetInstance()->SetMoney(CurentMoney + 1);

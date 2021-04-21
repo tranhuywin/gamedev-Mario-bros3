@@ -557,7 +557,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 		else																							// camY theo di bo
 		{
 			CamY = tileMap->GetHeightMap() -( game->GetScreenHeight() - hightCammeraStatusBar);
-			if (player->y < possitonCammeraInTheSky)					// vi tri tren troi TODO: them so 192 tu file txt
+			if (player->y < possitonCammeraInTheSky)					
 				CamY -= game->GetScreenHeight();
 		}
 		// gioi han camX
@@ -574,25 +574,16 @@ void CPlayScene::UpdateCammera(DWORD dt)
 			CamX = -CAMERA_X_START_MAP;
 			CamY = -CAMERA_Y_START_MAP;
 		}
-		/*else if (CurSecene == SCENCE_WORD_MAP_1_1)
-		{
-			CamX = CAMERA_X_WORLD_1_1;
-			CamY = CAMERA_Y_WORLD_1_1;
-		}
-		else if (CurSecene == SCENCE_WORD_MAP_4) {
-			player->GetPosition(CamX, CamY);
-			CamY -= game->GetScreenHeight() / 4;
-			CamX -= game->GetScreenWidth() / 2;
-		}
-		else if (CurSecene == SCENCE_WORD_MAP_4_1) {
-			CamY = CAMERA_Y_WORLD_4_1;
-		}*/
 	}
 	else
 	{
-		//CamX += CAMERA_MOVE_VX * dt;
+		CamX += CAMERA_MOVE_VX * dt;
 		if (CamX > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
 			CamX = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
+		if (player->x < CamX)
+			player->SetPosition(CamX, player->y);
+		if (player->x > CamX + game->GetScreenWidth() - MARIO_BIG_BBOX_WIDTH)
+			player->SetPosition(CamX + game->GetScreenWidth() - MARIO_BIG_BBOX_WIDTH, player->y);
 	}
 	CGame::GetInstance()->SetCamPos(CamX, CamY);
 }

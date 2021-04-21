@@ -699,11 +699,11 @@ bend over left Big
 7	1936	96	10	64	1
 # MARIO
 # start
-#0	90.0	80.0	1
+0	90.0	80.0	1
 #Item
 #0	653	94	1
 #coin
-0	980	123	1
+#0	980	123	1
 #portal
 #0	1970	74	1
 #
@@ -870,6 +870,6 @@ Grid\Grid_scene1-4.txt
 80000	80001	80010	80020	80030
 [CAMERA]
 #isMove(1==true,0==false)		Sky	hightStatusBar
-0	192	20
+1	192	20
 [TITLEMAP]
 200000	textures\tile_map1-4.png	textures\tile_map1-4.txt	8	4	16	16
