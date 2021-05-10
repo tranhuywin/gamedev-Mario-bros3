@@ -33,6 +33,7 @@
 #define MARIO_VY_ASCENDING_RUN		0.0014f
 #define MARIO_START_TELEPORT_VY		0.001f
 
+
 #define MARIO_STATE_IDLE				0
 #define MARIO_STATE_WALKING_RIGHT		100
 #define MARIO_STATE_WALKING_LEFT		200
@@ -173,6 +174,7 @@ class CMario : public CGameObject
 	float start_y; 
 	float XHolding;
 	float YHolding;
+	float mdy = 0;
 
 	bool IsRendering;
 	bool HaveInertia;

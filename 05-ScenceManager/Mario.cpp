@@ -218,9 +218,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
+		mdy += dy;
+		if (mdy > 2.0f) {
+			AllowJump = false;
+			OnPlatform = false;
+		}
 	}
 	else
 	{
+		mdy = 0;
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
@@ -479,8 +485,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							}
 						}
 					}
-					//else
-						//brick->IsBreaked = true;
+					else
+						brick->IsBreaked = true;
 						//brick->BBox = false;
 				}
 			}
@@ -542,6 +548,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (e->ny < 0)
 				{
 					flyingWood->IsCollMario = true;
+					this->vy = FLYING_WOOD_VY*dt;
+					//AllowJump = true;
+					OnPlatform = true;
 					//this->y = flyingWood->y - MARIO_BIG_BBOX_HEIGHT + flyingWood->dy;
 				}
 				if (e->nx < 0)
@@ -634,9 +643,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							this->vx = flyingWood->vx;
 					}
 					else if (level == MARIO_LEVEL_RACCOON) {
-						this->x = flyingWood->x - MARIO_RACCOON_BBOX_WIDTH + MARIO_RACCOON_BBOX_TAIL;//cong them bb duoi
-						if (vx != 0)
-							this->vx = flyingWood->vx;
+						//this->x = flyingWood->x - MARIO_RACCOON_BBOX_WIDTH + MARIO_RACCOON_BBOX_TAIL;//cong them bb duoi
+						//if (vx != 0)
+						//	this->vx = flyingWood->vx;
 					}
 					else if (level == MARIO_LEVEL_SMALL){
 						this->x = flyingWood->x - MARIO_SMALL_BBOX_WIDTH;

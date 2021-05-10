@@ -178,11 +178,24 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				LPCOLLISIONEVENT e = coEventsResultPro[i];
 				if (dynamic_cast<CMario*>(e->obj)) {
+					CMario* mario = dynamic_cast<CMario*>(e->obj);
 					if (nx != 0) {
 						vx = vxPre;
 						x += dx;
 					}
-					
+					if (IdItem == ITEM_MUSHROOM_RED || IdItem == ITEM_MUSHROOM_GREEN) {
+						
+						AniEffect = SpriteEffectStart + EFFECT_1000;
+						effect = new Effect(this->x, this->y, AniEffect);
+						int CurrentScore = CGame::GetInstance()->GetScore();
+						CGame::GetInstance()->SetScore(CurrentScore + 1000);
+						if (mario->GetLevel() == MARIO_LEVEL_SMALL) {
+							mario->y -= MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT;
+							mario->SetLevel(MARIO_LEVEL_BIG);
+						}
+						this->Active = false;
+						BBox = false;
+					}
 				}
 				else if (dynamic_cast<Brick*>(e->obj)) {
 					if (nx != 0)
@@ -213,7 +226,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vx = ITEM_MUSHROOM_VX * dt;
 		else
 			vx = -ITEM_MUSHROOM_VX * dt;
-
 		vy = ITEM_MUSHROOM_GRANVITY * dt;
 	}
 	if (sizeCo != 0)
@@ -351,9 +363,6 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 			}
 			else if (dynamic_cast<Brick*>(e) && BrickBreak == NULL) {
-				// multiple coin
-				//Active = false;
-				//OfBrick = true;
 				Brick* brick = dynamic_cast<Brick*>(e);
 				brick->IdItemOfBrick = IdItem;		
 				BrickBreak = brick;
@@ -389,9 +398,9 @@ void Items::Render()
 			}
 			//RenderBoundingBox();
 		}
-	if(ani != -1)
+	if(ani != -1 && BBox)
 		animation_set->at(ani)->Render(x, y);
-	//RenderBoundingBox();
+
 }
 
 Items::Items(int IdItem, int SpriteEffectStart)

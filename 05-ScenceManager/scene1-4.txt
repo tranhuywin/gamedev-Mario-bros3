@@ -870,6 +870,6 @@ Grid\Grid_scene1-4.txt
 80000	80001	80010	80020	80030
 [CAMERA]
 #isMove(1==true,0==false)		Sky	hightStatusBar
-1	192	20
+0	192	20
 [TITLEMAP]
 200000	textures\tile_map1-4.png	textures\tile_map1-4.txt	8	4	16	16

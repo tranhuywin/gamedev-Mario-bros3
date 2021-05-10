@@ -169,6 +169,9 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		{
 			vy = 0;
 		}
+		if (ny < 0) {
+			y -= min_ty * dy + ny * 0.4f;
+		}
 		if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN && ny < 0)
 		{
 			if(dt < 30)
