@@ -20,6 +20,7 @@
 #include "FlyingWood.h"
 #include "BoomerangOfBrother.h"
 #include "Brothers.h"
+#include "MusicNote.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -558,6 +559,24 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					//this->x = flyingWood->x - MARIO_BIG_BBOX_WIDTH;
 					//vx = flyingWood->vx;
 					
+				}
+			}
+			else if (dynamic_cast<MusicNote*>(e->obj)) {
+				MusicNote* musicNote = dynamic_cast<MusicNote*>(e->obj);
+				
+				if (e->ny < 0 && musicNote->GetState() == MUSIC_NOTE_STATE_IDLE) {
+					this->vx = 0.02 * dt;
+					//DebugOut(L"vxPre%f\n", vx);
+					musicNote->SetState(MUSIC_NOTE_STATE_MOVE_DOWN);
+					//SetState(MARIO_STATE_JUMP);
+					this->vy = -0.001 * dt;
+					AllowJump = true;
+					//IsJumping = true;
+					if (IsJumping)
+						SetState(MARIO_STATE_JUMP);
+				}
+				else if (GetState() == MUSIC_NOTE_STATE_MOVE_UP) {
+					//AllowJump = false;
 				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))

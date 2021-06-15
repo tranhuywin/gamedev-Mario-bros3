@@ -38,7 +38,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	if (effect != NULL)
 		effect->Update(dt);
-	if(!IsCatching && TypeKoopas != KOOPAS_TYPE_KOOPA_PARATROOPA_RED)
+	if(!IsCatching && (TypeKoopas != KOOPAS_TYPE_KOOPA_PARATROOPA_RED))
 		vy += KOOPAS_GRAVITY * dt;
 	if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN )
 	{
@@ -169,9 +169,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		{
 			vy = 0;
 		}
-		if (ny < 0) {
-			y -= min_ty * dy + ny * 0.4f;
+		if (nx != 0) {
+			vx = -vx;
 		}
+
+		if(ny > 0) // up
+			y -= min_ty * dy + ny * 0.4f;
+
 		if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN && ny < 0)
 		{
 			if(dt < 30)
@@ -210,12 +214,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			}
 			else if (dynamic_cast<Brick*>(e->obj))
 			{
+				vx = -vx;	//bat nguoc lai
+
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
 					if (nx != 0 && GetState() == KOOPAS_STATE_WALKING)
 					{
-						//if ((nx == 1 && vx < 0) || (nx == -1 && vx > 0))
-						//	vx = -vx;
 						x += dx * 2;
 					}
 					if (GetState() == KOOPAS_STATE_SHELL) {
@@ -231,19 +235,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
 					vy = -KOOPAS_PARATROOPA_WALKING_SPEED * dt;
 				}
-
 				if (GetState() == KOOPAS_STATE_ROTATORY  && nx != 0 && (brick->y -this->y < KOOPAS_BBOX_HEIGHT_SHELL - 1)) {
 					brick->IsBreaked = true;	
-					vx = -vx;	//bat nguoc lai
+					
 				}
-			}
-			else if (dynamic_cast<Ground*>(e->obj)) {
-				if(nx != 0)
-					vx = -vx;	//bat nguoc lai
-			}
-			else if (dynamic_cast<Tube*>(e->obj)) {
-				if (nx != 0)
-					vx = -vx;	//bat nguoc lai
 			}
 			else if (dynamic_cast<QuestionBrick*>(e->obj) && state == KOOPAS_STATE_ROTATORY)
 			{
@@ -257,8 +252,17 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			else if (dynamic_cast<CGoomba*>(e->obj) && state == KOOPAS_STATE_ROTATORY) {
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				goomba->SetState(GOOMBA_STATE_DIE);
-				//vx = vxPre;
+				vx = vxPre;
 				x += dx;
+			}
+			else if (dynamic_cast<CKoopas*>(e->obj)) {
+				if (GetState() == KOOPAS_STATE_ROTATORY)
+				{
+					CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
+					vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
+					koopas->SetState(KOOPAS_STATE_DIE);
+
+				}
 			}
 		}
 	}

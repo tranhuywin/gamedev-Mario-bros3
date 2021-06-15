@@ -2,6 +2,8 @@
 
 #include "GameObject.h"
 
+#define BOOMERANG_BBOX					14
+
 #define BOOMERANG_SPEED_VX				0.005f
 #define BOOMERANG_SPEED_SLOW_VX			0.0007f
 #define BOOMERANG_SPEED_VY				0.002f

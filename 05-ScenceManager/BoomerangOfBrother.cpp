@@ -4,8 +4,8 @@ void BoomerangOfBrother::GetBoundingBox(float& left, float& top, float& right, f
 {
 	left = x;
 	top = y;
-	right = x + 14;
-	bottom = y + 14;
+	right = x + BOOMERANG_BBOX;	
+	bottom = y + BOOMERANG_BBOX;
 }
 
 void BoomerangOfBrother::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)

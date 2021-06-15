@@ -18,6 +18,7 @@
 #include "Tree.h"
 #include "FlyingWood.h"
 #include "Brothers.h"
+#include "MusicNote.h"
 
 using namespace std;
 
@@ -59,6 +60,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_CARD				13
 #define OBJECT_TYPE_FLYING_WOOD			14
 #define OBJECT_TYPE_BROTHER				15
+#define OBJECT_TYPE_MUSIC_NOTE			16
 
 #define OBJECT_TYPE_PORTAL				50
 
@@ -240,6 +242,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
 		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
 		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); break;
+		case OBJECT_TYPE_MUSIC_NOTE: obj = new MusicNote(); break;
 		case OBJECT_TYPE_BROTHER: 
 		{
 			int IDType = atoi(tokens[4].c_str());
@@ -260,6 +263,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			int IdObj = atoi(tokens[4].c_str());
 			obj = new Tree(IdObj);
 		} break;
+		
 		case OBJECT_TYPE_TUBE: 
 		{
 			float Height = atoi(tokens[4].c_str());

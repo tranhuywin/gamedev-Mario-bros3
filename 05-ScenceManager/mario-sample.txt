@@ -5,5 +5,5 @@ start	3
 0	SenceStart.txt
 1	scene1-1.txt
 2	sence1_1_hiden.txt
-3	scene1-4.txt
+3	scene1-3.txt
 4	scene1-4End.txt
