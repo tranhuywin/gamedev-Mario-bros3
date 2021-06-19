@@ -262,7 +262,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		if (ny == 1)
 			AllowJump = false;
-
+		
 		for (UINT i = 0; i < coEventsResult.size(); i++) 
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -565,18 +565,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				MusicNote* musicNote = dynamic_cast<MusicNote*>(e->obj);
 				
 				if (e->ny < 0 && musicNote->GetState() == MUSIC_NOTE_STATE_IDLE) {
-					this->vx = 0.02 * dt;
-					//DebugOut(L"vxPre%f\n", vx);
-					musicNote->SetState(MUSIC_NOTE_STATE_MOVE_DOWN);
-					//SetState(MARIO_STATE_JUMP);
-					this->vy = -0.001 * dt;
-					AllowJump = true;
-					//IsJumping = true;
-					if (IsJumping)
-						SetState(MARIO_STATE_JUMP);
-				}
-				else if (GetState() == MUSIC_NOTE_STATE_MOVE_UP) {
-					//AllowJump = false;
+					musicNote->SetState(MUSIC_NOTE_STATE_MOVE_DOWN);	
+					
+					AllowJump = true;		// nhay thap, thieu setstate k nhay cao
+					SetState(MARIO_STATE_JUMP); // nhay cao, thieu allow jump k nhay lai
+					if (!CGame::GetInstance()->IsKeyDown(DIK_S))
+						YHolding = this->y  + 40.0f;   // tru bot do cao
 				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))

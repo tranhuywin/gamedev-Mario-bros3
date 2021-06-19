@@ -16,19 +16,25 @@ void MusicNote::GetBoundingBox(float& left, float& top, float& right, float& bot
 
 void MusicNote::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (isFirstUpdate)
+	{
+		initX = this->x;
+		initY = this->y;
+		isFirstUpdate = false;
+	}
 	if (GetState() == MUSIC_NOTE_STATE_MOVE_UP)
 	{
 		this->vy = -MUSIC_NOTE_VY * dt;
-		if (this->y - initY <= 0)
+		if (this->y - initY <= 0.0f)
 		{
 			SetState(MUSIC_NOTE_STATE_IDLE);
-			this->y = initY;
+			this->y = initY; 
 		}
 	}
 	else if(GetState() == MUSIC_NOTE_STATE_MOVE_DOWN)
 	{
 		this->vy = MUSIC_NOTE_VY * dt;
-		if (this->y - initY >= 8)
+		if (this->y - initY >= MUSIC_NOTE_DISTANCE_MOVE)
 		{
 			SetState(MUSIC_NOTE_STATE_MOVE_UP);
 		}
@@ -49,12 +55,12 @@ void MusicNote::SetState(int state)
 	switch (state)
 	{
 	case MUSIC_NOTE_STATE_IDLE:
-		vy = 0;		
+		this->vy = 0;		
 		break;
 	case MUSIC_NOTE_STATE_MOVE_UP:
 		break;
 	case MUSIC_NOTE_STATE_MOVE_DOWN:
-		initY = this->y;
+		//initY = this->y; // pre commit
 		break;
 	}
 	CGameObject::SetState(state);
