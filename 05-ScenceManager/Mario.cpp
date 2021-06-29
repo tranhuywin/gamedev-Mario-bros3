@@ -74,6 +74,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		SetState(MARIO_STATE_WALKING_RIGHT);
 	if (NoCardStartGame == 2 && CGame::GetInstance()->GetCard_3() != -1)
 		SetState(MARIO_STATE_WALKING_RIGHT);
+	if (isDeflect) {
+		if (vx == 0) 
+		{
+			if (nx > 0) {
+				vx = MARIO_DEFLECT_VY * dt;
+			}
+			else
+				vx = -MARIO_DEFLECT_VY * dt;
+		}
+	}
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
 	{
@@ -125,6 +135,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vy = 0;
 		}
 	}
+	// state falling
 	if (AllowJump)
 	{
 		vy = -MARIO_JUMP_SPEED_Y * dt;
@@ -152,9 +163,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		AllowJump = false;
 		IsDropping = true;
 	}
-
 	if (IsDropping && vy >= MARIO_DROP_VY_MAX)
 		vy = MARIO_DROP_VY_MAX;
+
+	
 	if (IsCatching && Shell->GetState() != KOOPAS_STATE_WALKING)
 	{
 		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT / 4);
@@ -245,7 +257,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		if (nx!=0 && !OnPlatform)
 			vx = 0;
-		if (ny!=0)
+		if (ny != 0)
 			vy = 0;
 		// check mario on a platform, because Mario is pushed, so need to check IsJunping
 		if (ny == -1) 
@@ -262,6 +274,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		if (ny == 1)
 			AllowJump = false;
+
+		//turn off isDeflect
+		if (isDeflect && ny < 0) {
+			isDeflect = false;
+		}
 		
 		for (UINT i = 0; i < coEventsResult.size(); i++) 
 		{
@@ -563,14 +580,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else if (dynamic_cast<MusicNote*>(e->obj)) {
 				MusicNote* musicNote = dynamic_cast<MusicNote*>(e->obj);
-				
+				//vx = vxPre;
+				isDeflect = true;
 				if (e->ny < 0 && musicNote->GetState() == MUSIC_NOTE_STATE_IDLE) {
 					musicNote->SetState(MUSIC_NOTE_STATE_MOVE_DOWN);	
-					
+				}
+				else if (e->ny < 0 && musicNote->GetState() == MUSIC_NOTE_STATE_MOVE_UP) {
 					AllowJump = true;		// nhay thap, thieu setstate k nhay cao
 					SetState(MARIO_STATE_JUMP); // nhay cao, thieu allow jump k nhay lai
 					if (!CGame::GetInstance()->IsKeyDown(DIK_S))
-						YHolding = this->y  + 40.0f;   // tru bot do cao
+						YHolding = this->y + 35.0f;   // tru bot do cao
 				}
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
@@ -716,7 +735,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	else {
 		TeleUp = false;
-	}
+	} 
 }
 
 void CMario::Render()
@@ -833,7 +852,8 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_IDLE_RIGHT;
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
-				if(!AllowJump && !OnPlatform)
+				//if(!AllowJump && !OnPlatform)
+				if(IsDropping || (isDeflect && vy >= 0))
 					ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 				if (Iskilling && Kill) 
 				{
@@ -855,7 +875,7 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_IDLE_LEFT;
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-				if (!AllowJump && !OnPlatform)
+				if (IsDropping || (isDeflect && vy >= 0))
 					ani = MARIO_ANI_RACCOON_DROP_LEFT;
 				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
@@ -877,7 +897,7 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_RIGHT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
-			if (!AllowJump && !OnPlatform)
+			if (IsDropping || (isDeflect && vy >= 0))
 				ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
@@ -896,7 +916,7 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_LEFT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-			if (!AllowJump && !OnPlatform)
+			if (IsDropping || (isDeflect && vy >= 0))
 				ani = MARIO_ANI_RACCOON_DROP_LEFT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;

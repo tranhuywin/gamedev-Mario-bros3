@@ -9,7 +9,7 @@
 
 #define MUSIC_NOTE_VY					0.004f
 
-#define MUSIC_NOTE_DISTANCE_MOVE		8
+#define MUSIC_NOTE_DISTANCE_MOVE		4
 
 #define MUSIC_NOTE_ANI_IDLE				0
 #define MUSIC_NOTE_ANI_MOVE				1

@@ -25,7 +25,7 @@ void MusicNote::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (GetState() == MUSIC_NOTE_STATE_MOVE_UP)
 	{
 		this->vy = -MUSIC_NOTE_VY * dt;
-		if (this->y - initY <= 0.0f)
+		if (this->y - initY <= 0)
 		{
 			SetState(MUSIC_NOTE_STATE_IDLE);
 			this->y = initY; 

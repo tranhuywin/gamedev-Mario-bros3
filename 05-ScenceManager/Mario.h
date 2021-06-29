@@ -12,7 +12,7 @@
 #define Y_RETURN_WORLD_1			375
 
 #define MARIO_JUMP_SPEED_Y			0.01f
-#define MARIO_DROP_VY_MAX			0.25f
+#define MARIO_DROP_VY_MAX			0.2f
 #define MARIO_JUMP_DEFLECT_SPEED	0.2f
 #define MARIO_GRAVITY				0.002f
 #define MARIO_GRAVITY_TELEPORT		0.000015f
@@ -32,7 +32,7 @@
 #define MARIO_VY_ASCENDING_SLIP_MAX	0.1f
 #define MARIO_VY_ASCENDING_RUN		0.0014f
 #define MARIO_START_TELEPORT_VY		0.001f
-
+#define MARIO_DEFLECT_VY			0.001f
 
 #define MARIO_STATE_IDLE				0
 #define MARIO_STATE_WALKING_RIGHT		100
@@ -46,7 +46,7 @@
 #define MARIO_STATE_FAST_RUN			800
 #define MARIO_STATE_BEND_OVER			900
 #define MARIO_STATE_STAND				1000
-#define MARIO_STATE_SKILL_ON			1100
+#define MARIO_STATE_SKILL_ON			1100 
 #define MARIO_STATE_SKILL_OFF			1200
 #define MARIO_STATE_UP					1300
 //start scence
@@ -187,12 +187,11 @@ class CMario : public CGameObject
 	bool PrepareCatch;
 	bool SkillOn;
 	bool KickShell;
+	bool isDeflect;
 	FireBullet* firebullet_1 = new FireBullet();
 	FireBullet* firebullet_2 = new FireBullet();
 	CKoopas* Shell;
 	Tail* TailofRaccoon = new Tail();
-//private:
-	//static CMario* __instance;
 	
 public: 
 	bool OnPlatform;
@@ -201,6 +200,7 @@ public:
 	bool IsLimitFlying;
 	bool Iskilling;
 	bool IsRunning, IsDropping;
+	bool isJumped;
 	bool IsWaitingTeleport;
 	bool StartTeleport;
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
