@@ -74,16 +74,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		SetState(MARIO_STATE_WALKING_RIGHT);
 	if (NoCardStartGame == 2 && CGame::GetInstance()->GetCard_3() != -1)
 		SetState(MARIO_STATE_WALKING_RIGHT);
-	if (isDeflect) {
-		if (vx == 0) 
-		{
-			if (nx > 0) {
-				vx = MARIO_DEFLECT_VY * dt;
-			}
-			else
-				vx = -MARIO_DEFLECT_VY * dt;
-		}
-	}
+	
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
 	{
@@ -103,14 +94,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 
 	// Simple fall down
-	if (vx >= MARIO_MAX_SPEED_RUNNING)
+	if (vx >= (MARIO_MAX_SPEED_RUNNING * dt))
 	{
-		vx = MARIO_MAX_SPEED_RUNNING;
+		vx = MARIO_MAX_SPEED_RUNNING * dt;
 		IsLimitRunning = true;
 	}
-	else if (vx <= -MARIO_MAX_SPEED_RUNNING)
+	else if (vx <= -(MARIO_MAX_SPEED_RUNNING * dt))
 	{
-		vx = -MARIO_MAX_SPEED_RUNNING;
+		vx = -(MARIO_MAX_SPEED_RUNNING * dt);
 		IsLimitRunning = true;
 	}
 	else IsLimitRunning = false;
@@ -124,14 +115,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			IsLimitRunning = false;
 			IsFlying = false;
-			vx = MARIO_WALKING_SPEED;
+			vx = MARIO_WALKING_SPEED * dt;
 			vy = 0;
 		}
 		else if (nx == -1)
 		{
 			IsLimitRunning = false;
 			IsFlying = false;
-			vx = -MARIO_WALKING_SPEED;
+			vx = -MARIO_WALKING_SPEED * dt;
 			vy = 0;
 		}
 	}
@@ -163,10 +154,19 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		AllowJump = false;
 		IsDropping = true;
 	}
-	if (IsDropping && vy >= MARIO_DROP_VY_MAX)
-		vy = MARIO_DROP_VY_MAX;
+	if (IsDropping && vy >= (MARIO_DROP_VY_MAX * dt))
+		vy = MARIO_DROP_VY_MAX * dt;
 
-	
+	if (isDeflect) {
+		if (vx == 0)
+		{
+			if (nx > 0) {
+				vx = MARIO_DEFLECT_VX * dt;
+			}
+			else
+				vx = -MARIO_DEFLECT_VX * dt;
+		}
+	}
 	if (IsCatching && Shell->GetState() != KOOPAS_STATE_WALKING)
 	{
 		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT / 4);
@@ -278,6 +278,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		//turn off isDeflect
 		if (isDeflect && ny < 0) {
 			isDeflect = false;
+			SetState(MARIO_STATE_DROP);
 		}
 		
 		for (UINT i = 0; i < coEventsResult.size(); i++) 
@@ -1040,7 +1041,6 @@ bool CMario::CheckMarioInScreen()
 
 void CMario::SetState(int state)
 {
-	//int PreState = this->GetState();
 	CGameObject::SetState(state);
 	if (level == MARIO_LEVEL_MINI)
 	{
@@ -1106,32 +1106,32 @@ void CMario::SetState(int state)
 		if (!HaveInertia)
 			XHolding = x;
 		HaveInertia = true;
-		if (vx < MARIO_VY_ASCENDING_SLIP_MAX && vx != 0)
+		if (vx < (MARIO_VY_ASCENDING_SLIP_MAX *dt) && vx != 0)
 		{
-			vx += MARIO_VY_ASCENDING_SLIP;
-			if (vx > MARIO_VY_ASCENDING_SLIP_MAX)
-				vx = MARIO_VY_ASCENDING_SLIP_MAX;
+			vx += MARIO_VY_ASCENDING_SLIP * dt;
+			if (vx > (MARIO_VY_ASCENDING_SLIP_MAX * dt))
+				vx = (MARIO_VY_ASCENDING_SLIP_MAX * dt);
 		}
 		if (vx == 0 && !IsRunning)
-			vx = MARIO_WALKING_SPEED;
+			vx = MARIO_WALKING_SPEED * dt;
 		if (IsRunning && vx < MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
-			vx += MARIO_VY_ASCENDING_RUN;
+			vx += MARIO_VY_ASCENDING_RUN * dt;
 			nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT: 
 		if (!HaveInertia)
 			XHolding = x;
 		HaveInertia = true;
-		if (vx > -MARIO_VY_ASCENDING_SLIP_MAX && vx != 0)
+		if (vx > -(MARIO_VY_ASCENDING_SLIP_MAX * dt) && vx != 0)
 		{
-			vx -= MARIO_VY_ASCENDING_SLIP;
-			if (vx < -MARIO_VY_ASCENDING_SLIP_MAX)
-				vx = -MARIO_VY_ASCENDING_SLIP_MAX;
+			vx -= MARIO_VY_ASCENDING_SLIP * dt;
+			if (vx < -(MARIO_VY_ASCENDING_SLIP_MAX * dt))
+				vx = -(MARIO_VY_ASCENDING_SLIP_MAX * dt);
 		}
 		if(vx == 0 && !IsRunning)
-			vx = -MARIO_WALKING_SPEED;
+			vx = -MARIO_WALKING_SPEED * dt;
 		if (IsRunning && vx != -MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
-			vx -= MARIO_VY_ASCENDING_RUN;
+			vx -= MARIO_VY_ASCENDING_RUN * dt;
 			nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
@@ -1200,7 +1200,7 @@ void CMario::SetState(int state)
 			if (vx > 0.0f)
 			{
 				StartSlip();
-				vx -= MARIO_INERTIA_DECREASE;
+				vx -= MARIO_INERTIA_DECREASE * dt;
 				if (vx < 0)
 				{
 					vx = 0;
@@ -1214,7 +1214,7 @@ void CMario::SetState(int state)
 		{
 			if (vx < 0.0f)
 			{
-				vx += MARIO_INERTIA_DECREASE;
+				vx += MARIO_INERTIA_DECREASE * dt;
 				if (vx > 0)
 				{
 					vx = 0;
@@ -1232,13 +1232,14 @@ void CMario::SetState(int state)
 		}
 		else
 		{
-			vx = 0;
+			if(!isDeflect)
+				vx = 0;
 			HaveInertia = false;
 			break;
 		}
 
 	case MARIO_STATE_DIE:
-		vy = -MARIO_DIE_DEFLECT_SPEED;
+		vy = -MARIO_DIE_DEFLECT_SPEED * dt;
 		int Life = CGame::GetInstance()->GetLife();
 		CGame::GetInstance()->SetLife(Life - 1);
 		//if (CGame::GetInstance()->GetLife() == 0)
