@@ -32,7 +32,8 @@
 #define MARIO_VY_ASCENDING_SLIP_MAX	0.00625f
 #define MARIO_VY_ASCENDING_RUN		0.000093f
 #define MARIO_START_TELEPORT_VY		0.001f
-#define MARIO_DEFLECT_VX			0.001f
+#define MARIO_DEFLECT_VX			0.002f
+#define MARIO_DEFLECT_LEFT_RIGHT	0.008f
 
 #define MARIO_STATE_IDLE				0
 #define MARIO_STATE_WALKING_RIGHT		100
@@ -187,7 +188,7 @@ class CMario : public CGameObject
 	bool PrepareCatch;
 	bool SkillOn;
 	bool KickShell;
-	bool isDeflect;
+	bool isDeflect, isDeflectLeft, isDeflectRight;
 	FireBullet* firebullet_1 = new FireBullet();
 	FireBullet* firebullet_2 = new FireBullet();
 	CKoopas* Shell;

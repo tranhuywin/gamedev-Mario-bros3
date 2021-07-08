@@ -166,6 +166,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else
 				vx = -MARIO_DEFLECT_VX * dt;
 		}
+		if (isDeflectLeft)
+		{
+			vx = -MARIO_DEFLECT_LEFT_RIGHT * dt;
+		}
+		else if(isDeflectRight)
+			vx = MARIO_DEFLECT_LEFT_RIGHT * dt;
 	}
 	if (IsCatching && Shell->GetState() != KOOPAS_STATE_WALKING)
 	{
@@ -278,6 +284,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		//turn off isDeflect
 		if (isDeflect && ny < 0) {
 			isDeflect = false;
+			isDeflectLeft = false; isDeflectRight = false;
 			SetState(MARIO_STATE_DROP);
 		}
 		
@@ -352,6 +359,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					AllowJump = true;
 					vy = vyLine;
 					y += dy;
+					//y -= min_ty * dy + ny * 0.4f;
 				}
 
 			}
@@ -592,6 +600,19 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if (!CGame::GetInstance()->IsKeyDown(DIK_S))
 						YHolding = this->y + 35.0f;   // tru bot do cao
 				}
+				else if (musicNote->typeNote == MUSIC_NOTE_TYPE_PINK) {
+					if (nx < 0)
+					{
+						musicNote->SetState(MUSIC_NOTE_STATE_MOVE_RIGHT_RIGHT);
+						isDeflectLeft = true;
+					}
+					else if (nx > 0)
+					{
+						musicNote->SetState(MUSIC_NOTE_STATE_MOVE_LEFT_LEFT);
+						isDeflectRight = true;
+					}
+				}
+
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
@@ -876,7 +897,7 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_IDLE_LEFT;
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-				if (IsDropping || (isDeflect && vy >= 0))
+				if (IsDropping || (isDeflect && vy < 0))
 					ani = MARIO_ANI_RACCOON_DROP_LEFT;
 				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
@@ -905,6 +926,8 @@ void CMario::Render()
 			}
 			if (vx < 0.1 && nx == -1)
 				ani = MARIO_ANI_RACCOON_SLIP_RIGHT;
+			if (isDeflectRight)
+				ani = MARIO_ANI_RACCOON_DROP_LEFT;
 			if (KickShell)
 				ani = MARIO_ANI_RACCOON_KICK_RIGHT;
 			if (IsCatching)
@@ -917,13 +940,15 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_LEFT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-			if (IsDropping || (isDeflect && vy >= 0))
+			if (IsDropping || (isDeflect && vy < 0))
 				ani = MARIO_ANI_RACCOON_DROP_LEFT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;
 			}
 			if (vx > -0.1 && nx == 1)
 				ani = MARIO_ANI_RACCOON_SLIP_LEFT;
+			if (isDeflectLeft)
+				ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 			if (KickShell)
 				ani = MARIO_ANI_RACCOON_KICK_LEFT;
 			if (IsCatching)
@@ -1234,6 +1259,8 @@ void CMario::SetState(int state)
 		{
 			if(!isDeflect)
 				vx = 0;
+			//if (isDeflectLeft)
+			//	SetState(MARIO_IS_DEFLECTED_LEFT);
 			HaveInertia = false;
 			break;
 		}
