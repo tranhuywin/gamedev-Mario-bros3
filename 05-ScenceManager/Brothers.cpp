@@ -1,5 +1,6 @@
 #include "Brothers.h"
 #include "Ground.h"
+#include "Utils.h"
 
 void Brothers::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -13,64 +14,91 @@ void Brothers::GetBoundingBox(float& left, float& top, float& right, float& bott
 
 void Brothers::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	this->dt = dt;
+	if (x > mario->x)
+	{
+		SetState(BROTHER_STATE_ATTACK_LEFT);
+	}
+	else {
+		SetState(BROTHER_STATE_ATTACK_RIGHT);
+	}
+
+	if (!isSetPossInit)
+	{
+		xInit = this->x; yInit = this->y;
+		vx = BROTHER_SPEED_VX * dt;
+		isSetPossInit = true;
+	}
+	Boomerang1->holdingLeft = false;
+	Boomerang1->holdingRight = false;
+	Boomerang2->holdingLeft = false;
+	Boomerang2->holdingRight = false;
 	if (WaitAttackBoom1)
 	{
-			Boomerang1->Attack(this->x, this->y);
-			/*if (!WaitThrow1) {
-				Boomerang1->x = this->x - 5;
-			}*/
+		if (GetState() == BROTHER_STATE_ATTACK_LEFT)
+		{
+			Boomerang1->Attack(this->x + BOOMERANG_POSX, this->y - BOOMERANG_POSY, -1);
+			Boomerang1->holdingLeft = true;
+			
+		}
+		else
+		{
+			Boomerang1->Attack(this->x - BOOMERANG_POSX, this->y - BOOMERANG_POSY, 1);
+			Boomerang1->holdingRight = true;
+		}
 	}
 	else {
 		Boomerang1->CatchBoomerang(this->x, this->y);
 	}
-	if(WaitAttackBoom2)
-		Boomerang2->Attack(this->x, this->y);
+	if (WaitAttackBoom2)
+	{
+		if (GetState() == BROTHER_STATE_ATTACK_LEFT)
+		{
+			Boomerang2->Attack(this->x + BOOMERANG_POSX, this->y - BOOMERANG_POSY, -1);
+			Boomerang2->holdingLeft = true;
+		}
+		else
+		{
+			Boomerang2->Attack(this->x - BOOMERANG_POSX, this->y - BOOMERANG_POSY, 1);
+			Boomerang2->holdingRight = true;
+		}
+	}
 	else {
 		Boomerang2->CatchBoomerang(this->x, this->y);
 	}
-	/*Boomerang1->Update(dt);
-	Boomerang2->Update(dt);*/
-	if (Boomerang1->CatchDone /*&& Boomerang2->CatchDone*/) {
+	if(Boomerang1->CatchDone && Boomerang2->CatchDone)
+	{
 		StartWaitAttackBoom1();
-		
-	}
-	if (Boomerang2->CatchDone) {
 		StartWaitAttackBoom2();
+		StartWaitThrow(); // an vu khi
 	}
-	ani = 0;
 	if (WaitAttackBoom1 && GetTickCount64() - WaitAttackBoom1_start > BOOMERANG_1_TIME_WAIT_ATTACK)
 	{
 		WaitAttackBoom1 = 0;
-		WaitAttackBoom1_start = 0;
-		if(WaitThrow1 == 0)
-		StartWaitThrow1();
-		
+		WaitAttackBoom1_start = 0;		
 	}
 	if (WaitAttackBoom2 && GetTickCount64() - WaitAttackBoom2_start > BOOMERANG_2_TIME_WAIT_ATTACK)
 	{
 		WaitAttackBoom2 = 0;
 		WaitAttackBoom2_start = 0;
 	}
-	if (WaitThrow1 && GetTickCount64() - WaitThrow1_start > 1000)
+	if (WaitThrow && GetTickCount64() - WaitThrow_start > BOOMERANG_TIME_WATING_THROW)
 	{
-		WaitThrow1 = 0;
-		WaitThrow1_start = 0;
+		WaitThrow = 0;
+		WaitThrow_start = 0;
 	}
-	if (WaitThrow2 && GetTickCount64() - WaitThrow2_start > 1000)
-	{
-		WaitThrow2 = 0;
-		WaitThrow2_start = 0;
-	}
+
 	Boomerang2->Update(dt);
 	Boomerang1->Update(dt);
-
+	//DebugOut(L"vx%f\n", this->vx);
 	CGameObject::Update(dt);
-	
-	vy += BROTHER_SPEED_VX * dt;
-	if (x > BROTHER_X_MAX)
+	//di chuyen cua brother
+	vy += BROTHER_GRAVITY * dt;
+	if (x >= xInit + BROTHER_X_DISTANCES)
 		vx = -BROTHER_SPEED_VX *dt;
-	if(x < BROTHER_X_MIN)
+	else if(x < xInit - BROTHER_X_DISTANCES)
 		vx = BROTHER_SPEED_VX * dt;
+
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 	coEvents.clear();
@@ -93,33 +121,44 @@ void Brothers::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vx = -vx;
 		if (ny != 0)
 			vy = 0;
-		for (UINT i = 0; i < coEventsResult.size(); i++)
-		{
-			LPCOLLISIONEVENT e = coEventsResult[i];
-			
-		}
+		//for (UINT i = 0; i < coEventsResult.size(); i++)
+		//{
+		//	//LPCOLLISIONEVENT e = coEventsResult[i];
+		//}
 	}
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+	
 }
 
 void Brothers::Render()
 {
-	Boomerang2->Render();
 	Boomerang1->Render();
-
-	if (!WaitAttackBoom1)
+	Boomerang2->Render();
+	if (!WaitThrow)
+	{
 		Boomerang1->RenderWeapon = true;
-	else
-		Boomerang1->RenderWeapon = false;
-	if (!WaitAttackBoom2)
 		Boomerang2->RenderWeapon = true;
+	}
 	else
+	{
+		Boomerang1->RenderWeapon = false;
 		Boomerang2->RenderWeapon = false;
-	if (WaitAttackBoom1 || WaitAttackBoom2)
-		animation_set->at(0)->Render(x, y);
-	else
-		animation_set->at(1)->Render(x, y);
-
+	}
+	
+	if (GetState() == BROTHER_STATE_ATTACK_RIGHT)
+	{
+		if (WaitAttackBoom1 || WaitAttackBoom2)
+			animation_set->at(BROTHER_BOOMERANG_ANI_WALKING_RIGHT)->Render(x, y);
+		else
+			animation_set->at(BOOMERANG_ANI_ATTACK_RIGHT)->Render(x, y); 
+	}
+	else if (GetState() == BROTHER_STATE_ATTACK_LEFT)
+	{
+		if (!WaitAttackBoom2)
+			animation_set->at(BOOMERANG_ANI_ATTACK_LEFT)->Render(x, y);
+		else
+			animation_set->at(BROTHER_BOOMERANG_ANI_WALKING_LEFT)->Render(x, y);
+	}
 }
 
 void Brothers::SetState(int state)
@@ -127,25 +166,31 @@ void Brothers::SetState(int state)
 	CGameObject::SetState(state);
 	switch (state)
 	{
-		case BROTHER_STATE_ATTACK:
+		case BROTHER_STATE_ATTACK_RIGHT:
 		{
-			this->vx = BROTHER_SPEED_VX_START;
+			nx = 1;
+		}
+		break;
+		case BROTHER_STATE_ATTACK_LEFT:
+		{
+			nx = -1;
 		}
 		break;
 		case BROTHER_STATE_DIE:
 		{
-			vy = -BROTHER_DEFLECT_SPEED;
+			vy = -BROTHER_DEFLECT_SPEED * dt;
 			BBox = false;
 		}
 		break;
 	}
 }
 
-Brothers::Brothers(int IDType, BoomerangOfBrother* Boomerang1, BoomerangOfBrother* Boomerang2)
+Brothers::Brothers(int IDType, BoomerangOfBrother* Boomerang1, BoomerangOfBrother* Boomerang2, CMario* player)
 {
 	this->IDTypeBrother = IDType;
 	this->Boomerang1 = Boomerang1;
 	this->Boomerang2 = Boomerang2;
-	SetState(BROTHER_STATE_ATTACK);
+	this->mario = player;
+	SetState(BROTHER_STATE_ATTACK_RIGHT);
 
 }

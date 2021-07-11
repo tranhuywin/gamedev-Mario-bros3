@@ -259,7 +259,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			//listAllObject.push_back(Boomerang2);
 			listWeaponEnemy.push_back(Boomerang2);
 			objects.push_back(Boomerang2);
-			obj = new Brothers(IDType, Boomerang1, Boomerang2);
+			obj = new Brothers(IDType, Boomerang1, Boomerang2, player);
 			
 		}break;
 		case OBJECT_TYPE_TREE:

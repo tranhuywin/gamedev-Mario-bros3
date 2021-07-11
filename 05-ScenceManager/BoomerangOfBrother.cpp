@@ -1,4 +1,5 @@
 #include "BoomerangOfBrother.h"
+#include "Utils.h"
 
 void BoomerangOfBrother::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -10,31 +11,40 @@ void BoomerangOfBrother::GetBoundingBox(float& left, float& top, float& right, f
 
 void BoomerangOfBrother::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (x - StartAttackX < 100 && IsAttacking && !IsCatching)
+	if (abs(x - StartAttackX) < BOOMERANG_DISTANCES_ATTACK && IsAttacking && !IsCatching)
 	{
-		vx = BOOMERANG_SPEED_VX * dt;
+		vx = nx * BOOMERANG_SPEED_VX * dt;
 		vy = -BOOMERANG_SPEED_VY * dt;
 	}
 	else
 		IsCatching = true;
 	
 	if (IsCatching) {
-		vx = -BOOMERANG_SPEED_VX * dt;
-		vy = BOOMERANG_SPEED_VY * dt;
-		if (x - StartAttackX > 95)
+		vx = nx * (-1) * BOOMERANG_SPEED_VX * dt;
+		vy = BOOMERANG_SPEED_VY_RETURN * dt;
+		if (abs(x - StartAttackX)> BOOMERANG_DISTANCE_SLOW)
 		{
-			vx = -BOOMERANG_SPEED_SLOW_VX * dt;
+			vx = nx * (-1) * BOOMERANG_SPEED_SLOW_VX * dt;
 		}
-		if (this->y > CatchY)
+		if (this->y > CatchY + 4)
 			vy = 0;
-		if (x < CatchX)
+		if (nx == 1 && x < CatchX) {
+			IsAttacking = false;
+			CatchDone = true;
+			RenderWeapon = false;
+		}
+		if(nx == -1  && x > CatchX)
 		{
 			IsAttacking = false;
 			CatchDone = true;
+			RenderWeapon = false;
 		}
 	}
-	if (StartAttackX > x && !IsAttacking)
+	if (abs(StartAttackX - x)> 0 && !IsAttacking)
 		IsAttacking = false;
+	if (!RenderWeapon) {
+		x = CatchX; y = CatchY;
+	}
 	CGameObject::Update(dt);
 	x += dx;
 	y += dy;
@@ -42,12 +52,46 @@ void BoomerangOfBrother::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void BoomerangOfBrother::Render()
 {
-	if(RenderWeapon)
-		animation_set->at(0)->Render(x, y);
+	int ani = 0;
+	if (RenderWeapon)
+	{
+		if (GetState() == BOOMERANG_ATTACK_LEFT)
+			ani = BOOMERANG_ANI_ATTACK_LEFT;
+		else if (GetState() == BOOMERANG_ATTACK_RIGHT)
+			ani = BOOMERANG_ANI_ATTACK_RIGHT;
+
+		if (holdingLeft)
+			ani = BOOMERANG_ANI_HOLDING_LEFT;
+		else if (holdingRight)
+			ani = BOOMERANG_ANI_HOLDING_RIGHT;
+
+		animation_set->at(ani)->Render(x, y);
+	}
+		
 }
 
 void BoomerangOfBrother::SetState(int state)
 {
+	CGameObject::SetState(state);
+	switch (state)
+	{
+		case BOOMERANG_ATTACK_LEFT:
+		{
+			nx = -1;
+		}
+		break;
+		case BOOMERANG_ATTACK_RIGHT:
+		{
+			nx = 1;
+		}
+		break;
+		case BOOMERANG_HOLDING_LEFT:
+			nx = -1;
+			break;
+		case BOOMERANG_HOLDING_RIGHT:
+			nx = 1;
+			break;
+	}
 }
 
 BoomerangOfBrother::BoomerangOfBrother(int Ani)
@@ -59,12 +103,18 @@ BoomerangOfBrother::BoomerangOfBrother(int Ani)
 
 }
 
-void BoomerangOfBrother::Attack(float x, float y)
+void BoomerangOfBrother::Attack(float x, float y, int attactDirection)
 {
 	this->StartAttackX = x;
 	this->StartAttackY = y;
 	this->x = x;
 	this->y = y;
+	if (attactDirection == -1)
+	{
+		SetState(BOOMERANG_ATTACK_LEFT);
+	}
+	else
+		SetState(BOOMERANG_ATTACK_RIGHT);
 	if (!IsAttacking)
 	{
 		IsAttacking = true;

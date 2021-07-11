@@ -170,8 +170,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			vx = -MARIO_DEFLECT_LEFT_RIGHT * dt;
 		}
-		else if(isDeflectRight)
+		else if (isDeflectRight)
 			vx = MARIO_DEFLECT_LEFT_RIGHT * dt;
+		else if (isDeflectByPinkNote)
+		{
+			vy = -MARIO_DEFLECT_PINK_NOTE * dt;
+			vx = 0;
+		}
 	}
 	if (IsCatching && Shell->GetState() != KOOPAS_STATE_WALKING)
 	{
@@ -600,8 +605,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if (!CGame::GetInstance()->IsKeyDown(DIK_S))
 						YHolding = this->y + 35.0f;   // tru bot do cao
 				}
-				else if (musicNote->typeNote == MUSIC_NOTE_TYPE_PINK) {
-					if (nx < 0)
+				if (musicNote->typeNote == MUSIC_NOTE_TYPE_PINK) {
+					if (e->ny < 0 && CGame::GetInstance()->IsKeyDown(DIK_S))
+					{
+						isDeflectByPinkNote = true;
+						isDeflect = true;
+					}
+					else if (nx < 0)
 					{
 						musicNote->SetState(MUSIC_NOTE_STATE_MOVE_RIGHT_RIGHT);
 						isDeflectLeft = true;

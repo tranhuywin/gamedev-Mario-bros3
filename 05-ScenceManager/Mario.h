@@ -11,6 +11,7 @@
 #define X_RETURN_WORLD_1			2336
 #define Y_RETURN_WORLD_1			375
 
+#define MARIO_DEFLECT_PINK_NOTE		0.002f
 #define MARIO_JUMP_SPEED_Y			0.01f
 #define MARIO_DROP_VY_MAX			0.0125f
 #define MARIO_JUMP_DEFLECT_SPEED	0.2f
@@ -188,7 +189,7 @@ class CMario : public CGameObject
 	bool PrepareCatch;
 	bool SkillOn;
 	bool KickShell;
-	bool isDeflect, isDeflectLeft, isDeflectRight;
+	bool isDeflect, isDeflectLeft, isDeflectRight, isDeflectByPinkNote;
 	FireBullet* firebullet_1 = new FireBullet();
 	FireBullet* firebullet_2 = new FireBullet();
 	CKoopas* Shell;
