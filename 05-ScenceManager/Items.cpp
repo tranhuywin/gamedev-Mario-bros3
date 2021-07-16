@@ -4,6 +4,7 @@
 #include "Brick.h"
 #include "Ground.h"
 #include "BulletPiranhaPlant.h"
+#include "WoodenBrick.h"
 void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	if (BBox) {
@@ -58,10 +59,10 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 
 void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (!(CGame::GetInstance()->GetLevel() == MARIO_LEVEL_RACCOON) && IdItem == ITEM_ANI_TREE_LEAF)
+	/*if ((CGame::GetInstance()->GetLevel() == MARIO_LEVEL_RACCOON) && IdItem == ITEM_ANI_TREE_LEAF)
 	{
 		IdItem = ITEM_ANI_MUSHROOM_RED;
-	}
+	}*/
 	if (!SetPosStart)
 	{
 		this->X_Start = this->x;
@@ -285,10 +286,10 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				else if (IdItem == ITEM_MONEY_ROTATOR ) {
 					Active = false;
-					int CurentScore = CGame::GetInstance()->GetScore();
+					/*int CurentScore = CGame::GetInstance()->GetScore();
 					CGame::GetInstance()->SetScore(CurentScore + 100);
 					int CurentMoney = CGame::GetInstance()->GetMoney();
-					CGame::GetInstance()->SetMoney(CurentMoney + 1);
+					CGame::GetInstance()->SetMoney(CurentMoney + 1);*/
 					BBox = false;
 				}
 				else if (IdItem == ITEM_MULTIPLE_MONEY) {
@@ -360,6 +361,17 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 					if(IdItem != ITEM_MULTIPLE_MONEY)
 						Active = true;
+				}
+			}
+			else if (dynamic_cast<WoodenBrick*>(e)) 
+			{
+				WoodenBrick* brick = dynamic_cast<WoodenBrick*>(e);
+				if (brick->haveItem && brick->GetState() != BRICK_STATE_IDLE)
+				{
+					if (IdItem == ITEM_TREE_LEAF)
+						vy = -ITEM_DEFLECT_SPEED * dt;
+					Active = true;
+					brick->haveItem = false;
 				}
 			}
 			else if (dynamic_cast<Brick*>(e) && BrickBreak == NULL) {

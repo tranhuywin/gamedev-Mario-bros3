@@ -900,8 +900,8 @@ bend over left Big
 4	-100	0	4
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	2256	109	0	2287	180	2
-50	2800	350	0	2810	418	0
+50	2256	109	0	2287	180	2	1
+50	2790	350	0	2810	418	0	0
 [GRID]
 Grid/Grid_scene1-1.txt
 [STATUS_BAR]

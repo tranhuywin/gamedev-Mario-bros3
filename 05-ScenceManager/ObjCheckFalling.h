@@ -2,6 +2,7 @@
 #include "GameObject.h"
 class ObjCheckFalling :public CGameObject
 {
+	float mdy;
 public:
 	bool isFalling = false;
 	ObjCheckFalling();

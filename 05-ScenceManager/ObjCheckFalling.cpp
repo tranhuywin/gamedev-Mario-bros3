@@ -1,4 +1,5 @@
 #include "ObjCheckFalling.h"
+#include "Utils.h"
 ObjCheckFalling::ObjCheckFalling()
 {
 }
@@ -15,10 +16,16 @@ void ObjCheckFalling::Update(DWORD dt, vector<LPGAMEOBJECT>* listMapObj)
 	{
 		x += dx;
 		y += dy;
-		isFalling = true;
+		//isFalling = true;
+		mdy += dy;
+		if (mdy > 5.0f)
+		{
+			isFalling = true;
+		}
 	}
 	else
 	{
+		mdy = 0;
 		float min_tx, min_ty, nx = 0, ny = 0;
 		float rdx = 0;
 		float rdy = 0;
@@ -27,7 +34,7 @@ void ObjCheckFalling::Update(DWORD dt, vector<LPGAMEOBJECT>* listMapObj)
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
 		x += min_tx * dx + nx * 0.4f;
-		y += min_ty * dy + ny * 0.0001f;
+		y += min_ty * dy + ny * 0.1f;
 
 		if (ny != 0)
 		{

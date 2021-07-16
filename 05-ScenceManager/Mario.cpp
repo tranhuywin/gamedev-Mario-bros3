@@ -21,6 +21,7 @@
 #include "BoomerangOfBrother.h"
 #include "Brothers.h"
 #include "MusicNote.h"
+#include "WoodenBrick.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -69,11 +70,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		CGame::GetInstance()->SetReturnWorld(false);
 	}
 	if (NoCardStartGame == 0 && CGame::GetInstance()->GetCard_1() != -1)
-		SetState(MARIO_STATE_WALKING_RIGHT);
+		vx = 0.01 * dt;
 	if (NoCardStartGame == 1 && CGame::GetInstance()->GetCard_2() != -1)
-		SetState(MARIO_STATE_WALKING_RIGHT);
+		vx = 0.01 * dt;
 	if (NoCardStartGame == 2 && CGame::GetInstance()->GetCard_3() != -1)
-		SetState(MARIO_STATE_WALKING_RIGHT);
+		vx = 0.01 * dt;
 	
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
@@ -94,14 +95,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 
 	// Simple fall down
-	if (vx >= (MARIO_MAX_SPEED_RUNNING * dt))
+	if (vx >= (MARIO_MAX_SPEED_RUNNING))
 	{
-		vx = MARIO_MAX_SPEED_RUNNING * dt;
+		vx = MARIO_MAX_SPEED_RUNNING;
 		IsLimitRunning = true;
 	}
-	else if (vx <= -(MARIO_MAX_SPEED_RUNNING * dt))
+	else if (vx <= -(MARIO_MAX_SPEED_RUNNING))
 	{
-		vx = -(MARIO_MAX_SPEED_RUNNING * dt);
+		vx = -(MARIO_MAX_SPEED_RUNNING);
 		IsLimitRunning = true;
 	}
 	else IsLimitRunning = false;
@@ -184,13 +185,26 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	else if (IsCatching && Shell->GetState() == KOOPAS_STATE_WALKING)
 	{
-		if (level > MARIO_LEVEL_SMALL)
+		if (untouchable == 0)
 		{
-			level = MARIO_LEVEL_SMALL;
-			StartUntouchable();
+			if (Shell->GetState() != KOOPAS_STATE_DIE)
+			{
+				if (level > MARIO_LEVEL_BIG)
+				{
+					SetLevel(MARIO_LEVEL_BIG);
+					this->x -= MARIO_RACCOON_BBOX_TAIL;
+					this->y -= 1;		// khong bi rot xuong Coobj
+					StartUntouchable();
+				}
+				else if (level > MARIO_LEVEL_SMALL)
+				{
+					level = MARIO_LEVEL_SMALL;
+					StartUntouchable();
+				}
+				else
+					SetState(MARIO_STATE_DIE);
+			}
 		}
-		else
-			SetState(MARIO_STATE_DIE);
 	}
 	if (Shell != NULL)
 		if (!IsCatching && Shell->GetState() == KOOPAS_STATE_SHELL && Shell->IsCatching)
@@ -254,7 +268,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
-		float vyLine = vy;
 		float vxPre = vx;
 		float vyPre = vy;
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
@@ -362,7 +375,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (e->ny > 0)		// o duoi len
 				{
 					AllowJump = true;
-					vy = vyLine;
+					vy = vyPre;
 					y += dy;
 					//y -= min_ty * dy + ny * 0.4f;
 				}
@@ -531,7 +544,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					brick->YCollition = brick->y;
 				}
 			}
-			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj))
+			else if (dynamic_cast<BulletPiranhaPlant*>(e->obj) || dynamic_cast<BoomerangOfBrother*>(e->obj))
 			{
 				y -= min_ty * dy + ny * 0.4f;
 			}
@@ -624,6 +637,25 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 
 			}
+			else if (dynamic_cast<WoodenBrick*>(e->obj))
+			{
+				WoodenBrick* brick = dynamic_cast<WoodenBrick*>(e->obj);
+				if (brick->typeBrick == BRICK_INCLUDE_ITEM) {
+					
+					if (nx < 0)
+					{
+						isDeflect = true;
+						brick->SetState(BRICK_STATE_MOVE_RIGHT_RIGHT);
+						isDeflectLeft = true;
+					}
+					else if (nx > 0)
+					{
+						isDeflect = true;
+						brick->SetState(BRICK_STATE_MOVE_LEFT_LEFT);
+						isDeflectRight = true;
+					}
+				}
+			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
 				vx = vxPre;
@@ -664,24 +696,23 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 				{
-					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
+					if (p->playerMove == PLAYER_MOVE_IDLE) {
 						CGame::GetInstance()->SwitchScene(p->GetSceneId());
 					}
-					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
+					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) {
 						CGame::GetInstance()->SetReturnWorld(true);
 					}
 					IsWaitingTeleport = true;
 					if (StartTeleport ) {
-						if(CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)
+						if (p->playerMove == PLAYER_MOVE_DOWN)
 							this->vy = MARIO_START_TELEPORT_VY * dt;
-						else if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
+						else if(p->playerMove == PLAYER_MOVE_UP)
 							this->vy = -MARIO_START_TELEPORT_VY * dt;
-						}
 					}
-					if (this->y > p->y && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)) {
-							CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					if (this->y > p->y && p->playerMove == PLAYER_MOVE_DOWN) {
+						CGame::GetInstance()->SwitchScene(p->GetSceneId());
 					}
-					else if (this->y < p->y && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) ) {
+					else if (this->y < p->y && (p->playerMove == PLAYER_MOVE_UP)) {
 						CGame::GetInstance()->SwitchScene(p->GetSceneId());
 					}
 					TeleUp = false;
@@ -759,10 +790,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						SetState(MARIO_STATE_DIE);
 				}
 			}
-			/*else {
+			else {
 				IsWaitingTeleport = false;
 				StartTeleport = false;
-			}*/
+				TeleUp = false;
+			}
 		}
 	}
 	else {
@@ -1149,7 +1181,7 @@ void CMario::SetState(int state)
 		}
 		if (vx == 0 && !IsRunning)
 			vx = MARIO_WALKING_SPEED * dt;
-		if (IsRunning && vx < MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
+		if (IsRunning && vx < (MARIO_MAX_SPEED_RUNNING) && !IsFlying && !IsLimitRunning)
 			vx += MARIO_VY_ASCENDING_RUN * dt;
 			nx = 1;
 		break;
@@ -1165,7 +1197,7 @@ void CMario::SetState(int state)
 		}
 		if(vx == 0 && !IsRunning)
 			vx = -MARIO_WALKING_SPEED * dt;
-		if (IsRunning && vx != -MARIO_MAX_SPEED_RUNNING && !IsFlying && !IsLimitRunning)
+		if (IsRunning && vx != -(MARIO_MAX_SPEED_RUNNING) && !IsFlying && !IsLimitRunning)
 			vx -= MARIO_VY_ASCENDING_RUN * dt;
 			nx = -1;
 		break;
@@ -1277,8 +1309,8 @@ void CMario::SetState(int state)
 
 	case MARIO_STATE_DIE:
 		vy = -MARIO_DIE_DEFLECT_SPEED * dt;
-		int Life = CGame::GetInstance()->GetLife();
-		CGame::GetInstance()->SetLife(Life - 1);
+		//int Life = CGame::GetInstance()->GetLife();
+		//CGame::GetInstance()->SetLife(Life - 1);
 		//if (CGame::GetInstance()->GetLife() == 0)
 		break;
 	}

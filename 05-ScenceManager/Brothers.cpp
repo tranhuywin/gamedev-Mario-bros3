@@ -134,6 +134,7 @@ void Brothers::Render()
 {
 	Boomerang1->Render();
 	Boomerang2->Render();
+	
 	if (!WaitThrow)
 	{
 		Boomerang1->RenderWeapon = true;
@@ -144,7 +145,6 @@ void Brothers::Render()
 		Boomerang1->RenderWeapon = false;
 		Boomerang2->RenderWeapon = false;
 	}
-	
 	if (GetState() == BROTHER_STATE_ATTACK_RIGHT)
 	{
 		if (WaitAttackBoom1 || WaitAttackBoom2)

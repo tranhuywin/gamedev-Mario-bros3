@@ -23,7 +23,6 @@ protected:
 	//Grid
 	Grid* grid;
 	vector <LPGAMEOBJECT> listAllObject;
-	//MarioChooseMap* playerChoose;
 	StatusBar* statusBar;
 	LPGAMEOBJECT ItemSwitch;
 	vector<LPGAMEOBJECT> objectsItem;
@@ -48,7 +47,6 @@ public:
 	virtual void Unload();
 	void UpdateCammera(DWORD dt);
 	CMario * GetPlayer() { return player; } 
-	//friend class CPlayScenceKeyHandler;
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler

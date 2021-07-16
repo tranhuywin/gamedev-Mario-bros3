@@ -240,7 +240,16 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		case OBJECT_TYPE_BRICK: obj = new Brick(ItemSwitch); break;
 		case OBJECT_TYPE_FIRE_BULLET: obj = new FireBullet(); break;
 		case OBJECT_TYPE_QUESTION_BRICK: obj = new QuestionBrick(); break;
-		case OBJECT_TYPE_WOODEN_BRICK: obj = new WoodenBrick(); break;
+		case OBJECT_TYPE_WOODEN_BRICK: 
+		{
+			if (tokens.size() == 5)
+			{
+				int typeItem = atoi(tokens[4].c_str());
+				obj = new WoodenBrick(typeItem);
+			}
+			else
+				obj = new WoodenBrick(); 
+		}break;
 		case OBJECT_TYPE_FLYING_WOOD: obj = new FlyingWood(); break;
 		case OBJECT_TYPE_MUSIC_NOTE: 
 		{
@@ -326,7 +335,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			float r = atof(tokens[4].c_str());
 			float b = atof(tokens[5].c_str());
 			int scene_id = atoi(tokens[6].c_str());
-			obj = new CPortal(x, y, r, b, scene_id);
+			int playerMove = atof(tokens[7].c_str());
+			obj = new CPortal(x, y, r, b, scene_id, playerMove);
 		}break;
 		default:
 			DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
@@ -477,8 +487,8 @@ void CPlayScene::Update(DWORD dt)
 
 	if (player->x < 0)
 		player->SetPosition(0, player->y);
-	if (player->x > tileMap->GetWidthMap() - MARIO_BIG_BBOX_WIDTH * 2)
-		player->SetPosition(tileMap->GetWidthMap()- MARIO_BIG_BBOX_WIDTH * 2, player->y);
+	if (player->x > tileMap->GetWidthMap() - MARIO_BIG_BBOX_WIDTH)
+		player->SetPosition(tileMap->GetWidthMap()- MARIO_BIG_BBOX_WIDTH, player->y);
 
 	// Update camera 
 	UpdateCammera(dt);
@@ -565,7 +575,7 @@ void CPlayScene::UpdateCammera(DWORD dt)
 		else																							// camY theo di bo
 		{
 			CamY = tileMap->GetHeightMap() -( game->GetScreenHeight() - hightCammeraStatusBar);
-			if (player->y < possitonCammeraInTheSky)					
+			if (player->y < possitonCammeraInTheSky)
 				CamY -= game->GetScreenHeight();
 		}
 		// gioi han camX
@@ -585,13 +595,20 @@ void CPlayScene::UpdateCammera(DWORD dt)
 	}
 	else
 	{
+		CamY = tileMap->GetHeightMap() - (game->GetScreenHeight() - hightCammeraStatusBar);
+		if ((player->y - game->GetScreenHeight() / 2) <= CamY)			// camY theo bay
+			CamY = (player->y - game->GetScreenHeight() / 2);
+
 		CamX += CAMERA_MOVE_VX * dt;
 		if (CamX > tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
 			CamX = tileMap->GetWidthMap() - game->GetScreenWidth() - SCREEN_BORDER_RIGHT;
 		if (player->x < CamX)
 			player->SetPosition(CamX, player->y);
-		if (player->x > CamX + game->GetScreenWidth() - MARIO_BIG_BBOX_WIDTH)
-			player->SetPosition(CamX + game->GetScreenWidth() - MARIO_BIG_BBOX_WIDTH, player->y);
+		if (player->x > CamX + game->GetScreenWidth() - SCREEN_BORDER_RIGHT)
+			player->SetPosition(CamX + game->GetScreenWidth() - SCREEN_BORDER_RIGHT, player->y);
+		// gioi han camY
+		if (CamY < 0.0f)
+			CamY = 0.0f;
 	}
 	CGame::GetInstance()->SetCamPos(CamX, CamY);
 }

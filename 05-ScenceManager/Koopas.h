@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "Effect.h"
 #include "ObjCheckFalling.h"
-#define KOOPAS_WALKING_SPEED				0.015f
+#define KOOPAS_WALKING_SPEED				0.001f
 #define KOOPAS_PARATROOPA_GREEN_WALKING_SPEED				0.0022f
 #define KOOPAS_PARATROOPA_WALKING_SPEED		0.01f
 #define KOOPAS_ROTATORY_SPEED	0.2f

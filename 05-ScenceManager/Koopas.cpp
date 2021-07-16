@@ -17,6 +17,7 @@ CKoopas::CKoopas(int TypeKoopas)
 	
 	this->TypeKoopas = TypeKoopas;
 	SetState(KOOPAS_STATE_WALKING);
+	vx = -0.015f;
 	if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_RED) {
 		SetState(KOOPAS_STATE_FLYING_UP);
 	}
@@ -52,7 +53,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED && GetState() == KOOPAS_STATE_WALKING)
 	{
 		
-		if (nx == 1)
+		if (vx >= 0)
 		{
 			objCheckFalling->SetPosition(x + 5, y);
 			if (objCheckFalling->isFalling)
@@ -62,7 +63,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				SetState(KOOPAS_STATE_WALKING);
 			}
 		}
-		else if (nx == -1)
+		else if (vx < 0)
 		{
 			objCheckFalling->SetPosition(x - 10, y);
 			if (objCheckFalling->isFalling)
@@ -111,7 +112,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		{
 			PrepareWakeUp_start = 0;
 			PrepareWakeUp = 0;
-			y -= 12.0f;
+			y -= 6.0f;
 			SetState(KOOPAS_STATE_WALKING);
 		}
 	}
@@ -214,7 +215,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			}
 			else if (dynamic_cast<Brick*>(e->obj))
 			{
-				vx = -vx;	//bat nguoc lai
+				//if (nx != 0) 
+				{
+					vx = vxPre;
+				}
 
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
@@ -223,9 +227,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						x += dx * 2;
 					}
 					if (GetState() == KOOPAS_STATE_SHELL) {
-						vx = 0;
+						vx = -vx;
 					}
-					
+					else if (GetState() == KOOPAS_STATE_ROTATORY && nx != 0)
+					{
+						vx = -vx;
+					}
 					if (e->ny > 0)
 					{
 						vy = vyLine;
@@ -259,7 +266,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				if (GetState() == KOOPAS_STATE_ROTATORY)
 				{
 					CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
-					vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
+					//vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
 					koopas->SetState(KOOPAS_STATE_DIE);
 
 				}
@@ -379,14 +386,14 @@ void CKoopas::SetState(int state)
 		}
 		break;
 	case KOOPAS_STATE_ROTATORY:
-		vx = KOOPAS_ROTATORY_SPEED;
+		vx = KOOPAS_ROTATORY_SPEED * dt;
 		break;
 	case KOOPAS_STATE_WALKING:
-		vx = -KOOPAS_WALKING_SPEED;
+		vx = -KOOPAS_WALKING_SPEED * dt;
 		if (nx == 1)
-			vx = KOOPAS_WALKING_SPEED;
+			vx = KOOPAS_WALKING_SPEED * dt;
 		else if (nx == -1)
-			vx = -KOOPAS_WALKING_SPEED;
+			vx = -KOOPAS_WALKING_SPEED * dt;
 		
 		break;
 	case KOOPAS_STATE_FLYING_UP:

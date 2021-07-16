@@ -716,7 +716,7 @@ bend over left Big
 4	-100	0	4
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	360	0	1	375	35	1
+50	360	0	1	375	35	1	-1
 [GRID]
 Grid\Grid_sence1_1_hiden.txt
 [STATUS_BAR]
