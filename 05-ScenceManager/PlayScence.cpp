@@ -232,7 +232,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			}
 			obj = new CMario(x, y);
 			player = (CMario*)obj;
-
+			if (tokens.size() == 6) {
+				player->xTele = atof(tokens[4].c_str());
+				player->yTele = atof(tokens[5].c_str());
+			}
 			if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START)
 				player->SetLevel(MARIO_LEVEL_MINI);
 			DebugOut(L"[INFO] Player object created!\n");

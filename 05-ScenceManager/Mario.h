@@ -145,7 +145,7 @@
 #define MARIO_RACCOON_BBOX_HEIGHT		27
 #define MARIO_RACCOON_KILL_BBOX_WIDTH	23
 #define	MARIO_RACCOON_BBOX_TAIL			8
-#define MARIO_RACCOON_BBOX_BEND_OVER_WIDTH		22
+#define MARIO_RACCOON_BBOX_BEND_OVER_WIDTH		12
 #define MARIO_RACCOON_BBOX_BEND_OVER_HEIGHT		18
 
 #define MARIO_UNTOUCHABLE_TIME			5000
@@ -188,7 +188,7 @@ class CMario : public CGameObject
 	bool IsCatching;
 	bool PrepareCatch;
 	bool SkillOn;
-	bool KickShell;
+	bool KickShell, firstUpdate = true;
 	bool isDeflect, isDeflectLeft, isDeflectRight, isDeflectByPinkNote;
 	FireBullet* firebullet_1 = new FireBullet();
 	FireBullet* firebullet_2 = new FireBullet();
@@ -205,6 +205,7 @@ public:
 	bool isJumped;
 	bool IsWaitingTeleport;
 	bool StartTeleport;
+	float xTele = 0.0f, yTele = 0.0f;
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 

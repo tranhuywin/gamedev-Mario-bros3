@@ -10,6 +10,7 @@
 #include "QuestionBrick.h"
 #include "Brick.h"
 #include "Goomba.h"
+#include "Brothers.h"
 
 CKoopas::CKoopas(int TypeKoopas)
 {
@@ -50,30 +51,30 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		}
 	}
 	// check falling
-	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED && GetState() == KOOPAS_STATE_WALKING)
+	if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED)
 	{
-		
-		if (vx >= 0)
-		{
-			objCheckFalling->SetPosition(x + 5, y);
-			if (objCheckFalling->isFalling)
+		if (GetState() == KOOPAS_STATE_WALKING) {
+			if (vx >= 0)
 			{
-				nx = -1;
-				objCheckFalling->SetPosition(x - 15, y);
-				SetState(KOOPAS_STATE_WALKING);
-			}
-		}
-		else if (vx < 0)
-		{
-			objCheckFalling->SetPosition(x - 10, y);
-			if (objCheckFalling->isFalling)
-			{
-				nx = 1;
 				objCheckFalling->SetPosition(x + 5, y);
-				SetState(KOOPAS_STATE_WALKING);
+				if (objCheckFalling->isFalling)
+				{
+					nx = -1;
+					objCheckFalling->SetPosition(x - 15, y);
+					SetState(KOOPAS_STATE_WALKING);
+				}
+			}
+			else if (vx < 0)
+			{
+				objCheckFalling->SetPosition(x - 10, y);
+				if (objCheckFalling->isFalling)
+				{
+					nx = 1;
+					objCheckFalling->SetPosition(x + 5, y);
+					SetState(KOOPAS_STATE_WALKING);
+				}
 			}
 		}
-
 	}
 	if (objCheckFalling != NULL)
 		objCheckFalling->Update(dt, coObjects);
@@ -215,7 +216,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			}
 			else if (dynamic_cast<Brick*>(e->obj))
 			{
-				//if (nx != 0) 
 				{
 					vx = vxPre;
 				}
@@ -229,7 +229,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					if (GetState() == KOOPAS_STATE_SHELL) {
 						vx = -vx;
 					}
-					else if (GetState() == KOOPAS_STATE_ROTATORY && nx != 0)
+					else if (GetState() == KOOPAS_STATE_ROTATORY && nx != 0 && !(this->y + KOOPAS_BBOX_HEIGHT_SHELL - brick->y < 1.0f))
 					{
 						vx = -vx;
 					}
@@ -237,6 +237,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						vy = vyLine;
 						y += dy;
+					}
+				}
+				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_GREEN)
+				{
+					if (nx != 0 && GetState() == KOOPAS_STATE_WALKING)
+					{
+						vx = -vx;
 					}
 				}
 				else if (TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN) {
@@ -269,6 +276,19 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					//vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
 					koopas->SetState(KOOPAS_STATE_DIE);
 
+				}
+			}
+			else if (dynamic_cast<BoomerangOfBrother*>(e->obj))
+			{
+				vx = vxPre;
+				x += dx;
+			}
+			else if (dynamic_cast<Brothers*>(e->obj))
+			{
+				if (GetState() == KOOPAS_STATE_ROTATORY)
+				{
+					Brothers* brothers = dynamic_cast<Brothers*>(e->obj);
+					brothers->SetState(BROTHER_STATE_DIE);
 				}
 			}
 		}
@@ -387,6 +407,10 @@ void CKoopas::SetState(int state)
 		break;
 	case KOOPAS_STATE_ROTATORY:
 		vx = KOOPAS_ROTATORY_SPEED * dt;
+		if (nx == 1)
+			vx = KOOPAS_ROTATORY_SPEED * dt;
+		else if (nx == -1)
+			vx = -KOOPAS_ROTATORY_SPEED * dt;
 		break;
 	case KOOPAS_STATE_WALKING:
 		vx = -KOOPAS_WALKING_SPEED * dt;

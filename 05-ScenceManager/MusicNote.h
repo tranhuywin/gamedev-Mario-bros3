@@ -33,6 +33,7 @@ class MusicNote : public CGameObject
 	float initX, initY;
 	bool isFirstUpdate = true;
 public:
+	bool appear = false;
 	int typeNote = 1;
 	float vxOfPlayer = 0;
 	MusicNote(int typeNote);

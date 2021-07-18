@@ -38,20 +38,15 @@ CMario::CMario(float x, float y) : CGameObject()
 	else
 		NoCardStartGame = 0;
 
-	if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1)
-		level = MARIO_LEVEL_RACCOON;
-	else if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4_1) {
-		level = MARIO_LEVEL_RACCOON;
+	if (CGame::GetInstance()->GetReturnWorld()) {
+		this->x = xTele;
+		this->y = yTele;
 	}
-	else
+	if (CGame::GetInstance()->GetLevel() == MARIO_LEVEL_MINI)
 	{
-		level = MARIO_LEVEL_SMALL;
-		if (CGame::GetInstance()->GetReturnWorld()) {
-			this->x = X_RETURN_WORLD_1;
-			this->y = Y_RETURN_WORLD_1;
-			level = MARIO_LEVEL_RACCOON;
-		}
+		CGame::GetInstance()->SetLevel(MARIO_LEVEL_SMALL);
 	}
+	level = CGame::GetInstance()->GetLevel();
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 	start_x = x; 
@@ -64,17 +59,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if(CGame::GetInstance()->GetLevel() != -1)
 		CGame::GetInstance()->SetLevel(level);
-	if (CGame::GetInstance()->GetReturnWorld() && (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1 || CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4)) {
-		this->x = X_RETURN_WORLD_1;
-		this->y = Y_RETURN_WORLD_1;
+	if (CGame::GetInstance()->GetReturnWorld() && (CGame::GetInstance()->Getcurrent_scene() == CGame::GetInstance()->idMapWillbeTele)) {
+		this->x = xTele;
+		this->y = yTele;
 		CGame::GetInstance()->SetReturnWorld(false);
+		CGame::GetInstance()->idMapWillbeTele = 0;
 	}
 	if (NoCardStartGame == 0 && CGame::GetInstance()->GetCard_1() != -1)
-		vx = 0.01 * dt;
+		vx = 0.005 * dt;
 	if (NoCardStartGame == 1 && CGame::GetInstance()->GetCard_2() != -1)
-		vx = 0.01 * dt;
+		vx = 0.005 * dt;
 	if (NoCardStartGame == 2 && CGame::GetInstance()->GetCard_3() != -1)
-		vx = 0.01 * dt;
+		vx = 0.005 * dt;
 	
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)
@@ -338,12 +334,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					goomba->SetState(GOOMBA_STATE_DIE);
 				}
-				else if (e->nx != 0 && !Iskilling)
+				else if ((e->nx != 0 || e->ny > 0) && !Iskilling)
 				{
 					if (untouchable == 0)
 					{
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
+							goomba->y += 0.5f;
 							if (level > MARIO_LEVEL_BIG)
 							{
 								SetLevel(MARIO_LEVEL_BIG);
@@ -357,16 +354,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 								StartUntouchable();
 							}
 							else
-								SetState(MARIO_STATE_DIE);	
-						}
-						else {
-							//vy = vyPre;
-							//y += dy;
+								SetState(MARIO_STATE_DIE);
 						}
 					}
 					else {
 						vx = vxPre;
 						x += dx; 
+						y -= 1.0f;
 					}
 				}
 			}
@@ -619,20 +613,37 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						YHolding = this->y + 35.0f;   // tru bot do cao
 				}
 				if (musicNote->typeNote == MUSIC_NOTE_TYPE_PINK) {
-					if (e->ny < 0 && CGame::GetInstance()->IsKeyDown(DIK_S))
-					{
-						isDeflectByPinkNote = true;
-						isDeflect = true;
+					if (musicNote->appear) {
+						if (e->ny < 0 && CGame::GetInstance()->IsKeyDown(DIK_S))
+						{
+							isDeflectByPinkNote = true;
+							isDeflect = true;
+						}
+						else if (e->ny < 0)
+						{
+							musicNote->SetState(MUSIC_NOTE_STATE_MOVE_DOWN);
+						}
+						else if (nx < 0)
+						{
+							musicNote->SetState(MUSIC_NOTE_STATE_MOVE_RIGHT_RIGHT);
+							isDeflectLeft = true;
+						}
+						else if (nx > 0)
+						{
+							musicNote->SetState(MUSIC_NOTE_STATE_MOVE_LEFT_LEFT);
+							isDeflectRight = true;
+						}
 					}
-					else if (nx < 0)
-					{
-						musicNote->SetState(MUSIC_NOTE_STATE_MOVE_RIGHT_RIGHT);
-						isDeflectLeft = true;
-					}
-					else if (nx > 0)
-					{
-						musicNote->SetState(MUSIC_NOTE_STATE_MOVE_LEFT_LEFT);
-						isDeflectRight = true;
+					else {
+						vx = vxPre; x += dx;
+						if (ny > 0)
+						{
+							musicNote->appear = true;
+						}
+						else
+						{
+							vy = vyPre; y += dy;
+						}
 					}
 				}
 
@@ -671,15 +682,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEventsResultColl.clear();
 	if (state != MARIO_STATE_DIE)
 		CalCollisions(coObjects, coEventsResultColl);
-	if (state == MARIO_STATE_DIE && level == MARIO_LEVEL_SMALL && !CheckMarioInScreen())
+	if ((state == MARIO_STATE_DIE && level == MARIO_LEVEL_SMALL) && !CheckMarioInScreen())
 	{
 		CGame::GetInstance()->SwitchScene(SCENCE_START);
 		return;
 	}
-	else if (this->y > (CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenWidth())&& CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_4) {
+	else if (!firstUpdate && this->y > (CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenWidth())) {
 		CGame::GetInstance()->SwitchScene(SCENCE_START);
 		return;
 	}
+	if (firstUpdate) firstUpdate = false;
 	if (coEventsResultColl.size() != 0)
 	{
 		for (UINT i = 0; i < coEventsResultColl.size(); i++)
@@ -699,8 +711,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if (p->playerMove == PLAYER_MOVE_IDLE) {
 						CGame::GetInstance()->SwitchScene(p->GetSceneId());
 					}
-					if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_WORD_MAP_1_1) {
+					if (CGame::GetInstance()->Getcurrent_scene() == 2 || CGame::GetInstance()->Getcurrent_scene() == 5) {
 						CGame::GetInstance()->SetReturnWorld(true);
+						CGame::GetInstance()->idMapWillbeTele = p->GetSceneId();
 					}
 					IsWaitingTeleport = true;
 					if (StartTeleport ) {
@@ -917,7 +930,7 @@ void CMario::Render()
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
 				//if(!AllowJump && !OnPlatform)
-				if(IsDropping || (isDeflect && vy >= 0))
+				if((IsDropping && !OnPlatform)|| (isDeflect && vy >= 0))
 					ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 				if (Iskilling && Kill) 
 				{
@@ -939,7 +952,7 @@ void CMario::Render()
 				ani = MARIO_ANI_RACCOON_IDLE_LEFT;
 				if (AllowJump)
 					ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-				if (IsDropping || (isDeflect && vy < 0))
+				if ((IsDropping && !OnPlatform) || (isDeflect && vy < 0))
 					ani = MARIO_ANI_RACCOON_DROP_LEFT;
 				if (Iskilling && Kill) {
 					ani = MARIO_ANI_RACCOON_KILL_LEFT;
@@ -961,7 +974,7 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_RIGHT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_RIGHT;
-			if (IsDropping || (isDeflect && vy >= 0))
+			if ((IsDropping && !OnPlatform) || (isDeflect && vy >= 0))
 				ani = MARIO_ANI_RACCOON_DROP_RIGHT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_RIGHT;
@@ -982,7 +995,7 @@ void CMario::Render()
 			ani = MARIO_ANI_RACCOON_WALKING_LEFT;
 			if (AllowJump)
 				ani = MARIO_ANI_RACCOON_JUMP_LEFT;
-			if (IsDropping || (isDeflect && vy < 0))
+			if ((IsDropping && !OnPlatform) || (isDeflect && vy < 0))
 				ani = MARIO_ANI_RACCOON_DROP_LEFT;
 			if (Iskilling && Kill) {
 				ani = MARIO_ANI_RACCOON_KILL_LEFT;
@@ -1320,6 +1333,7 @@ void CMario::SetState(int state)
 void CMario::SetLevel(int l)
 {
 	level = l;
+	CGame::GetInstance()->SetLevel(l);
 }
 
 void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom)

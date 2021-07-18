@@ -51,7 +51,7 @@ class CGame
 	int Money = 0;
 	int Life = LIFE;
 	int Time = TIME;
-	int Level = -1;
+	int Level = 1;
 	int Card_1 = -1, Card_2 =-1, Card_3 = -1;
 	bool ReturnWorld;
 	unordered_map<int, LPSCENE> scenes;
@@ -61,6 +61,7 @@ class CGame
 	void _ParseSection_SCENES(string line);
 
 public:
+	int idMapWillbeTele = 0;
 	void InitKeyboard();
 	void SetKeyHandler(LPKEYEVENTHANDLER handler) { keyHandler = handler; }
 	void Init(HWND hWnd);

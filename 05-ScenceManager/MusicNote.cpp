@@ -13,8 +13,19 @@ void MusicNote::GetBoundingBox(float& left, float& top, float& right, float& bot
 {
 	left = x;
 	top = y;
-	right = x + MUSIC_NOTE_BBOX;
-	bottom = y + MUSIC_NOTE_BBOX;
+	if (typeNote == MUSIC_NOTE_TYPE_WHILE)
+	{
+		right = x + MUSIC_NOTE_BBOX;
+		bottom = y + MUSIC_NOTE_BBOX;
+	}
+	else if (typeNote == MUSIC_NOTE_TYPE_PINK)
+	{
+		right = x + MUSIC_NOTE_BBOX - 1;
+		bottom = y + MUSIC_NOTE_BBOX;
+		if (!appear)
+			bottom = y + 1;
+	}
+
 }
 
 void MusicNote::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -85,12 +96,12 @@ void MusicNote::Render()
 {
 	if(typeNote == MUSIC_NOTE_TYPE_WHILE)
 		animation_set->at(MUSIC_NOTE_WHILE_ANI)->Render(x, y);
-	else if (typeNote == MUSIC_NOTE_TYPE_PINK)
+	else if (typeNote == MUSIC_NOTE_TYPE_PINK && appear)
 	{
 		if(GetState() == MUSIC_NOTE_STATE_IDLE)
-			animation_set->at(MUSIC_NOTE_WHILE_ANI)->Render(x, y);
-		else
 			animation_set->at(MUSIC_NOTE_PINK_ANI)->Render(x, y);
+		else
+			animation_set->at(MUSIC_NOTE_WHILE_ANI)->Render(x, y);
 	}
 }
 	

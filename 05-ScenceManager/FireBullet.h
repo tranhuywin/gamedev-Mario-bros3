@@ -12,7 +12,7 @@ class FireBullet : public CGameObject
 {
 	float PosPlatform;
 	int Explode;
-	DWORD Explode_start;
+	ULONGLONG Explode_start;
 	float XExplode;
 	float YExplode;
 public:
