@@ -57,7 +57,7 @@ void Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 	}
 }
 
-void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void Items::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	/*if ((CGame::GetInstance()->GetLevel() == MARIO_LEVEL_RACCOON) && IdItem == ITEM_ANI_TREE_LEAF)
 	{
@@ -123,7 +123,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (Y_Start - y > ITEM_SWITCH_YSTART_DISTANCE_Y)
 					vy = 0;
 				if (state == ITEM_SWITCH_STATE_OFF) {
-					for (int i = 0; i < coObjects->size(); i++) {
+					for (unsigned int i = 0; i < coObjects->size(); i++) {
 						if (dynamic_cast<Brick*>(coObjects->at(i)))
 						{
 							Brick* brick = dynamic_cast<Brick*>(coObjects->at(i));
@@ -219,7 +219,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPGAMEOBJECT> coEventsResult;
 	coEventsResult.clear();
 	CalCollisions(coObjects, coEventsResult);
-	int sizeCo = coEventsResult.size();
+	unsigned int sizeCo = coEventsResult.size();
 
 	if (sizeCo == 0 && (IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED))
 	{
@@ -231,7 +231,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (sizeCo != 0)
 	{
-		for (UINT i = 0; i < sizeCo; i++)
+		for (unsigned int i = 0; i < sizeCo; i++)
 		{
 			LPGAMEOBJECT e = coEventsResult[i];
 			if (dynamic_cast<CMario*>(e))
@@ -316,7 +316,7 @@ void Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 					//Active = false;
 					EndScence = true;
-					vy = -0.03 * dt;
+					vy = -0.03f * dt;
 					BBox = false;
 				}
 				else if ((IdItem == ITEM_MUSHROOM_GREEN || IdItem == ITEM_MUSHROOM_RED) && vx != 0) {
@@ -424,7 +424,7 @@ Items::Items(int IdItem, int SpriteEffectStart)
 		Active = true;
 	else if (IdItem == ITEM_MUSHROOM_GREEN)
 	{
-		srand(time(NULL));
+		srand((int)time(NULL));
 		int rd = rand() % (2);
 		if (rd == 1)
 			nx = 1;

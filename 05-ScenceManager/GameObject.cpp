@@ -15,7 +15,7 @@ CGameObject::CGameObject()
 	nx = 1;	
 }
 
-void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+void CGameObject::Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	this->dt = dt;
 	dx = vx*dt;
@@ -66,7 +66,7 @@ void CGameObject::CalCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPGAMEOB
 	float l, t, r, b;
 	float coObjects_l, coObjects_t, coObjects_r, coObjects_b;
 
-	int Total_coObjects = coObjects->size();
+	unsigned int Total_coObjects = coObjects->size();
 
 	GetBoundingBox(l, t, r, b);
 

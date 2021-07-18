@@ -16,7 +16,7 @@ public:
 	bool AllowAttack, IsAttack;
 	BulletPiranhaPlant();
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	void Attack(int PosAttack, bool AttackIsAtive, float bulletX, float bulletY);
 };

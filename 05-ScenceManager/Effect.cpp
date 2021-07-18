@@ -1,6 +1,6 @@
 #include "Effect.h"
 
-void Effect::Update(DWORD dt)
+void Effect::Update(ULONGLONG dt)
 {
 	Vy -= SPEED_VY * dt;
 	PosY += Vy;

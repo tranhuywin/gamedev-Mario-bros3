@@ -14,7 +14,7 @@ Tail::Tail()
 {
 }
 
-void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void Tail::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
 
@@ -22,11 +22,11 @@ void Tail::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEventsResult.clear();
 	if(IsKilling)
 		CalCollisions(coObjects, coEventsResult);
-	int sizeCo = coEventsResult.size();
+	unsigned int sizeCo = coEventsResult.size();
 
 	if (sizeCo != 0)
 	{
-		for (UINT i = 0; i < sizeCo; i++)
+		for (unsigned int i = 0; i < sizeCo; i++)
 		{
 			LPGAMEOBJECT e = coEventsResult[i];
 			if (dynamic_cast<CGoomba*>(e)) // if e->obj is Goomba 

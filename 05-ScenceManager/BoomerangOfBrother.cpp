@@ -9,7 +9,7 @@ void BoomerangOfBrother::GetBoundingBox(float& left, float& top, float& right, f
 	bottom = y + BOOMERANG_BBOX;
 }
 
-void BoomerangOfBrother::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void BoomerangOfBrother::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (abs(x - StartAttackX) < BOOMERANG_DISTANCES_ATTACK && IsAttacking && !IsCatching)
 	{

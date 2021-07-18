@@ -4,10 +4,10 @@
 void StatusBar::DrawNumber(float x, float y, string stringnumb, int maxsize)
 {
 	stringnumb = string(maxsize - stringnumb.size(), '0').append(stringnumb);
-	for (int i = 0; i < stringnumb.size(); i++)
+	for (unsigned int i = 0; i < stringnumb.size(); i++)
 	{
 		int numb; // 48 la gia tri 0 trong bang ma ascii
-		for (int j = 0; j < 10; j++)
+		for (unsigned int j = 0; j < 10; j++)
 		{
 			numb = 48 + j;
 			if (stringnumb[i] == numb)
@@ -20,7 +20,7 @@ void StatusBar::DrawNumber(float x, float y, string stringnumb, int maxsize)
 	}
 }
 
-void StatusBar::Update(DWORD dt, float camX, float camY)
+void StatusBar::Update(ULONGLONG dt, float camX, float camY)
 {
 	posX = camX;
 	posY = camY;

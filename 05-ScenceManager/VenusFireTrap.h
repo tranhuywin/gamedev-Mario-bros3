@@ -40,11 +40,11 @@ class VenusFireTrap : public CGameObject
 	int Attack, WaitAttack;
 	int PosAttack, TypeVenusFireTrap;
 	BulletPiranhaPlant* Bullet;
-	DWORD Attack_start, WaitAttack_start;
+	ULONGLONG Attack_start, WaitAttack_start;
 	CMario* mario;
 	int TimeAttack = 1900, TimeWaitAttack = 0;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	int ani;
 public:

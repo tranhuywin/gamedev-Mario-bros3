@@ -38,7 +38,7 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 		bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
 }
 
-void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+void CGoomba::Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	if (effect != NULL) {
 		effect->Update(dt);
@@ -116,7 +116,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 void CGoomba::Render()
 {
-	int YRender = y;
+	float YRender = y;
 	if (effect != NULL) {
 		effect->Render();
 	}

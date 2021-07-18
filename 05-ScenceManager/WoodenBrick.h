@@ -23,7 +23,7 @@ public:
 	float initX, initY;
 	WoodenBrick();
 	WoodenBrick(int typeItem);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* obj);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* obj);
 	void SetState(int state);
 	virtual void Render();
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);

@@ -19,7 +19,7 @@ void Brick::Render()
 	}
 }
 
-void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
+void Brick::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* colliable_objects)
 {
 	if (IsBreaked) {
 		vyBreak += BRICK_VY_BREAK * dt;
@@ -53,10 +53,10 @@ void Brick::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 	coEventsResult.clear();
 
 	CalCollisions(colliable_objects, coEventsResult);
-	int sizeCo = coEventsResult.size();
+	unsigned int sizeCo = coEventsResult.size();
 	if (sizeCo != 0)
 	{
-		for (UINT i = 0; i < sizeCo; i++)
+		for (unsigned int i = 0; i < sizeCo; i++)
 		{
 			LPGAMEOBJECT e = coEventsResult[i];
 			if (dynamic_cast<QuestionBrick*>(e))
@@ -81,8 +81,9 @@ void Brick::GetBoundingBox(float& l, float& t, float& r, float& b)
 			b = y + BRICK_BBOX_WIDTH;
 		}
 		else {
-			r = x;
-			b = y;
+			l = 0.0f; t = 0.0f;
+			r = 0.0f;
+			b = 0.0f;
 		}
 	}
 }

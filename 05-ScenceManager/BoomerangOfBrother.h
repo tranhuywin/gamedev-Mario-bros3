@@ -24,15 +24,15 @@
 class BoomerangOfBrother : public CGameObject
 {
 public:
-	float StartAttackX, StartAttackY;
-	float CatchX, CatchY;
-	bool IsAttacking, RenderWeapon;
-	bool IsCatching, CatchDone = true, holdingLeft, holdingRight;
+	float StartAttackX = -1.0f, StartAttackY = -1.0f;
+	float CatchX = -1.0f, CatchY = -1.0f;
+	bool IsAttacking = false , RenderWeapon = false;
+	bool IsCatching = false, CatchDone = true, holdingLeft = false, holdingRight = false;
 	BoomerangOfBrother(int Ani);
 	void Attack(float x, float y, int marioPos);
 	void CatchBoomerang(float x, float y);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects = NULL);
 	virtual void Render();
 	virtual void SetState(int state);
 };

@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "Effect.h"
 #define GOOMBA_WALKING_SPEED 0.05f
-#define GOOMBA_GRAVITY		0.001
+#define GOOMBA_GRAVITY		0.001f
 #define PARAGOOMBA_JUMP_DEFLECT_HEIGHT_SPEED		0.25f
 #define PARAGOOMBA_JUMP_DEFLECT_SPEED				0.01f
 #define PARAGOOMBA_VY_WING_BIG						0.05f
@@ -35,12 +35,12 @@
 class CGoomba : public CGameObject
 {
 	int ani;
-	DWORD Die_start;
+	ULONGLONG Die_start;
 	bool Died;
 	int Die , JumpCount;
 	
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
 	void StartDie() { Die = 1; Die_start = GetTickCount64(); }
 

@@ -80,13 +80,13 @@ void Grid::ClearGrid(int numRow, int numCol)
 
 void Grid::AddObjectToGrid(int id, vector<LPGAMEOBJECT> object)
 {
-	int totalCol = MAP_WIDTH / CELL_WIDTH;
-	int totalRow = MAP_HEIGHT / CELL_HEIGHT;
+	unsigned int totalCol = MAP_WIDTH / CELL_WIDTH;
+	unsigned int totalRow = MAP_HEIGHT / CELL_HEIGHT;
 	Resize();
 
-	for (int i = 0; i < totalRow; i++) {
-		for (int j = 0; j < totalCol; j++) {
-			for (int k = 0; k < listIdObjects[i][j].size(); k++)
+	for (unsigned int i = 0; i < totalRow; i++) {
+		for (unsigned int j = 0; j < totalCol; j++) {
+			for (unsigned int k = 0; k < listIdObjects[i][j].size(); k++)
 			{
 				if (listIdObjects[i][j][k] == id)
 				{
@@ -102,20 +102,20 @@ void Grid::GetGrid(vector<LPGAMEOBJECT>& list)
 {
 	//vector<LPGAMEOBJECT> ObjectUpdated;
 
-	int firstCol = (int)(CGame::GetInstance()->GetCamPosX() / CELL_WIDTH);
-	int lastCol = (ceil)((CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()) / CELL_WIDTH);
-	int firstRow = (int)(CGame::GetInstance()->GetCamPosY() / CELL_HEIGHT);
-	int lastRow = (ceil)((CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()) / CELL_HEIGHT);
+	unsigned int firstCol = (int)(CGame::GetInstance()->GetCamPosX() / CELL_WIDTH);
+	unsigned int lastCol = (int)(ceil)((CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()) / CELL_WIDTH);
+	unsigned int firstRow = (int)(CGame::GetInstance()->GetCamPosY() / CELL_HEIGHT);
+	unsigned int lastRow = (int)(ceil)((CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight()) / CELL_HEIGHT);
 
-	for (int i = firstRow; i <= lastRow; i++)
+	for (unsigned int i = firstRow; i <= lastRow; i++)
 	{
-		for (int j = firstCol; j <= lastCol; j++)
+		for (unsigned int j = firstCol; j <= lastCol; j++)
 		{
-			for (int k = 0; k < listCells[i][j].size(); k++)	// tat ca obj trong 1 cell
+			for (unsigned int k = 0; k < listCells[i][j].size(); k++)	// tat ca obj trong 1 cell
 			{
 				bool similar = false; // kiem tra
 				if(!similar)
-					for (int m = 0; m < list.size(); m++) 
+					for (unsigned int m = 0; m < list.size(); m++)
 					{
 						if (listCells[i][j][k] == list[m])
 						{
@@ -128,17 +128,17 @@ void Grid::GetGrid(vector<LPGAMEOBJECT>& list)
 			//DebugOut(L"Col %d \n", j);
 		}
 	}
-	for (int i = 0; i < list.size(); i++)
+	for (unsigned int i = 0; i < list.size(); i++)
 	{	
 		if (dynamic_cast<CKoopas*>(list[i]) || dynamic_cast<CGoomba*>(list[i]) || dynamic_cast<BulletPiranhaPlant*>(list[i]) 
 			|| dynamic_cast<BoomerangOfBrother*>(list[i]) || dynamic_cast<FlyingWood*>(list[i]))
 		{
 			float l, t, r, b;
 			list[i]->GetBoundingBox(l, t, r, b);
-			int Top = int(t / CELL_HEIGHT);
-			int Left = int(l / CELL_WIDTH);
-			int Right = ceil(r / CELL_WIDTH);
-			int Bottom = ceil(b / CELL_HEIGHT);
+			unsigned int Top = int(t / CELL_HEIGHT);
+			unsigned int Left = int(l / CELL_WIDTH);
+			unsigned int Right = (int)ceil(r / CELL_WIDTH);
+			unsigned int Bottom = (int)ceil(b / CELL_HEIGHT);
 
 			if (!((Top >= firstRow && Bottom <= (lastRow)) && (Left >= firstCol && Right <= (lastCol)))) {
 				list.erase(list.begin() + i);

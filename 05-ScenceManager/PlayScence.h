@@ -45,7 +45,7 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-	void UpdateCammera(DWORD dt);
+	void UpdateCammera(ULONGLONG dt);
 	CMario * GetPlayer() { return player; } 
 };
 

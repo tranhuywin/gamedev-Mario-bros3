@@ -19,7 +19,7 @@ public:
 	bool OnPlatform;
 	bool IsBeingFired;
 	FireBullet();
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void Render();
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	void attack(float x, float y, bool isRight);

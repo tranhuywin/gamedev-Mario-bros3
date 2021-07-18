@@ -18,7 +18,7 @@ void BulletPiranhaPlant::GetBoundingBox(float& left, float& top, float& right, f
 	bottom = y + BULLET_BBOX;
 }
 
-void BulletPiranhaPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void BulletPiranhaPlant::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 
 	if ((this->x < CGame::GetInstance()->GetCamPosX() || this->x > CGame::GetInstance()->GetCamPosX() + CGame::GetInstance()->GetScreenWidth()))

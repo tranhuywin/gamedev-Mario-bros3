@@ -11,7 +11,7 @@ WoodenBrick::WoodenBrick(int typeItem)
 	haveItem = true;
 	SetState(BRICK_STATE_IDLE);
 }
-void WoodenBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* obj)
+void WoodenBrick::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* obj)
 {
 	if (typeBrick == BRICK_INCLUDE_ITEM)
 	{

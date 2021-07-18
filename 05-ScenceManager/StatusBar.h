@@ -49,7 +49,7 @@ class StatusBar
 	void DrawPMeter();
 	void DrawCard();
 public:
-	void Update(DWORD dt, float camX, float camY);
+	void Update(ULONGLONG dt, float camX, float camY);
 	void Render();
 	CMario* Mario;
 	StatusBar(CMario* mario, int SpriteStatusBar, int SpriteCardBar, int SpriteNumber0, int SpritePowerState, int SpriteCard);

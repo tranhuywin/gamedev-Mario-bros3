@@ -22,7 +22,7 @@ void QuestionBrick::Render()
 	//RenderBoundingBox();
 }
 
-void QuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void QuestionBrick::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
 	y += dy;
@@ -36,10 +36,10 @@ void QuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void QuestionBrick::GetBoundingBox(float &l, float &t, float &r, float &b)
 {
-	l = x;
-	t = y + 1;
-	r = x + BRICK_BBOX_WIDTH;
-	b = y + BRICK_BBOX_HEIGHT;
+	l = x + 0.5f;
+	t = y + 1.0f;
+	r = x + QBRICK_BBOX_WIDTH;
+	b = y + QBRICK_BBOX_HEIGHT - 0.5f;
 }
 
 void QuestionBrick::SetState(int state)

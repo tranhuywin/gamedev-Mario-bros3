@@ -19,7 +19,7 @@ public:
 	int AniEffect;
 	float PosX, PosY, Vy = 0;
 	bool StopDraw;
-	void Update(DWORD dt);
+	void Update(ULONGLONG dt);
 	void Render();
 	Effect(float PosX, float PosY, int Ani);
 };

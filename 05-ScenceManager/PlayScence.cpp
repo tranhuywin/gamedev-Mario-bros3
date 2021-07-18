@@ -13,7 +13,7 @@
 #include "WoodenBrick.h"
 #include "Brick.h"
 #include "VenusFireTrap.h"
-#include "Items.h";
+#include "Items.h"
 #include "BulletPiranhaPlant.h"
 #include "Tree.h"
 #include "FlyingWood.h"
@@ -123,7 +123,7 @@ void CPlayScene::_ParseSection_ANIMATIONS(string line)
 	LPANIMATION ani = new CAnimation();
 
 	int ani_id = atoi(tokens[0].c_str());
-	for (int i = 1; i < tokens.size(); i += 2)	// why i+=2 ?  sprite_id | frame_time  
+	for (unsigned int i = 1; i < tokens.size(); i += 2)	// why i+=2 ?  sprite_id | frame_time  
 	{
 		int sprite_id = atoi(tokens[i].c_str());
 		int frame_time = atoi(tokens[i+1].c_str());
@@ -144,7 +144,7 @@ void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 
 	CAnimations *animations = CAnimations::GetInstance();
 
-	for (int i = 1; i < tokens.size(); i++)
+	for (unsigned int i = 1; i < tokens.size(); i++)
 	{
 		int ani_id = atoi(tokens[i].c_str());
 		
@@ -212,8 +212,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	if (tokens.size() < 3) return; // skip invalid lines - an object set must have at least id, x, y
 
 	int object_type = atoi(tokens[0].c_str());
-	float x = atof(tokens[1].c_str());
-	float y = atof(tokens[2].c_str());
+	float x = (float) atof(tokens[1].c_str());
+	float y = (float) atof(tokens[2].c_str());
 
 	int ani_set_id = atoi(tokens[3].c_str());
 
@@ -233,8 +233,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			obj = new CMario(x, y);
 			player = (CMario*)obj;
 			if (tokens.size() == 6) {
-				player->xTele = atof(tokens[4].c_str());
-				player->yTele = atof(tokens[5].c_str());
+				player->xTele = (float) atof(tokens[4].c_str());
+				player->yTele = (float) atof(tokens[5].c_str());
 			}
 			if (CGame::GetInstance()->Getcurrent_scene() == SCENCE_START)
 				player->SetLevel(MARIO_LEVEL_MINI);
@@ -282,18 +282,18 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		
 		case OBJECT_TYPE_TUBE: 
 		{
-			float Height = atoi(tokens[4].c_str());
+			float Height = (float) atof(tokens[4].c_str());
 			int IDAni = atoi(tokens[5].c_str());
 			obj = new Tube(Height, IDAni);
 		} break;
 		case OBJECT_TYPE_LINE: 
 		{
-			float Width = atoi(tokens[4].c_str());
+			float Width = (float) atoi(tokens[4].c_str());
 			obj = new Line(Width);
 		}break;
 		case OBJECT_TYPE_GROUND: 
 		{
-			float Width = atoi(tokens[4].c_str());
+			float Width = (float) atoi(tokens[4].c_str());
 			obj = new Ground(Width);
 		}break;
 		case OBJECT_TYPE_KOOPAS: 
@@ -335,10 +335,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		}break;
 		case OBJECT_TYPE_PORTAL:
 		{
-			float r = atof(tokens[4].c_str());
-			float b = atof(tokens[5].c_str());
+			float r = (float) atof(tokens[4].c_str());
+			float b = (float) atof(tokens[5].c_str());
 			int scene_id = atoi(tokens[6].c_str());
-			int playerMove = atof(tokens[7].c_str());
+			int playerMove = atoi(tokens[7].c_str());
 			obj = new CPortal(x, y, r, b, scene_id, playerMove);
 		}break;
 		default:
@@ -453,18 +453,18 @@ void CPlayScene::Update(DWORD dt)
 	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START)
 	{
 		grid->GetGrid(ObjectsInGrid);
-		for (int i = 0; i < ObjectsInGrid.size(); i++)
+		for (unsigned int i = 0; i < ObjectsInGrid.size(); i++)
 		{
 			if (!dynamic_cast<Items*>(ObjectsInGrid[i]))
 				coObjects.push_back(ObjectsInGrid[i]);
 		}
 		
-		for (int i = 0; i < listWeaponEnemy.size(); i++) {
+		for (unsigned int i = 0; i < listWeaponEnemy.size(); i++) {
 			coObjects.push_back(listWeaponEnemy[i]);
 		}
 
 
-		for (int i = 0; i < ObjectsInGrid.size(); i++)
+		for (unsigned int i = 0; i < ObjectsInGrid.size(); i++)
 		{
 			if (!dynamic_cast<Items*>(ObjectsInGrid[i]))
 				ObjectsInGrid[i]->Update(dt, &coObjects);
@@ -510,13 +510,13 @@ void CPlayScene::Render()
 	if (CGame::GetInstance()->Getcurrent_scene() != SCENCE_START) {
 		grid->GetGrid(ObjectsInGrid);
 		
-		for (int i = 0; i < ObjectsInGrid.size(); i++)
+		for (unsigned int i = 0; i < ObjectsInGrid.size(); i++)
 		{
 			ObjectsInGrid[i]->Render();
 		}
 	}
 	else {
-		for (int i = 0; i < objects.size(); i++)
+		for (unsigned int i = 0; i < objects.size(); i++)
 		{
 			objects[i]->Render();
 		}
@@ -537,10 +537,10 @@ void CPlayScene::Render()
 void CPlayScene::Unload()
 {
 	CamX = 0; CamY = 0;
-	for (int i = 0; i < objects.size(); i++)
+	for (unsigned int i = 0; i < objects.size(); i++)
 		delete objects[i];
 	objects.clear();
-	for (int i = 0; i < objectsItem.size(); i++)
+	for (unsigned int i = 0; i < objectsItem.size(); i++)
 		delete objectsItem[i];
 	objectsItem.clear();
 	/*for (int i = 0; i < listAllObject.size(); i++)
@@ -560,7 +560,7 @@ void CPlayScene::Unload()
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
 
-void CPlayScene::UpdateCammera(DWORD dt)
+void CPlayScene::UpdateCammera(ULONGLONG dt)
 {
 	CGame* game = CGame::GetInstance();
 	//float CamX, CamY;

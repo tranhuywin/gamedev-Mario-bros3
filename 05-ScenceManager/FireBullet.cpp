@@ -13,7 +13,7 @@ FireBullet::FireBullet()
 {
 	this->SetAnimationSet(CAnimationSets::GetInstance()->Get(4));
 }
-void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void FireBullet::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (!IsBeingFired)
 	{
@@ -33,7 +33,7 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		vy = FIRE_BULLET_SPEED_Y;
 	}
-	if (GetTickCount() - Explode_start > FIRE_BULLET_EXPLODE_TIME)
+	if (GetTickCount64() - Explode_start > FIRE_BULLET_EXPLODE_TIME)
 	{
 		Explode_start = 0;
 		Explode = 0;
@@ -65,6 +65,12 @@ void FireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 		else
 			OnPlatform = false;
+		if (nx != 0)
+		{
+			StartExplode();
+			XExplode = x;
+			YExplode = y;
+		}
 		vy = -FIRE_BULLET_SPEED_Y;
 
 		for (UINT i = 0; i < coEventsResult.size(); i++)

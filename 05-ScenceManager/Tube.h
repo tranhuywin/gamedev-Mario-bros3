@@ -18,7 +18,7 @@
 #define TUBE_BBOX_HIGHT_6	32
 class Tube : public CGameObject
 {
-	float Height;
+	float Height = -1;
 	int SprTure = -1;
 public:
 	Tube(float Height, int SprTure);

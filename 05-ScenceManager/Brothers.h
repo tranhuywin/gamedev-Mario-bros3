@@ -32,18 +32,18 @@ class Brothers : public CGameObject
 {
 	BoomerangOfBrother* Boomerang1 = NULL;
 	BoomerangOfBrother* Boomerang2 = NULL;
-	bool isSetPossInit;
-	float xInit, yInit;
-	int IDTypeBrother;
+	bool isSetPossInit = false;
+	float xInit = NULL, yInit = NULL;
+	int IDTypeBrother = NULL;
 	int ani = 0;
-	int WaitAttackBoom1, WaitAttackBoom2, WaitThrow;
-	DWORD WaitAttackBoom1_start, WaitAttackBoom2_start, Attack_start;
-	DWORD WaitThrow_start;
+	int WaitAttackBoom1 = NULL, WaitAttackBoom2 = NULL, WaitThrow = NULL;
+	ULONGLONG WaitAttackBoom1_start, WaitAttackBoom2_start, Attack_start;
+	ULONGLONG WaitThrow_start;
 	CMario* mario;
 public:
 	Brothers(int IDType, BoomerangOfBrother* Boomerang1, BoomerangOfBrother* Boomerang2, CMario* player);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	virtual void SetState(int state);
 	void StartWaitAttackBoom1() { WaitAttackBoom1 = 1; WaitAttackBoom1_start = GetTickCount64(); }

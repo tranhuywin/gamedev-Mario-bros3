@@ -12,7 +12,7 @@ void Brothers::GetBoundingBox(float& left, float& top, float& right, float& bott
 	}
 }
 
-void Brothers::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void Brothers::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	this->dt = dt;
 	if (x > mario->x)

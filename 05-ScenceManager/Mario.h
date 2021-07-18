@@ -165,12 +165,12 @@ class CMario : public CGameObject
 	int alpha = 255;
 	int CountMiliSeconds = 0;
 	int NoCardStartGame = 0;
-	DWORD untouchable_start;
-	DWORD Kill_start;
-	DWORD Fly_start;
-	DWORD Slip_start;
-	DWORD FireAttack_start;
-	DWORD Kick_start;
+	ULONGLONG untouchable_start;
+	ULONGLONG Kill_start;
+	ULONGLONG Fly_start;
+	ULONGLONG Slip_start;
+	ULONGLONG FireAttack_start;
+	ULONGLONG Kick_start;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y; 
@@ -206,7 +206,7 @@ public:
 	bool IsWaitingTeleport;
 	bool StartTeleport;
 	float xTele = 0.0f, yTele = 0.0f;
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 
 	CMario(float x = 0.0f, float y = 0.0f);

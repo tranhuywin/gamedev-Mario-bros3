@@ -54,16 +54,16 @@ class Items : public CGameObject
 public:
 	Effect* effect = NULL;
 	Brick* BrickBreak = NULL;
-	bool EndScence;
-	int IdItem;
+	bool EndScence = false;
+	int IdItem = -1;
 	int CountColl = COUNT_COLLiTION_MARIO;
-	int AniEffect;
-	int SpriteEffectStart;
-	bool Active, SetPosStart, MoneyofSwitchOff, MarioGetMoney, OfBrick;
-	bool DrawEffect;
-	float X_Start, Y_Start;
+	int AniEffect = -1;
+	int SpriteEffectStart = -1;
+	bool Active = false, SetPosStart = false, MoneyofSwitchOff = false, MarioGetMoney = false, OfBrick = false;
+	bool DrawEffect = false;
+	float X_Start = -1, Y_Start = -1;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void Render();
 	Items(int IdItem, int SpriteEffectStart);
 	virtual void SetState(int state);

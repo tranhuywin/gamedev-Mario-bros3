@@ -37,7 +37,7 @@ void TileMap::LoadFilePath()
 		{
 			ColRead = 0;
 			RowRead++;
-			NumRowOnTilemap = RowRead;
+			NumRowOnTilemap = (float) RowRead;
 		}
 		fs >> tilemap[RowRead][ColRead];
 		ColRead++;
@@ -90,7 +90,7 @@ void TileMap::SetNumColOnTilemap()
 	}
 	string Col;
 	getline(fs, Col);
-	NumColOnTilemap = Col.size() / 2;	// chia khoan trang khoang trang
+	NumColOnTilemap = (float)Col.size() / 2;	// chia khoan trang khoang trang
 	fs.close();
 }
 float TileMap::GetHeightMap()

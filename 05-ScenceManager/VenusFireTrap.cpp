@@ -19,7 +19,7 @@ void VenusFireTrap::GetBoundingBox(float& left, float& top, float& right, float&
 	}
 }
 
-void VenusFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void VenusFireTrap::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	y += dy;
 	CGameObject::Update(dt);

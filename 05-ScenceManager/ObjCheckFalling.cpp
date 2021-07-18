@@ -3,7 +3,7 @@
 ObjCheckFalling::ObjCheckFalling()
 {
 }
-void ObjCheckFalling::Update(DWORD dt, vector<LPGAMEOBJECT>* listMapObj)
+void ObjCheckFalling::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* listMapObj)
 {
 	vy += 0.005f * dt;
 	vector<LPCOLLISIONEVENT> coEvents;

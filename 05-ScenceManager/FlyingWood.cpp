@@ -1,6 +1,6 @@
 #include "FlyingWood.h"
 
-void FlyingWood::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
+void FlyingWood::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* colliable_objects)
 {
 	vx = -FLYING_WOOD_VX * dt;
 	if (IsCollMario)

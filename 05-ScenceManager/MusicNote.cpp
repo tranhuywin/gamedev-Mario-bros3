@@ -28,7 +28,7 @@ void MusicNote::GetBoundingBox(float& left, float& top, float& right, float& bot
 
 }
 
-void MusicNote::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void MusicNote::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (isFirstUpdate)
 	{

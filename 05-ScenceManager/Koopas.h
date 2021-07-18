@@ -20,7 +20,7 @@
 
 #define KOOPA_PARATROOPA_RED_FLY_X_MIN			32
 #define KOOPA_PARATROOPA_RED_FLY_X_MAX			128
-#define KOOPA_PARATROOPA_RED_FLY_VY				0.005
+#define KOOPA_PARATROOPA_RED_FLY_VY				0.005f
 #define KOOPAS_STATE_WALKING		100
 #define KOOPAS_STATE_SHELL			200
 #define KOOPAS_STATE_ROTATORY		300
@@ -60,12 +60,12 @@
 class CKoopas : public CGameObject
 {
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
 	bool ShakingLeft;
 	int Sleep, PrepareWakeUp;
 	float XLeftBrick = 0, XRightBrick = 0;
-	DWORD Sleep_start, PrepareWakeUp_start;
+	ULONGLONG Sleep_start, PrepareWakeUp_start;
 public:
 	bool TailAttack, IsCatching;
 	int TypeKoopas;

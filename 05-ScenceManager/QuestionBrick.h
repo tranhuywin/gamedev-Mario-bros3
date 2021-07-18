@@ -1,11 +1,11 @@
 #pragma once
 #include "GameObject.h"
 
-#define BRICK_BBOX_WIDTH  16
-#define BRICK_BBOX_HEIGHT 15
+#define QBRICK_BBOX_WIDTH  15.5f
+#define QBRICK_BBOX_HEIGHT 15.0f
 
-#define BRICK_DEFLECT_SPEED				0.01
-#define BRICK_DISTANCE_DEFLECT			10
+#define BRICK_DEFLECT_SPEED				0.01f
+#define BRICK_DISTANCE_DEFLECT			10.0f
 
 #define BRICK_STATE_QUESTION_ON			0
 #define BRICK_STATE_QUESTION_OFF		1
@@ -21,7 +21,7 @@ public:
 	float YCollition = 0;
 	QuestionBrick();
 	virtual void Render();
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void GetBoundingBox(float &l, float &t, float &r, float &b);
 	void SetState(int state);
 };

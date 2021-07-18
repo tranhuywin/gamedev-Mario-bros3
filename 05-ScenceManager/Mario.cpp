@@ -55,7 +55,7 @@ CMario::CMario(float x, float y) : CGameObject()
 	this->y = y; 
 }
 
-void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void CMario::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if(CGame::GetInstance()->GetLevel() != -1)
 		CGame::GetInstance()->SetLevel(level);
@@ -66,11 +66,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		CGame::GetInstance()->idMapWillbeTele = 0;
 	}
 	if (NoCardStartGame == 0 && CGame::GetInstance()->GetCard_1() != -1)
-		vx = 0.005 * dt;
+		vx = 0.005f * dt;
 	if (NoCardStartGame == 1 && CGame::GetInstance()->GetCard_2() != -1)
-		vx = 0.005 * dt;
+		vx = 0.005f * dt;
 	if (NoCardStartGame == 2 && CGame::GetInstance()->GetCard_3() != -1)
-		vx = 0.005 * dt;
+		vx = 0.005f * dt;
 	
 	CGameObject::Update(dt);
 	if (level != MARIO_LEVEL_MINI)

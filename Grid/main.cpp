@@ -106,8 +106,8 @@ int main() {
 				//Done export file + BBOX
 				int ColStart = int(Left / GRID_WIDTH);
 				int RowStart = int(Top / GRID_HEIGHT);
-				int ColEnd = ceil(Right / GRID_WIDTH);
-				int RowEnd = ceil(Bottom / GRID_HEIGHT);
+				int ColEnd = (int)ceil(Right / GRID_WIDTH);
+				int RowEnd = (int)ceil(Bottom / GRID_HEIGHT);
 
 				switch (idobj)
 				{

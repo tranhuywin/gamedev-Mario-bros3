@@ -36,7 +36,7 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 		bottom = y + KOOPAS_BBOX_HEIGHT_SHELL - 1;
 }
 
-void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+void CKoopas::Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	if (effect != NULL)
 		effect->Update(dt);
@@ -113,7 +113,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		{
 			PrepareWakeUp_start = 0;
 			PrepareWakeUp = 0;
-			y -= 6.0f;
+			this->y -= 20.0f;
 			SetState(KOOPAS_STATE_WALKING);
 		}
 	}
@@ -122,10 +122,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	coEventsResultColl.clear();
 
 	CalCollisions(coObjects, coEventsResultColl);
-	int sizeCo = coEventsResultColl.size();
+	unsigned int sizeCo = coEventsResultColl.size();
 	if (sizeCo != 0)
 	{
-		for (UINT i = 0; i < sizeCo; i++)
+		for (unsigned int i = 0; i < sizeCo; i++)
 		{
 			LPGAMEOBJECT e = coEventsResultColl[i];
 			if (dynamic_cast<QuestionBrick*>(e))
@@ -222,14 +222,14 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 				Brick* brick = dynamic_cast<Brick*>(e->obj);
 				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
-					if (nx != 0 && GetState() == KOOPAS_STATE_WALKING)
+					if (nx != 0 && GetState() == KOOPAS_STATE_WALKING && (this->y + KOOPAS_BBOX_HEIGHT_SHELL - brick->y < 1.5f))
 					{
 						x += dx * 2;
 					}
 					if (GetState() == KOOPAS_STATE_SHELL) {
 						vx = -vx;
 					}
-					else if (GetState() == KOOPAS_STATE_ROTATORY && nx != 0 && !(this->y + KOOPAS_BBOX_HEIGHT_SHELL - brick->y < 1.0f))
+					else if (GetState() == KOOPAS_STATE_ROTATORY && nx != 0 && !(this->y + KOOPAS_BBOX_HEIGHT_SHELL - brick->y < 1.5f))
 					{
 						vx = -vx;
 					}
@@ -243,6 +243,9 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				{
 					if (nx != 0 && GetState() == KOOPAS_STATE_WALKING)
 					{
+						vx = -vx;
+					}
+					else if (GetState() == KOOPAS_STATE_ROTATORY) {
 						vx = -vx;
 					}
 				}

@@ -1,6 +1,6 @@
 #include "Tree.h"
 
-void Tree::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
+void Tree::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* colliable_objects)
 {
 }
 

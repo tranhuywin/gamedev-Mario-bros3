@@ -10,7 +10,7 @@ class Tail : public CGameObject
 public:
 	bool IsKilling;
 	Tail();
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
+	virtual void Update(ULONGLONG dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Render();
 	void Attack(float x, float y, bool IsKilling,int CurrentFrame);
