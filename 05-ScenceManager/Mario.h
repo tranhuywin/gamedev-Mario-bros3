@@ -4,6 +4,7 @@
 #include "FireBullet.h"
 #include "Tail.h"
 #include "Koopas.h"
+//#include "MicroGoomba.h"
 
 #define MARIO_WALKING_SPEED				0.0005f
 #define MARIO_MAX_SPEED_RUNNING			0.225f 
@@ -151,6 +152,7 @@
 #define MARIO_UNTOUCHABLE_TIME			5000
 #define MARIO_FLY_TIME					500
 #define MARIO_SLIP_TIME					1000
+#define MARIO_PRESS_LEFT_RIGHT_TIME		1000
 //#define MARIO_FIRE_ATTACK_TIME			200
 class CMario : public CGameObject
 {
@@ -171,11 +173,11 @@ class CMario : public CGameObject
 	ULONGLONG Slip_start;
 	ULONGLONG FireAttack_start;
 	ULONGLONG Kick_start;
+	ULONGLONG PressKeyLeft_1 = 0, PressKeyLeft_2 = 0, PressKeyLeft_3 = 0;
+	ULONGLONG PressKeyRight_1 = 0, PressKeyRight_2 = 0, PressKeyRight_3 = 0;
 
-	float start_x;			// initial position of Mario at scene
-	float start_y; 
-	float XHolding;
-	float YHolding;
+	float start_x, start_y;			// initial position of Mario at scene
+	float XHolding, YHolding;
 	float mdy = 0;
 
 	bool IsRendering;
@@ -194,14 +196,14 @@ class CMario : public CGameObject
 	FireBullet* firebullet_2 = new FireBullet();
 	CKoopas* Shell;
 	Tail* TailofRaccoon = new Tail();
-	
+
 public: 
 	bool OnPlatform;
 	bool IsFlying;
 	bool IsLimitRunning;
 	bool IsLimitFlying;
 	bool Iskilling;
-	bool IsRunning, IsDropping;
+	bool IsRunning, IsDropping, isSticked;//, unStick = false;
 	bool isJumped;
 	bool IsWaitingTeleport;
 	bool StartTeleport;
@@ -220,5 +222,8 @@ public:
 	void StartSlip() { Slip = 1; Slip_start = GetTickCount64(); }
 	void StartFireAttack() { FireAttack = 1; FireAttack_start = GetTickCount64(); }
 	void Reset();
+	void resetTimePressKey() {
+		PressKeyLeft_1 = 0; PressKeyLeft_2 = 0; PressKeyLeft_3 = 0; PressKeyRight_1 = 0; PressKeyRight_2 = 0; PressKeyRight_3 = 0;
+	};
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 };

@@ -187,7 +187,7 @@
 30002	32	11	48	27	10
 #die
 30003	54	18	70	27	10
-###### para goomba ############
+###### RED para goomba ############
 #walking Wing
 30011	164	40	184	59	11
 30012	188	40	208	59	11
@@ -198,6 +198,16 @@
 30017	204	70	220	86	11
 #die
 30020	163	77	179	86	11
+######  BROWN PARA GOOMBA ########
+#walking Wing
+30030	155	6	175	30	11
+30031	179	6	199	30	11
+30032	205	6	225	30	11
+30033	229	6	249	30	11
+#micro goomba
+30035	142	21	150	30	11
+#walking	30001	30002
+#die	30003
 #brick with question mark animation
 40001	300	117	316	133	20
 40002	318	117	334	133	20
@@ -610,7 +620,7 @@ bend over left Big
 ############    Tube ###########
 703	70006	100
 704	70007	100
-# ==== PARA GOOMBA  =========
+# ==== RED PARA GOOMBA  =========
 #walking wing big
 705	30013	100	30014	100
 # small
@@ -619,6 +629,13 @@ bend over left Big
 707	30016	100	30017	100
 #die
 708	30020	200
+#####   BROWN PARA GOOMBA   ###########
+#wing big
+730	30032	100	30033	100
+#small
+731	30030	100	30031	10	30032	100	30033	100
+#micro
+732	30035	100
 #####		Bumerang	############
 #right
 710	60110	100	60111	100
@@ -714,7 +731,7 @@ bend over left Big
 # QUESTION MARK BRICK 
 22	602
 # GOOMBA
-3	701	702	705	706	707	708
+3	701	702	705	706	707	708	730	731	732
 # FIRE BULLET
 4	800	801
 #line
@@ -750,10 +767,10 @@ bend over left Big
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 4 = fire bullets, 5 = Ground, 7 = tube, 8 = question brick
 #tube
 7	128	144	10	64	1
-# MARIO
+# MARIO	xtele ytele
 # start
-0	100	284	1	2104.0	63.0
-#0	600	300	1
+#0	1900	284	1	2104.0	63.0
+0	100	300	1	2104.0	63.0
 #Ground
 5	0	416	1	1280
 5	1296	416	1	175
@@ -841,6 +858,7 @@ bend over left Big
 2	1186	360	3	2
 2	1644	387	3	1
 2	1684	387	3	1
+2	1975	312	3	3
 #koopas
 3	250	387	7	1
 3	625	268	7	0

@@ -190,7 +190,7 @@ void CKoopas::Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects)
 			if (dynamic_cast<Line*>(e->obj))
 			{
 				Line* line = dynamic_cast<Line*>(e->obj);
-				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED) {
+				if (TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_RED|| TypeKoopas == KOOPAS_TYPE_KOOPA_TROOPA_GREEN) {
 
 					float XLeftLine = line->GetX_Left();
 					if (vx < 0 && x < XLeftLine && state == KOOPAS_STATE_WALKING) {
@@ -275,10 +275,15 @@ void CKoopas::Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects)
 			else if (dynamic_cast<CKoopas*>(e->obj)) {
 				if (GetState() == KOOPAS_STATE_ROTATORY)
 				{
-					CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
-					//vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
-					koopas->SetState(KOOPAS_STATE_DIE);
-
+					CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);					
+					if (koopas->TypeKoopas == KOOPAS_TYPE_KOOPA_PARATROOPA_GREEN)
+					{
+						vy = -KOOPAS_DIE_DEFLECT_SPEED * dt;
+						koopas->y -= 1.0f;
+						koopas->TypeKoopas = KOOPAS_TYPE_KOOPA_TROOPA_GREEN;
+					}
+					else
+						koopas->SetState(KOOPAS_STATE_DIE);
 				}
 			}
 			else if (dynamic_cast<BoomerangOfBrother*>(e->obj))
@@ -292,6 +297,8 @@ void CKoopas::Update(ULONGLONG dt, vector<LPGAMEOBJECT> *coObjects)
 				{
 					Brothers* brothers = dynamic_cast<Brothers*>(e->obj);
 					brothers->SetState(BROTHER_STATE_DIE);
+					vx = vxPre;
+					x -= min_tx * dx + nx * 0.4f;
 				}
 			}
 		}
@@ -403,7 +410,7 @@ void CKoopas::SetState(int state)
 		vy = 0;
 		StartSleep();
 		if (effect == NULL) {
-			effect = new Effect(this->x, this->y, 80100);
+			effect = new Effect(this->x, this->y, CGame::GetInstance()->GetSpriteEffect() + EFFECT_100);
 			int CurrentScore = CGame::GetInstance()->GetScore();
 			CGame::GetInstance()->SetScore(CurrentScore + 100);
 		}

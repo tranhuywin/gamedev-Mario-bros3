@@ -22,7 +22,7 @@ using namespace std;
 #define SCENCE_WORD_MAP_1_1		2
 #define SCENCE_WORD_MAP_4		3
 #define SCENCE_WORD_MAP_4_1		4
-//#define SCREEN_WIDTH 1000.0f
+
 class CGame
 {
 	static CGame * __instance;
@@ -53,6 +53,7 @@ class CGame
 	int Time = TIME;
 	int Level = 1;
 	int Card_1 = -1, Card_2 =-1, Card_3 = -1;
+	int spriteEffect;
 	bool ReturnWorld;
 	unordered_map<int, LPSCENE> scenes;
 	int current_scene; 
@@ -84,6 +85,8 @@ public:
 	void SetCard_3(int Card_3) { this->Card_3 = Card_3; };
 	int GetLevel() { return Level; };
 	void SetLevel(int level) { this->Level = level; };
+	int GetSpriteEffect() { return spriteEffect; };
+	void SetSpriteEffect(int sprite) { this->spriteEffect = sprite; };
 	int Getcurrent_scene() { return current_scene; }
 	int IsKeyDown(int KeyCode);
 	int IsKeyUp(int KeyCode);

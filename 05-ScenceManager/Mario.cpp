@@ -146,7 +146,11 @@ void CMario::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 			IsSlowDropping = false;
 		}
 	}
-	if (YHolding - y > MARIO_DISTANCE_JUMP)
+	float distanceJump = MARIO_DISTANCE_JUMP;
+	if (isSticked)
+		distanceJump = MARIO_DISTANCE_JUMP / 4;
+
+	if (YHolding - y > distanceJump)
 	{
 		AllowJump = false;
 		IsDropping = true;
@@ -175,6 +179,7 @@ void CMario::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 			vx = 0;
 		}
 	}
+
 	if (IsCatching && Shell->GetState() != KOOPAS_STATE_WALKING)
 	{
 		Shell->BeCatch(this, this->y + MARIO_RACCOON_BBOX_HEIGHT / 4);
@@ -209,6 +214,7 @@ void CMario::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 			Shell->vx = KOOPAS_ROTATORY_SPEED * nx;
 			Shell->IsCatching = false;
 		}
+
 	if (KickShell && GetTickCount64() - Kick_start > animation_set->at(ani)->GettotalFrameTime())
 		KickShell = false;
 	if (Kill && GetTickCount64() - Kill_start > animation_set->at(ani)->GettotalFrameTime())
@@ -316,7 +322,7 @@ void CMario::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 						vy = -MARIO_JUMP_DEFLECT_SPEED;
 					if (goomba->TypeGoomba == GOOMBA_NORMAL)
 						goomba->SetState(GOOMBA_STATE_DIE);
-					else if (goomba->TypeGoomba == PARA_GOOMBA)
+					else if (goomba->TypeGoomba == RED_PARA_GOOMBA)
 					{
 						if (goomba->LevelParaGoomba == 0)
 						{
@@ -327,6 +333,10 @@ void CMario::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 							goomba->SetState(GOOMBA_STATE_WALKING);
 							goomba->LevelParaGoomba--;
 						}
+					}
+					else if (goomba->TypeGoomba == BROWN_PARA_GOOMBA)
+					{
+						goomba->TypeGoomba = GOOMBA_NORMAL;
 					}
 
 				}
@@ -666,6 +676,16 @@ void CMario::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 						isDeflectRight = true;
 					}
 				}
+			}
+			else if (dynamic_cast<MicroGoomba*>(e->obj))
+			{
+				MicroGoomba* microGoomba = dynamic_cast<MicroGoomba*>(e->obj);
+				x -= min_tx * dx + nx * 0.4f;
+				y -= min_ty * dy + ny * 0.4f;
+				vx = vxPre; vy = vyPre;
+				BBox = false;
+				microGoomba->SetState(MICRO_GOOMBA_STATE_STICK_TO_MARIO);
+				isSticked = true;
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
@@ -1197,6 +1217,24 @@ void CMario::SetState(int state)
 		if (IsRunning && vx < (MARIO_MAX_SPEED_RUNNING) && !IsFlying && !IsLimitRunning)
 			vx += MARIO_VY_ASCENDING_RUN * dt;
 			nx = 1;
+
+		if (isSticked)
+		{
+			if (PressKeyRight_1 == 0)
+				PressKeyRight_1 = GetTickCount64();
+			else if (PressKeyRight_2 == 0 && PressKeyLeft_1 != 0)
+			{
+				PressKeyRight_2 = GetTickCount64();
+				if (GetTickCount64() - PressKeyLeft_1 > MARIO_PRESS_LEFT_RIGHT_TIME)
+					resetTimePressKey();
+			}
+			else if (PressKeyRight_3 == 0 && PressKeyLeft_2 != 0)
+			{
+				PressKeyRight_3 = GetTickCount64();
+				if (GetTickCount64() - PressKeyLeft_2 > MARIO_PRESS_LEFT_RIGHT_TIME)
+					resetTimePressKey();
+			}
+		}
 		break;
 	case MARIO_STATE_WALKING_LEFT: 
 		if (!HaveInertia)
@@ -1213,6 +1251,34 @@ void CMario::SetState(int state)
 		if (IsRunning && vx != -(MARIO_MAX_SPEED_RUNNING) && !IsFlying && !IsLimitRunning)
 			vx -= MARIO_VY_ASCENDING_RUN * dt;
 			nx = -1;
+		
+		if (isSticked)
+		{
+			if (PressKeyLeft_1 == 0 && PressKeyRight_1 != 0)
+			{
+				PressKeyLeft_1 = GetTickCount64();
+				if (GetTickCount64() - PressKeyRight_1 > MARIO_PRESS_LEFT_RIGHT_TIME)
+					resetTimePressKey();
+			}
+			else if (PressKeyLeft_2 == 0 && PressKeyRight_2 != 0)
+			{
+				PressKeyLeft_2 = GetTickCount64();
+				if (GetTickCount64() - PressKeyRight_2 > MARIO_PRESS_LEFT_RIGHT_TIME)
+					resetTimePressKey();
+			}
+			else if (PressKeyLeft_3 == 0 && PressKeyRight_3 != 0)
+			{
+				PressKeyLeft_3 = GetTickCount64();
+				if (GetTickCount64() - PressKeyRight_3 > MARIO_PRESS_LEFT_RIGHT_TIME)
+					resetTimePressKey();
+				else
+				{
+					isSticked = false;
+					resetTimePressKey();
+				}
+				
+			}
+		}
 		break;
 	case MARIO_STATE_JUMP:
 		if (OnPlatform && !IsJumping)						// check mario on a platform

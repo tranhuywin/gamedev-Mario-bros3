@@ -172,7 +172,11 @@ void CPlayScene::_ParseSection_TITLE_MAP(string line)
 void CPlayScene::_ParseSection_EFFECT(string line) {
 	vector<string> tokens = split(line);
 	if (tokens.size() < 1) return;
-	SpriteEffectStart = atoi(tokens[0].c_str());
+	{
+		SpriteEffectStart = atoi(tokens[0].c_str()); 
+		CGame::GetInstance()->SetSpriteEffect(SpriteEffectStart);
+	}
+
 }
 void CPlayScene::_ParseSection_STATUS_BAR(string line) {
 	vector<string> tokens = split(line);
@@ -317,7 +321,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		case OBJECT_TYPE_GOOMBA:
 		{
 			int TypeGoomba = atoi(tokens[4].c_str());
-			obj = new CGoomba(TypeGoomba);
+			if (TypeGoomba == BROWN_PARA_GOOMBA)
+				obj = new CGoomba(TypeGoomba, player);
+			else
+				obj = new CGoomba(TypeGoomba);
 		}break;
 		case OBJECT_TYPE_FIRE_PIRANHA_PLANT:
 		{

@@ -81,7 +81,7 @@ void FireBullet::Update(ULONGLONG dt, vector<LPGAMEOBJECT>* coObjects)
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				if(goomba->TypeGoomba == GOOMBA_NORMAL)
 					goomba->SetState(GOOMBA_STATE_DIE);
-				else if (goomba->TypeGoomba == PARA_GOOMBA)
+				else if (goomba->TypeGoomba == RED_PARA_GOOMBA)
 				{
 					if (goomba->LevelParaGoomba == 1)
 					{
